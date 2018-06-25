@@ -1,0 +1,2602 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"main.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	pxPort:
+  21 0000 00000000 		.space	4
+  22              		.global	gatekeeper
+  23              		.align	2
+  24              		.type	gatekeeper, %object
+  25              		.size	gatekeeper, 4
+  26              	gatekeeper:
+  27 0004 00000000 		.space	4
+  28              		.global	queue_handle
+  29              		.align	2
+  30              		.type	queue_handle, %object
+  31              		.size	queue_handle, 4
+  32              	queue_handle:
+  33 0008 00000000 		.space	4
+  34              		.comm	rx_receive,1,1
+  35              		.comm	buffer,64,4
+  36              		.comm	left_wheel,36,4
+  37              		.comm	right_wheel,36,4
+  38              		.comm	k,24,8
+  39              		.section	.rodata
+  40              		.align	2
+  41              	.LC0:
+  42 0000 0A3D3D3D 		.ascii	"\012=== NEW RUN ===\012\012\000"
+  42      204E4557 
+  42      2052554E 
+  42      203D3D3D 
+  42      0A0A00
+  43 0013 00       		.align	2
+  44              	.LC1:
+  45 0014 696E6974 		.ascii	"initialise the PID\000"
+  45      69616C69 
+  45      73652074 
+  45      68652050 
+  45      494400
+  46 0027 00       		.align	2
+  47              	.LC2:
+  48 0028 77616974 		.ascii	"waiting for a serial bus to come in\000"
+  48      696E6720 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 2
+
+
+  48      666F7220 
+  48      61207365 
+  48      7269616C 
+  49              		.section	.text.main,"ax",%progbits
+  50              		.align	2
+  51              		.global	main
+  52              		.thumb
+  53              		.thumb_func
+  54              		.type	main, %function
+  55              	main:
+  56              	.LFB68:
+  57              		.file 1 "main.c"
+   1:main.c        **** /*
+   2:main.c        ****  * FreeRTOS Kernel V10.0.1
+   3:main.c        ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:main.c        ****  *
+   5:main.c        ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:main.c        ****  * this software and associated documentation files (the "Software"), to deal in
+   7:main.c        ****  * the Software without restriction, including without limitation the rights to
+   8:main.c        ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:main.c        ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:main.c        ****  * subject to the following conditions:
+  11:main.c        ****  *
+  12:main.c        ****  * The above copyright notice and this permission notice shall be included in all
+  13:main.c        ****  * copies or substantial portions of the Software.
+  14:main.c        ****  *
+  15:main.c        ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:main.c        ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:main.c        ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:main.c        ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:main.c        ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:main.c        ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:main.c        ****  *
+  22:main.c        ****  * http://www.FreeRTOS.org
+  23:main.c        ****  * http://aws.amazon.com/freertos
+  24:main.c        ****  *
+  25:main.c        ****  * 1 tab == 4 spaces!
+  26:main.c        ****  */
+  27:main.c        **** 
+  28:main.c        **** /* Standard includes */
+  29:main.c        **** #include <device.h>
+  30:main.c        **** #include <stdio.h>
+  31:main.c        **** #include <stdint.h>
+  32:main.c        **** 
+  33:main.c        **** /* FreeRTOS includes */
+  34:main.c        **** #include "FreeRTOS.h"
+  35:main.c        **** #include "task.h"
+  36:main.c        **** #include "semphr.h"
+  37:main.c        **** #include "serial.h"
+  38:main.c        **** 
+  39:main.c        **** /* My headers */
+  40:main.c        **** #include "movement.h"
+  41:main.c        **** 
+  42:main.c        **** /* The time between cycles of the 'check' functionality (defined within the
+  43:main.c        **** tick hook. */
+  44:main.c        **** #define mainCHECK_DELAY						( ( TickType_t ) 5000 / portTICK_PERIOD_MS )
+  45:main.c        **** #define mainCOM_LED							( 3 )
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 3
+
+
+  46:main.c        **** 
+  47:main.c        **** /* The number of nano seconds between each processor clock. */
+  48:main.c        **** #define mainNS_PER_CLOCK ( ( unsigned long ) ( ( 1.0 / ( double ) configCPU_CLOCK_HZ ) * 1000000000
+  49:main.c        **** 
+  50:main.c        **** /* Task priorities. */
+  51:main.c        **** #define mainSENDER_PRIORITY       			( tskIDLE_PRIORITY )
+  52:main.c        **** #define mainRECEIVER_PRIORITY        		( tskIDLE_PRIORITY )
+  53:main.c        **** 
+  54:main.c        **** #define comRX_BLOCK_TIME			( ( TickType_t ) 0xffff )
+  55:main.c        **** 
+  56:main.c        **** 
+  57:main.c        **** void PID_initialise( void *p );
+  58:main.c        **** void receive_data( void *p );
+  59:main.c        **** static void prvHardwareSetup( void );
+  60:main.c        **** 
+  61:main.c        **** 
+  62:main.c        **** static xComPortHandle pxPort = NULL;
+  63:main.c        **** xSemaphoreHandle gatekeeper = 0;
+  64:main.c        **** xQueueHandle queue_handle = NULL;
+  65:main.c        **** 
+  66:main.c        **** 
+  67:main.c        **** /* global variables */
+  68:main.c        **** signed char rx_receive;
+  69:main.c        **** unsigned char buffer[64];
+  70:main.c        **** 
+  71:main.c        **** wheel_data left_wheel;
+  72:main.c        **** wheel_data right_wheel;
+  73:main.c        **** PID_data k;
+  74:main.c        **** 
+  75:main.c        **** // START OF FUNCTIONS
+  76:main.c        **** int main( void ) {
+  58              		.loc 1 76 0
+  59              		.cfi_startproc
+  60              		@ args = 0, pretend = 0, frame = 256
+  61              		@ frame_needed = 1, uses_anonymous_args = 0
+  62 0000 B0B5     		push	{r4, r5, r7, lr}
+  63              		.cfi_def_cfa_offset 16
+  64              		.cfi_offset 4, -16
+  65              		.cfi_offset 5, -12
+  66              		.cfi_offset 7, -8
+  67              		.cfi_offset 14, -4
+  68 0002 C2B0     		sub	sp, sp, #264
+  69              		.cfi_def_cfa_offset 280
+  70 0004 02AF     		add	r7, sp, #8
+  71              		.cfi_def_cfa 7, 272
+  77:main.c        **** 	prvHardwareSetup(); 
+  72              		.loc 1 77 0
+  73 0006 FFF7FEFF 		bl	prvHardwareSetup
+  78:main.c        ****     
+  79:main.c        ****     const signed char * run[64];
+  80:main.c        ****     sprintf((char *) run, "\n=== NEW RUN ===\n\n");
+  74              		.loc 1 80 0
+  75 000a 3B46     		mov	r3, r7
+  76 000c 184A     		ldr	r2, .L3
+  77 000e 1C46     		mov	r4, r3
+  78 0010 1546     		mov	r5, r2
+  79 0012 0FCD     		ldmia	r5!, {r0, r1, r2, r3}
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 4
+
+
+  80 0014 0FC4     		stmia	r4!, {r0, r1, r2, r3}
+  81 0016 2B68     		ldr	r3, [r5]
+  82 0018 1A46     		mov	r2, r3	@ movhi
+  83 001a 2280     		strh	r2, [r4]	@ movhi
+  84 001c 0234     		adds	r4, r4, #2
+  85 001e 1B0C     		lsrs	r3, r3, #16
+  86 0020 2370     		strb	r3, [r4]
+  81:main.c        ****     vSerialPutString(pxPort, (const signed char *) run, 64);
+  87              		.loc 1 81 0
+  88 0022 144B     		ldr	r3, .L3+4
+  89 0024 1A68     		ldr	r2, [r3]
+  90 0026 3B46     		mov	r3, r7
+  91 0028 1046     		mov	r0, r2
+  92 002a 1946     		mov	r1, r3
+  93 002c 4022     		movs	r2, #64
+  94 002e FFF7FEFF 		bl	vSerialPutString
+  82:main.c        ****     
+  83:main.c        ****     gatekeeper = xSemaphoreCreateMutex();
+  95              		.loc 1 83 0
+  96 0032 0120     		movs	r0, #1
+  97 0034 FFF7FEFF 		bl	xQueueCreateMutex
+  98 0038 0246     		mov	r2, r0
+  99 003a 0F4B     		ldr	r3, .L3+8
+ 100 003c 1A60     		str	r2, [r3]
+  84:main.c        ****     
+  85:main.c        ****     xTaskCreate( PID_initialise, (const char*) "initialise the PID", 1024, NULL, 2, NULL );
+ 101              		.loc 1 85 0
+ 102 003e 0223     		movs	r3, #2
+ 103 0040 0093     		str	r3, [sp]
+ 104 0042 0023     		movs	r3, #0
+ 105 0044 0193     		str	r3, [sp, #4]
+ 106 0046 0D48     		ldr	r0, .L3+12
+ 107 0048 0D49     		ldr	r1, .L3+16
+ 108 004a 4FF48062 		mov	r2, #1024
+ 109 004e 0023     		movs	r3, #0
+ 110 0050 FFF7FEFF 		bl	xTaskCreate
+  86:main.c        ****     xTaskCreate( receive_data, (const char*) "waiting for a serial bus to come in", 1024, NULL, 1, 
+ 111              		.loc 1 86 0
+ 112 0054 0123     		movs	r3, #1
+ 113 0056 0093     		str	r3, [sp]
+ 114 0058 0023     		movs	r3, #0
+ 115 005a 0193     		str	r3, [sp, #4]
+ 116 005c 0948     		ldr	r0, .L3+20
+ 117 005e 0A49     		ldr	r1, .L3+24
+ 118 0060 4FF48062 		mov	r2, #1024
+ 119 0064 0023     		movs	r3, #0
+ 120 0066 FFF7FEFF 		bl	xTaskCreate
+  87:main.c        ****     
+  88:main.c        **** 	vTaskStartScheduler();
+ 121              		.loc 1 88 0
+ 122 006a FFF7FEFF 		bl	vTaskStartScheduler
+ 123              	.L2:
+  89:main.c        **** 
+  90:main.c        **** 	for( ;; );  // You won't actually reach this for loop.
+ 124              		.loc 1 90 0 discriminator 1
+ 125 006e FEE7     		b	.L2
+ 126              	.L4:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 5
+
+
+ 127              		.align	2
+ 128              	.L3:
+ 129 0070 00000000 		.word	.LC0
+ 130 0074 00000000 		.word	pxPort
+ 131 0078 00000000 		.word	gatekeeper
+ 132 007c 00000000 		.word	PID_initialise
+ 133 0080 14000000 		.word	.LC1
+ 134 0084 00000000 		.word	receive_data
+ 135 0088 28000000 		.word	.LC2
+ 136              		.cfi_endproc
+ 137              	.LFE68:
+ 138              		.size	main, .-main
+ 139              		.section	.rodata
+ 140              		.align	2
+ 141              	.LC3:
+ 142 004c 62756666 		.ascii	"buffer read as %s\012\000"
+ 142      65722072 
+ 142      65616420 
+ 142      61732025 
+ 142      730A00
+ 143 005f 00       		.align	2
+ 144              	.LC4:
+ 145 0060 6C656674 		.ascii	"left inc: %i\012right inc: %i\000"
+ 145      20696E63 
+ 145      3A202569 
+ 145      0A726967 
+ 145      68742069 
+ 146              		.section	.text.receive_data,"ax",%progbits
+ 147              		.align	2
+ 148              		.global	receive_data
+ 149              		.thumb
+ 150              		.thumb_func
+ 151              		.type	receive_data, %function
+ 152              	receive_data:
+ 153              	.LFB69:
+  91:main.c        **** }
+  92:main.c        **** 
+  93:main.c        **** void receive_data( void *p ) {
+ 154              		.loc 1 93 0
+ 155              		.cfi_startproc
+ 156              		@ args = 0, pretend = 0, frame = 280
+ 157              		@ frame_needed = 1, uses_anonymous_args = 0
+ 158 0000 80B5     		push	{r7, lr}
+ 159              		.cfi_def_cfa_offset 8
+ 160              		.cfi_offset 7, -8
+ 161              		.cfi_offset 14, -4
+ 162 0002 C6B0     		sub	sp, sp, #280
+ 163              		.cfi_def_cfa_offset 288
+ 164 0004 00AF     		add	r7, sp, #0
+ 165              		.cfi_def_cfa_register 7
+ 166 0006 3B1D     		adds	r3, r7, #4
+ 167 0008 1860     		str	r0, [r3]
+  94:main.c        ****     
+  95:main.c        ****     p = NULL;
+ 168              		.loc 1 95 0
+ 169 000a 3B1D     		adds	r3, r7, #4
+ 170 000c 0022     		movs	r2, #0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 6
+
+
+ 171 000e 1A60     		str	r2, [r3]
+  96:main.c        ****     
+  97:main.c        ****     const signed char * local_write[64];
+  98:main.c        ****     int i = 0;
+ 172              		.loc 1 98 0
+ 173 0010 0023     		movs	r3, #0
+ 174 0012 C7F81431 		str	r3, [r7, #276]
+  99:main.c        ****     int go = 0;
+ 175              		.loc 1 99 0
+ 176 0016 0023     		movs	r3, #0
+ 177 0018 C7F81031 		str	r3, [r7, #272]
+ 100:main.c        ****     signed char type = 0;
+ 178              		.loc 1 100 0
+ 179 001c 0023     		movs	r3, #0
+ 180 001e 87F80F31 		strb	r3, [r7, #271]
+ 181              	.L14:
+ 101:main.c        ****     
+ 102:main.c        ****     while(1) {
+ 103:main.c        ****         if (pdTRUE == xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME)) {
+ 182              		.loc 1 103 0
+ 183 0022 534B     		ldr	r3, .L15
+ 184 0024 1B68     		ldr	r3, [r3]
+ 185 0026 1846     		mov	r0, r3
+ 186 0028 5249     		ldr	r1, .L15+4
+ 187 002a 4FF6FF72 		movw	r2, #65535
+ 188 002e FFF7FEFF 		bl	xSerialGetChar
+ 189 0032 0346     		mov	r3, r0
+ 190 0034 012B     		cmp	r3, #1
+ 191 0036 40F09A80 		bne	.L6
+ 104:main.c        ****             go = 1;
+ 192              		.loc 1 104 0
+ 193 003a 0123     		movs	r3, #1
+ 194 003c C7F81031 		str	r3, [r7, #272]
+ 105:main.c        ****             if(xSemaphoreTake(gatekeeper, 50000)) {
+ 195              		.loc 1 105 0
+ 196 0040 4D4B     		ldr	r3, .L15+8
+ 197 0042 1B68     		ldr	r3, [r3]
+ 198 0044 1846     		mov	r0, r3
+ 199 0046 4CF25031 		movw	r1, #50000
+ 200 004a FFF7FEFF 		bl	xQueueSemaphoreTake
+ 201 004e 0346     		mov	r3, r0
+ 202 0050 002B     		cmp	r3, #0
+ 203 0052 00F08C80 		beq	.L6
+ 106:main.c        ****                 type = rx_receive;
+ 204              		.loc 1 106 0
+ 205 0056 474B     		ldr	r3, .L15+4
+ 206 0058 1B78     		ldrb	r3, [r3]
+ 207 005a 87F80F31 		strb	r3, [r7, #271]
+ 107:main.c        ****                 while (go) { 
+ 208              		.loc 1 107 0
+ 209 005e 7AE0     		b	.L7
+ 210              	.L13:
+ 108:main.c        ****                     xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME);
+ 211              		.loc 1 108 0
+ 212 0060 434B     		ldr	r3, .L15
+ 213 0062 1B68     		ldr	r3, [r3]
+ 214 0064 1846     		mov	r0, r3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 7
+
+
+ 215 0066 4349     		ldr	r1, .L15+4
+ 216 0068 4FF6FF72 		movw	r2, #65535
+ 217 006c FFF7FEFF 		bl	xSerialGetChar
+ 109:main.c        ****                     if ( i<8  && type == '1') {
+ 218              		.loc 1 109 0
+ 219 0070 D7F81431 		ldr	r3, [r7, #276]
+ 220 0074 072B     		cmp	r3, #7
+ 221 0076 12DC     		bgt	.L8
+ 222              		.loc 1 109 0 is_stmt 0 discriminator 1
+ 223 0078 97F90F31 		ldrsb	r3, [r7, #271]
+ 224 007c 312B     		cmp	r3, #49
+ 225 007e 0ED1     		bne	.L8
+ 110:main.c        ****                         buffer[i] = rx_receive;
+ 226              		.loc 1 110 0 is_stmt 1
+ 227 0080 3C4B     		ldr	r3, .L15+4
+ 228 0082 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 229 0084 D9B2     		uxtb	r1, r3
+ 230 0086 3D4A     		ldr	r2, .L15+12
+ 231 0088 D7F81431 		ldr	r3, [r7, #276]
+ 232 008c 1344     		add	r3, r3, r2
+ 233 008e 0A46     		mov	r2, r1
+ 234 0090 1A70     		strb	r2, [r3]
+ 111:main.c        ****                         i++;     
+ 235              		.loc 1 111 0
+ 236 0092 D7F81431 		ldr	r3, [r7, #276]
+ 237 0096 0133     		adds	r3, r3, #1
+ 238 0098 C7F81431 		str	r3, [r7, #276]
+ 239 009c 5BE0     		b	.L7
+ 240              	.L8:
+ 112:main.c        ****                     }
+ 113:main.c        ****                     else if( i<4 && type == '2') {
+ 241              		.loc 1 113 0
+ 242 009e D7F81431 		ldr	r3, [r7, #276]
+ 243 00a2 032B     		cmp	r3, #3
+ 244 00a4 12DC     		bgt	.L9
+ 245              		.loc 1 113 0 is_stmt 0 discriminator 1
+ 246 00a6 97F90F31 		ldrsb	r3, [r7, #271]
+ 247 00aa 322B     		cmp	r3, #50
+ 248 00ac 0ED1     		bne	.L9
+ 114:main.c        ****                         buffer[i] = rx_receive;
+ 249              		.loc 1 114 0 is_stmt 1
+ 250 00ae 314B     		ldr	r3, .L15+4
+ 251 00b0 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 252 00b2 D9B2     		uxtb	r1, r3
+ 253 00b4 314A     		ldr	r2, .L15+12
+ 254 00b6 D7F81431 		ldr	r3, [r7, #276]
+ 255 00ba 1344     		add	r3, r3, r2
+ 256 00bc 0A46     		mov	r2, r1
+ 257 00be 1A70     		strb	r2, [r3]
+ 115:main.c        ****                         i++;    
+ 258              		.loc 1 115 0
+ 259 00c0 D7F81431 		ldr	r3, [r7, #276]
+ 260 00c4 0133     		adds	r3, r3, #1
+ 261 00c6 C7F81431 		str	r3, [r7, #276]
+ 262 00ca 44E0     		b	.L7
+ 263              	.L9:
+ 116:main.c        ****                     }
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 8
+
+
+ 117:main.c        ****                     else {
+ 118:main.c        ****                         
+ 119:main.c        ****                         sprintf((char *) local_write, "buffer read as %s\n", buffer);
+ 264              		.loc 1 119 0
+ 265 00cc 07F10C03 		add	r3, r7, #12
+ 266 00d0 1846     		mov	r0, r3
+ 267 00d2 2B49     		ldr	r1, .L15+16
+ 268 00d4 294A     		ldr	r2, .L15+12
+ 269 00d6 FFF7FEFF 		bl	sprintf
+ 120:main.c        ****                         vSerialPutString(pxPort, (const signed char *) local_write, 64);
+ 270              		.loc 1 120 0
+ 271 00da 254B     		ldr	r3, .L15
+ 272 00dc 1A68     		ldr	r2, [r3]
+ 273 00de 07F10C03 		add	r3, r7, #12
+ 274 00e2 1046     		mov	r0, r2
+ 275 00e4 1946     		mov	r1, r3
+ 276 00e6 4022     		movs	r2, #64
+ 277 00e8 FFF7FEFF 		bl	vSerialPutString
+ 121:main.c        ****                         if (type == '1'){
+ 278              		.loc 1 121 0
+ 279 00ec 97F90F31 		ldrsb	r3, [r7, #271]
+ 280 00f0 312B     		cmp	r3, #49
+ 281 00f2 17D1     		bne	.L10
+ 122:main.c        ****                             update_inc( &left_wheel, &right_wheel, buffer);
+ 282              		.loc 1 122 0
+ 283 00f4 2348     		ldr	r0, .L15+20
+ 284 00f6 2449     		ldr	r1, .L15+24
+ 285 00f8 204A     		ldr	r2, .L15+12
+ 286 00fa FFF7FEFF 		bl	update_inc
+ 123:main.c        ****                             sprintf((char *) local_write, "left inc: %i\nright inc: %i", left_wheel
+ 287              		.loc 1 123 0
+ 288 00fe 214B     		ldr	r3, .L15+20
+ 289 0100 9A69     		ldr	r2, [r3, #24]
+ 290 0102 214B     		ldr	r3, .L15+24
+ 291 0104 9B69     		ldr	r3, [r3, #24]
+ 292 0106 07F10C01 		add	r1, r7, #12
+ 293 010a 0846     		mov	r0, r1
+ 294 010c 1F49     		ldr	r1, .L15+28
+ 295 010e FFF7FEFF 		bl	sprintf
+ 124:main.c        ****                             vSerialPutString(pxPort, (const signed char *) local_write, 64);
+ 296              		.loc 1 124 0
+ 297 0112 174B     		ldr	r3, .L15
+ 298 0114 1A68     		ldr	r2, [r3]
+ 299 0116 07F10C03 		add	r3, r7, #12
+ 300 011a 1046     		mov	r0, r2
+ 301 011c 1946     		mov	r1, r3
+ 302 011e 4022     		movs	r2, #64
+ 303 0120 FFF7FEFF 		bl	vSerialPutString
+ 304              	.L10:
+ 125:main.c        ****                             
+ 126:main.c        ****                         }
+ 127:main.c        ****                         
+ 128:main.c        ****                         for (i=0; i<65; i++) {
+ 305              		.loc 1 128 0
+ 306 0124 0023     		movs	r3, #0
+ 307 0126 C7F81431 		str	r3, [r7, #276]
+ 308 012a 0AE0     		b	.L11
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 9
+
+
+ 309              	.L12:
+ 129:main.c        ****                             buffer[i] = '\0';
+ 310              		.loc 1 129 0 discriminator 3
+ 311 012c 134A     		ldr	r2, .L15+12
+ 312 012e D7F81431 		ldr	r3, [r7, #276]
+ 313 0132 1344     		add	r3, r3, r2
+ 314 0134 0022     		movs	r2, #0
+ 315 0136 1A70     		strb	r2, [r3]
+ 128:main.c        ****                             buffer[i] = '\0';
+ 316              		.loc 1 128 0 discriminator 3
+ 317 0138 D7F81431 		ldr	r3, [r7, #276]
+ 318 013c 0133     		adds	r3, r3, #1
+ 319 013e C7F81431 		str	r3, [r7, #276]
+ 320              	.L11:
+ 128:main.c        ****                             buffer[i] = '\0';
+ 321              		.loc 1 128 0 is_stmt 0 discriminator 1
+ 322 0142 D7F81431 		ldr	r3, [r7, #276]
+ 323 0146 402B     		cmp	r3, #64
+ 324 0148 F0DD     		ble	.L12
+ 130:main.c        ****                         }
+ 131:main.c        ****                         go = 0;
+ 325              		.loc 1 131 0 is_stmt 1
+ 326 014a 0023     		movs	r3, #0
+ 327 014c C7F81031 		str	r3, [r7, #272]
+ 132:main.c        ****                         i = 0;                       
+ 328              		.loc 1 132 0
+ 329 0150 0023     		movs	r3, #0
+ 330 0152 C7F81431 		str	r3, [r7, #276]
+ 331              	.L7:
+ 107:main.c        ****                     xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME);
+ 332              		.loc 1 107 0
+ 333 0156 D7F81031 		ldr	r3, [r7, #272]
+ 334 015a 002B     		cmp	r3, #0
+ 335 015c 80D1     		bne	.L13
+ 133:main.c        ****                         
+ 134:main.c        ****                     }
+ 135:main.c        ****                 }
+ 136:main.c        ****                 xSemaphoreGive(gatekeeper);
+ 336              		.loc 1 136 0
+ 337 015e 064B     		ldr	r3, .L15+8
+ 338 0160 1B68     		ldr	r3, [r3]
+ 339 0162 1846     		mov	r0, r3
+ 340 0164 0021     		movs	r1, #0
+ 341 0166 0022     		movs	r2, #0
+ 342 0168 0023     		movs	r3, #0
+ 343 016a FFF7FEFF 		bl	xQueueGenericSend
+ 344              	.L6:
+ 137:main.c        ****             }
+ 138:main.c        ****         }
+ 139:main.c        ****     }
+ 345              		.loc 1 139 0
+ 346 016e 58E7     		b	.L14
+ 347              	.L16:
+ 348              		.align	2
+ 349              	.L15:
+ 350 0170 00000000 		.word	pxPort
+ 351 0174 00000000 		.word	rx_receive
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 10
+
+
+ 352 0178 00000000 		.word	gatekeeper
+ 353 017c 00000000 		.word	buffer
+ 354 0180 4C000000 		.word	.LC3
+ 355 0184 00000000 		.word	left_wheel
+ 356 0188 00000000 		.word	right_wheel
+ 357 018c 60000000 		.word	.LC4
+ 358              		.cfi_endproc
+ 359              	.LFE69:
+ 360              		.size	receive_data, .-receive_data
+ 361              		.section	.rodata
+ 362 007b 00       		.align	2
+ 363              	.LC5:
+ 364 007c 6C656674 		.ascii	"left wheel time: %li\012\000"
+ 364      20776865 
+ 364      656C2074 
+ 364      696D653A 
+ 364      20256C69 
+ 365 0092 0000     		.section	.text.PID_initialise,"ax",%progbits
+ 366              		.align	2
+ 367              		.global	PID_initialise
+ 368              		.thumb
+ 369              		.thumb_func
+ 370              		.type	PID_initialise, %function
+ 371              	PID_initialise:
+ 372              	.LFB70:
+ 140:main.c        **** }
+ 141:main.c        **** void PID_initialise( void *p ) {
+ 373              		.loc 1 141 0
+ 374              		.cfi_startproc
+ 375              		@ args = 0, pretend = 0, frame = 264
+ 376              		@ frame_needed = 1, uses_anonymous_args = 0
+ 377 0000 80B5     		push	{r7, lr}
+ 378              		.cfi_def_cfa_offset 8
+ 379              		.cfi_offset 7, -8
+ 380              		.cfi_offset 14, -4
+ 381 0002 C2B0     		sub	sp, sp, #264
+ 382              		.cfi_def_cfa_offset 272
+ 383 0004 00AF     		add	r7, sp, #0
+ 384              		.cfi_def_cfa_register 7
+ 385 0006 3B1D     		adds	r3, r7, #4
+ 386 0008 1860     		str	r0, [r3]
+ 142:main.c        ****     
+ 143:main.c        ****     p = NULL;
+ 387              		.loc 1 143 0
+ 388 000a 3B1D     		adds	r3, r7, #4
+ 389 000c 0022     		movs	r2, #0
+ 390 000e 1A60     		str	r2, [r3]
+ 144:main.c        ****         
+ 145:main.c        ****     initialise_wheel_data(&left_wheel);
+ 391              		.loc 1 145 0
+ 392 0010 2748     		ldr	r0, .L20+8
+ 393 0012 FFF7FEFF 		bl	initialise_wheel_data
+ 146:main.c        ****     initialise_wheel_data(&right_wheel);
+ 394              		.loc 1 146 0
+ 395 0016 2748     		ldr	r0, .L20+12
+ 396 0018 FFF7FEFF 		bl	initialise_wheel_data
+ 147:main.c        ****     
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 11
+
+
+ 148:main.c        ****     k.Kp = 100;
+ 397              		.loc 1 148 0
+ 398 001c 2649     		ldr	r1, .L20+16
+ 399 001e 4FF00002 		mov	r2, #0
+ 400 0022 264B     		ldr	r3, .L20+20
+ 401 0024 C1E90223 		strd	r2, [r1, #8]
+ 149:main.c        ****     k.Ki = 0.1;
+ 402              		.loc 1 149 0
+ 403 0028 2349     		ldr	r1, .L20+16
+ 404 002a 1FA3     		adr	r3, .L20
+ 405 002c D3E90023 		ldrd	r2, [r3]
+ 406 0030 C1E90023 		strd	r2, [r1]
+ 150:main.c        ****     k.Kd = 1000;
+ 407              		.loc 1 150 0
+ 408 0034 2049     		ldr	r1, .L20+16
+ 409 0036 4FF00002 		mov	r2, #0
+ 410 003a 214B     		ldr	r3, .L20+24
+ 411 003c C1E90423 		strd	r2, [r1, #16]
+ 412              	.L19:
+ 151:main.c        ****     
+ 152:main.c        ****     signed char *local_write[64];  
+ 153:main.c        ****     
+ 154:main.c        ****     while(1) {
+ 155:main.c        ****     	if(xSemaphoreTake(gatekeeper, 50000)) {              // wait until semaphore is free:
+ 413              		.loc 1 155 0
+ 414 0040 204B     		ldr	r3, .L20+28
+ 415 0042 1B68     		ldr	r3, [r3]
+ 416 0044 1846     		mov	r0, r3
+ 417 0046 4CF25031 		movw	r1, #50000
+ 418 004a FFF7FEFF 		bl	xQueueSemaphoreTake
+ 419 004e 0346     		mov	r3, r0
+ 420 0050 002B     		cmp	r3, #0
+ 421 0052 25D0     		beq	.L18
+ 156:main.c        ****             mov_update_error(&left_wheel, &right_wheel);    // update error values
+ 422              		.loc 1 156 0
+ 423 0054 1648     		ldr	r0, .L20+8
+ 424 0056 1749     		ldr	r1, .L20+12
+ 425 0058 FFF7FEFF 		bl	mov_update_error
+ 157:main.c        ****             sprintf((char *) local_write, "left wheel time: %li\n", left_wheel.time-left_wheel.time
+ 426              		.loc 1 157 0
+ 427 005c 144B     		ldr	r3, .L20+8
+ 428 005e DB69     		ldr	r3, [r3, #28]
+ 429 0060 134A     		ldr	r2, .L20+8
+ 430 0062 126A     		ldr	r2, [r2, #32]
+ 431 0064 9B1A     		subs	r3, r3, r2
+ 432 0066 07F10802 		add	r2, r7, #8
+ 433 006a 1046     		mov	r0, r2
+ 434 006c 1649     		ldr	r1, .L20+32
+ 435 006e 1A46     		mov	r2, r3
+ 436 0070 FFF7FEFF 		bl	sprintf
+ 158:main.c        ****             vSerialPutString(pxPort, (signed char *) local_write, 64);
+ 437              		.loc 1 158 0
+ 438 0074 154B     		ldr	r3, .L20+36
+ 439 0076 1A68     		ldr	r2, [r3]
+ 440 0078 07F10803 		add	r3, r7, #8
+ 441 007c 1046     		mov	r0, r2
+ 442 007e 1946     		mov	r1, r3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 12
+
+
+ 443 0080 4022     		movs	r2, #64
+ 444 0082 FFF7FEFF 		bl	vSerialPutString
+ 159:main.c        ****             mov_get_PID(&left_wheel, &right_wheel, &k);     // calculate wheel voltage from errors 
+ 445              		.loc 1 159 0
+ 446 0086 0A48     		ldr	r0, .L20+8
+ 447 0088 0A49     		ldr	r1, .L20+12
+ 448 008a 0B4A     		ldr	r2, .L20+16
+ 449 008c FFF7FEFF 		bl	mov_get_PID
+ 160:main.c        ****             /*
+ 161:main.c        ****             mov_Adj_Volt(&left_wheel, &right_wheel);        // adjust the voltage of the wheels
+ 162:main.c        ****             */
+ 163:main.c        **** 			xSemaphoreGive(gatekeeper);                     // give the semaphore back
+ 450              		.loc 1 163 0
+ 451 0090 0C4B     		ldr	r3, .L20+28
+ 452 0092 1B68     		ldr	r3, [r3]
+ 453 0094 1846     		mov	r0, r3
+ 454 0096 0021     		movs	r1, #0
+ 455 0098 0022     		movs	r2, #0
+ 456 009a 0023     		movs	r3, #0
+ 457 009c FFF7FEFF 		bl	xQueueGenericSend
+ 458              	.L18:
+ 164:main.c        ****     	}
+ 165:main.c        ****         vTaskDelay(10);                                     // wait 10ms before going again
+ 459              		.loc 1 165 0
+ 460 00a0 0A20     		movs	r0, #10
+ 461 00a2 FFF7FEFF 		bl	vTaskDelay
+ 166:main.c        ****     }
+ 462              		.loc 1 166 0
+ 463 00a6 CBE7     		b	.L19
+ 464              	.L21:
+ 465              		.align	3
+ 466              	.L20:
+ 467 00a8 9A999999 		.word	-1717986918
+ 468 00ac 9999B93F 		.word	1069128089
+ 469 00b0 00000000 		.word	left_wheel
+ 470 00b4 00000000 		.word	right_wheel
+ 471 00b8 00000000 		.word	k
+ 472 00bc 00005940 		.word	1079574528
+ 473 00c0 00408F40 		.word	1083129856
+ 474 00c4 00000000 		.word	gatekeeper
+ 475 00c8 7C000000 		.word	.LC5
+ 476 00cc 00000000 		.word	pxPort
+ 477              		.cfi_endproc
+ 478              	.LFE70:
+ 479              		.size	PID_initialise, .-PID_initialise
+ 480              		.section	.text.prvHardwareSetup,"ax",%progbits
+ 481              		.align	2
+ 482              		.thumb
+ 483              		.thumb_func
+ 484              		.type	prvHardwareSetup, %function
+ 485              	prvHardwareSetup:
+ 486              	.LFB71:
+ 167:main.c        **** }
+ 168:main.c        **** void prvHardwareSetup( void ) {
+ 487              		.loc 1 168 0
+ 488              		.cfi_startproc
+ 489              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 13
+
+
+ 490              		@ frame_needed = 1, uses_anonymous_args = 0
+ 491 0000 80B5     		push	{r7, lr}
+ 492              		.cfi_def_cfa_offset 8
+ 493              		.cfi_offset 7, -8
+ 494              		.cfi_offset 14, -4
+ 495 0002 00AF     		add	r7, sp, #0
+ 496              		.cfi_def_cfa_register 7
+ 169:main.c        **** /* Port layer functions that need to be copied into the vector table. */
+ 170:main.c        **** extern void xPortPendSVHandler( void );
+ 171:main.c        **** extern void xPortSysTickHandler( void );
+ 172:main.c        **** extern void vPortSVCHandler( void );
+ 173:main.c        **** extern cyisraddress CyRamVectors[];
+ 174:main.c        **** 
+ 175:main.c        **** 	/* Install the OS Interrupt Handlers. */
+ 176:main.c        **** 	CyRamVectors[ 11 ] = ( cyisraddress ) vPortSVCHandler;
+ 497              		.loc 1 176 0
+ 498 0004 144B     		ldr	r3, .L23
+ 499 0006 154A     		ldr	r2, .L23+4
+ 500 0008 DA62     		str	r2, [r3, #44]
+ 177:main.c        **** 	CyRamVectors[ 14 ] = ( cyisraddress ) xPortPendSVHandler;
+ 501              		.loc 1 177 0
+ 502 000a 134B     		ldr	r3, .L23
+ 503 000c 144A     		ldr	r2, .L23+8
+ 504 000e 9A63     		str	r2, [r3, #56]
+ 178:main.c        **** 	CyRamVectors[ 15 ] = ( cyisraddress ) xPortSysTickHandler;
+ 505              		.loc 1 178 0
+ 506 0010 114B     		ldr	r3, .L23
+ 507 0012 144A     		ldr	r2, .L23+12
+ 508 0014 DA63     		str	r2, [r3, #60]
+ 179:main.c        **** 
+ 180:main.c        **** 	/* Start-up the peripherals. */
+ 181:main.c        ****     
+ 182:main.c        **** 
+ 183:main.c        **** 	/* Start the UART. */
+ 184:main.c        **** 	UART_1_Start();                         // Start the UART
+ 509              		.loc 1 184 0
+ 510 0016 FFF7FEFF 		bl	UART_1_Start
+ 185:main.c        ****     xSerialPortInitMinimal( 57600, 64 );    // Set the serial baud rate and buffer size in bytes
+ 511              		.loc 1 185 0
+ 512 001a 4FF46140 		mov	r0, #57600
+ 513 001e 4021     		movs	r1, #64
+ 514 0020 FFF7FEFF 		bl	xSerialPortInitMinimal
+ 186:main.c        ****     
+ 187:main.c        ****     PWM_M1_Start();
+ 515              		.loc 1 187 0
+ 516 0024 FFF7FEFF 		bl	PWM_M1_Start
+ 188:main.c        ****     PWM_M2_Start();
+ 517              		.loc 1 188 0
+ 518 0028 FFF7FEFF 		bl	PWM_M2_Start
+ 189:main.c        ****     M1Clock_Start();
+ 519              		.loc 1 189 0
+ 520 002c FFF7FEFF 		bl	M1Clock_Start
+ 190:main.c        ****     MClock_Start();
+ 521              		.loc 1 190 0
+ 522 0030 FFF7FEFF 		bl	MClock_Start
+ 191:main.c        ****     
+ 192:main.c        ****     M1QuadDec_Start();
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 14
+
+
+ 523              		.loc 1 192 0
+ 524 0034 FFF7FEFF 		bl	M1QuadDec_Start
+ 193:main.c        ****     M1QuadDec_Enable();
+ 525              		.loc 1 193 0
+ 526 0038 FFF7FEFF 		bl	M1QuadDec_Enable
+ 194:main.c        ****     M1QuadDec_SetCounter(0);
+ 527              		.loc 1 194 0
+ 528 003c 0020     		movs	r0, #0
+ 529 003e FFF7FEFF 		bl	M1QuadDec_SetCounter
+ 195:main.c        ****     
+ 196:main.c        ****     M2QuadDec_Start();
+ 530              		.loc 1 196 0
+ 531 0042 FFF7FEFF 		bl	M2QuadDec_Start
+ 197:main.c        ****     M2QuadDec_Enable();
+ 532              		.loc 1 197 0
+ 533 0046 FFF7FEFF 		bl	M2QuadDec_Enable
+ 198:main.c        ****     M2QuadDec_SetCounter(0);
+ 534              		.loc 1 198 0
+ 535 004a 0020     		movs	r0, #0
+ 536 004c FFF7FEFF 		bl	M2QuadDec_SetCounter
+ 199:main.c        ****     
+ 200:main.c        ****     Timer_1_Start();
+ 537              		.loc 1 200 0
+ 538 0050 FFF7FEFF 		bl	Timer_1_Start
+ 201:main.c        **** 
+ 202:main.c        **** }
+ 539              		.loc 1 202 0
+ 540 0054 80BD     		pop	{r7, pc}
+ 541              	.L24:
+ 542 0056 00BF     		.align	2
+ 543              	.L23:
+ 544 0058 00000000 		.word	CyRamVectors
+ 545 005c 00000000 		.word	vPortSVCHandler
+ 546 0060 00000000 		.word	xPortPendSVHandler
+ 547 0064 00000000 		.word	xPortSysTickHandler
+ 548              		.cfi_endproc
+ 549              	.LFE71:
+ 550              		.size	prvHardwareSetup, .-prvHardwareSetup
+ 551              		.section	.text.vApplicationStackOverflowHook,"ax",%progbits
+ 552              		.align	2
+ 553              		.global	vApplicationStackOverflowHook
+ 554              		.thumb
+ 555              		.thumb_func
+ 556              		.type	vApplicationStackOverflowHook, %function
+ 557              	vApplicationStackOverflowHook:
+ 558              	.LFB72:
+ 203:main.c        **** 
+ 204:main.c        **** 
+ 205:main.c        **** // DON'T TOUCH THESE (PART OF FREERTOS)
+ 206:main.c        **** void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName ) {
+ 559              		.loc 1 206 0
+ 560              		.cfi_startproc
+ 561              		@ args = 0, pretend = 0, frame = 16
+ 562              		@ frame_needed = 1, uses_anonymous_args = 0
+ 563              		@ link register save eliminated.
+ 564 0000 80B4     		push	{r7}
+ 565              		.cfi_def_cfa_offset 4
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 15
+
+
+ 566              		.cfi_offset 7, -4
+ 567 0002 85B0     		sub	sp, sp, #20
+ 568              		.cfi_def_cfa_offset 24
+ 569 0004 00AF     		add	r7, sp, #0
+ 570              		.cfi_def_cfa_register 7
+ 571 0006 7860     		str	r0, [r7, #4]
+ 572 0008 3960     		str	r1, [r7]
+ 573              	.LBB6:
+ 574              	.LBB7:
+ 575              		.file 2 "..\\..\\FreeRTOS_Source\\portable\\GCC\\ARM_CM3/portmacro.h"
+   1:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*
+   2:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+   5:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * subject to the following conditions:
+  11:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  12:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * copies or substantial portions of the Software.
+  14:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  15:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  22:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * http://www.FreeRTOS.org
+  23:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * http://aws.amazon.com/freertos
+  24:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  25:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * 1 tab == 4 spaces!
+  26:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  */
+  27:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  28:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  29:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef PORTMACRO_H
+  30:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define PORTMACRO_H
+  31:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  32:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifdef __cplusplus
+  33:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern "C" {
+  34:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+  35:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  36:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------
+  37:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Port specific definitions.
+  38:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  39:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * The settings in this file configure FreeRTOS correctly for the
+  40:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * given hardware and compiler.
+  41:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  42:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * These settings should not be altered.
+  43:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *-----------------------------------------------------------
+  44:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  */
+  45:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  46:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Type definitions. */
+  47:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portCHAR		char
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 16
+
+
+  48:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portFLOAT		float
+  49:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portDOUBLE		double
+  50:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portLONG		long
+  51:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSHORT		short
+  52:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSTACK_TYPE	uint32_t
+  53:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portBASE_TYPE	long
+  54:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  55:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef portSTACK_TYPE StackType_t;
+  56:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef long BaseType_t;
+  57:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef unsigned long UBaseType_t;
+  58:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  59:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #if( configUSE_16_BIT_TICKS == 1 )
+  60:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	typedef uint16_t TickType_t;
+  61:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portMAX_DELAY ( TickType_t ) 0xffff
+  62:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #else
+  63:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	typedef uint32_t TickType_t;
+  64:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portMAX_DELAY ( TickType_t ) 0xffffffffUL
+  65:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  66:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
+  67:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	not need to be guarded with a critical section. */
+  68:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portTICK_TYPE_IS_ATOMIC 1
+  69:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+  70:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  71:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  72:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Architecture specifics. */
+  73:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSTACK_GROWTH			( -1 )
+  74:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+  75:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portBYTE_ALIGNMENT			8
+  76:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  77:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  78:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Scheduler utilities. */
+  79:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portYIELD() 															\
+  80:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {																				\
+  81:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Set a PendSV to request a context switch. */								\
+  82:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;								\
+  83:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 																				\
+  84:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Barriers are normally not required but do ensure the code is completely	\
+  85:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	within the specified behaviour for the architecture. */						\
+  86:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "dsb" ::: "memory" );										\
+  87:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "isb" );													\
+  88:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+  89:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  90:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNVIC_INT_CTRL_REG		( * ( ( volatile uint32_t * ) 0xe000ed04 ) )
+  91:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNVIC_PENDSVSET_BIT		( 1UL << 28UL )
+  92:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired != pdFALSE ) portYIELD()
+  93:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
+  94:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  95:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  96:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Critical section management. */
+  97:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern void vPortEnterCritical( void );
+  98:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern void vPortExitCritical( void );
+  99:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSET_INTERRUPT_MASK_FROM_ISR()		ulPortRaiseBASEPRI()
+ 100:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	vPortSetBASEPRI(x)
+ 101:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portDISABLE_INTERRUPTS()				vPortRaiseBASEPRI()
+ 102:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portENABLE_INTERRUPTS()					vPortSetBASEPRI(0)
+ 103:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portENTER_CRITICAL()					vPortEnterCritical()
+ 104:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portEXIT_CRITICAL()						vPortExitCritical()
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 17
+
+
+ 105:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 106:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 107:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 108:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Task function macros as described on the FreeRTOS.org WEB site.  These are
+ 109:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** not necessary for to use this port.  They are defined so the common demo files
+ 110:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** (which build with all the ports) will build. */
+ 111:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
+ 112:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+ 113:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 114:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 115:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Tickless idle/low power functionality. */
+ 116:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef portSUPPRESS_TICKS_AND_SLEEP
+ 117:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	extern void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime );
+ 118:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime ) vPortSuppressTicksAndSleep( xExpectedIdl
+ 119:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 120:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 121:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 122:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Architecture specific optimisations. */
+ 123:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
+ 124:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
+ 125:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 126:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 127:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
+ 128:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 129:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Generic helper function. */
+ 130:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBitma
+ 131:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 132:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	uint8_t ucReturn;
+ 133:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 134:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		__asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) : "memory" );
+ 135:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		return ucReturn;
+ 136:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 137:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 138:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Check the configuration. */
+ 139:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#if( configMAX_PRIORITIES > 32 )
+ 140:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		#error configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is 
+ 141:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#endif
+ 142:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 143:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Store/clear the ready priorities in a bit map. */
+ 144:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portRECORD_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) |= ( 1UL 
+ 145:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portRESET_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) &= ~( 1UL 
+ 146:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 147:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/*-----------------------------------------------------------*/
+ 148:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 149:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31UL - ( ui
+ 150:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 151:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
+ 152:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 153:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 154:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 155:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifdef configASSERT
+ 156:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	void vPortValidateInterruptPriority( void );
+ 157:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() 	vPortValidateInterruptPriority()
+ 158:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 159:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 160:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* portNOP() is not required by this port. */
+ 161:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNOP()
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 18
+
+
+ 162:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 163:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portINLINE	__inline
+ 164:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 165:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef portFORCE_INLINE
+ 166:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portFORCE_INLINE inline __attribute__(( always_inline))
+ 167:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 168:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 169:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
+ 170:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 171:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** uint32_t ulCurrentInterrupt;
+ 172:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** BaseType_t xReturn;
+ 173:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 174:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Obtain the number of the currently executing interrupt. */
+ 175:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "mrs %0, ipsr" : "=r"( ulCurrentInterrupt ) :: "memory" );
+ 176:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 177:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	if( ulCurrentInterrupt == 0 )
+ 178:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 179:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		xReturn = pdFALSE;
+ 180:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 181:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	else
+ 182:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 183:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		xReturn = pdTRUE;
+ 184:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 185:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 186:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	return xReturn;
+ 187:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+ 188:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 189:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 190:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 191:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static void vPortRaiseBASEPRI( void )
+ 192:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 193:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** uint32_t ulNewBASEPRI;
+ 194:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 195:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile
+ 576              		.loc 2 195 0
+ 577              	@ 195 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 578 000a 4FF0A003 			mov r3, #160												
+ 579 000e 83F31188 		msr basepri, r3											
+ 580 0012 BFF36F8F 		isb														
+ 581 0016 BFF34F8F 		dsb														
+ 582              	
+ 583              	@ 0 "" 2
+ 584              		.thumb
+ 585 001a FB60     		str	r3, [r7, #12]
+ 586              	.L26:
+ 587              	.LBE7:
+ 588              	.LBE6:
+ 207:main.c        **** 	/* The stack space has been execeeded for a task, considering allocating more. */
+ 208:main.c        **** 	taskDISABLE_INTERRUPTS();
+ 209:main.c        **** 	for( ;; );
+ 589              		.loc 1 209 0 discriminator 1
+ 590 001c FEE7     		b	.L26
+ 591              		.cfi_endproc
+ 592              	.LFE72:
+ 593              		.size	vApplicationStackOverflowHook, .-vApplicationStackOverflowHook
+ 594 001e 00BF     		.section	.text.vApplicationMallocFailedHook,"ax",%progbits
+ 595              		.align	2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 19
+
+
+ 596              		.global	vApplicationMallocFailedHook
+ 597              		.thumb
+ 598              		.thumb_func
+ 599              		.type	vApplicationMallocFailedHook, %function
+ 600              	vApplicationMallocFailedHook:
+ 601              	.LFB73:
+ 210:main.c        **** }
+ 211:main.c        **** void vApplicationMallocFailedHook( void ) {
+ 602              		.loc 1 211 0
+ 603              		.cfi_startproc
+ 604              		@ args = 0, pretend = 0, frame = 8
+ 605              		@ frame_needed = 1, uses_anonymous_args = 0
+ 606              		@ link register save eliminated.
+ 607 0000 80B4     		push	{r7}
+ 608              		.cfi_def_cfa_offset 4
+ 609              		.cfi_offset 7, -4
+ 610 0002 83B0     		sub	sp, sp, #12
+ 611              		.cfi_def_cfa_offset 16
+ 612 0004 00AF     		add	r7, sp, #0
+ 613              		.cfi_def_cfa_register 7
+ 614              	.LBB8:
+ 615              	.LBB9:
+ 616              		.loc 2 195 0
+ 617              	@ 195 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 618 0006 4FF0A003 			mov r3, #160												
+ 619 000a 83F31188 		msr basepri, r3											
+ 620 000e BFF36F8F 		isb														
+ 621 0012 BFF34F8F 		dsb														
+ 622              	
+ 623              	@ 0 "" 2
+ 624              		.thumb
+ 625 0016 7B60     		str	r3, [r7, #4]
+ 626              	.L28:
+ 627              	.LBE9:
+ 628              	.LBE8:
+ 212:main.c        **** 	/* The heap space has been execeeded. */
+ 213:main.c        **** 	taskDISABLE_INTERRUPTS();
+ 214:main.c        **** 	for( ;; );
+ 629              		.loc 1 214 0 discriminator 1
+ 630 0018 FEE7     		b	.L28
+ 631              		.cfi_endproc
+ 632              	.LFE73:
+ 633              		.size	vApplicationMallocFailedHook, .-vApplicationMallocFailedHook
+ 634 001a 00BF     		.text
+ 635              	.Letext0:
+ 636              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 637              		.file 4 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 638              		.file 5 "Generated_Source\\PSoC5/cytypes.h"
+ 639              		.file 6 "..\\..\\FreeRTOS_Source\\include/task.h"
+ 640              		.file 7 "..\\..\\FreeRTOS_Source\\include/queue.h"
+ 641              		.file 8 "..\\..\\FreeRTOS_Source\\include/semphr.h"
+ 642              		.file 9 "..\\..\\FreeRTOS_Source\\include/serial.h"
+ 643              		.file 10 "movement.h"
+ 644              		.file 11 "Generated_Source\\PSoC5/core_cm3.h"
+ 645              		.section	.debug_info,"",%progbits
+ 646              	.Ldebug_info0:
+ 647 0000 5F040000 		.4byte	0x45f
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 20
+
+
+ 648 0004 0400     		.2byte	0x4
+ 649 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 650 000a 04       		.byte	0x4
+ 651 000b 01       		.uleb128 0x1
+ 652 000c E7000000 		.4byte	.LASF56
+ 653 0010 01       		.byte	0x1
+ 654 0011 1F030000 		.4byte	.LASF57
+ 655 0015 CC020000 		.4byte	.LASF58
+ 656 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 657 001d 00000000 		.4byte	0
+ 658 0021 00000000 		.4byte	.Ldebug_line0
+ 659 0025 02       		.uleb128 0x2
+ 660 0026 01       		.byte	0x1
+ 661 0027 06       		.byte	0x6
+ 662 0028 1B020000 		.4byte	.LASF0
+ 663 002c 03       		.uleb128 0x3
+ 664 002d 9D010000 		.4byte	.LASF4
+ 665 0031 03       		.byte	0x3
+ 666 0032 1D       		.byte	0x1d
+ 667 0033 37000000 		.4byte	0x37
+ 668 0037 02       		.uleb128 0x2
+ 669 0038 01       		.byte	0x1
+ 670 0039 08       		.byte	0x8
+ 671 003a CB010000 		.4byte	.LASF1
+ 672 003e 02       		.uleb128 0x2
+ 673 003f 02       		.byte	0x2
+ 674 0040 05       		.byte	0x5
+ 675 0041 73000000 		.4byte	.LASF2
+ 676 0045 02       		.uleb128 0x2
+ 677 0046 02       		.byte	0x2
+ 678 0047 07       		.byte	0x7
+ 679 0048 7A020000 		.4byte	.LASF3
+ 680 004c 03       		.uleb128 0x3
+ 681 004d 4A030000 		.4byte	.LASF5
+ 682 0051 03       		.byte	0x3
+ 683 0052 3F       		.byte	0x3f
+ 684 0053 57000000 		.4byte	0x57
+ 685 0057 02       		.uleb128 0x2
+ 686 0058 04       		.byte	0x4
+ 687 0059 05       		.byte	0x5
+ 688 005a 86030000 		.4byte	.LASF6
+ 689 005e 03       		.uleb128 0x3
+ 690 005f 52000000 		.4byte	.LASF7
+ 691 0063 03       		.byte	0x3
+ 692 0064 41       		.byte	0x41
+ 693 0065 69000000 		.4byte	0x69
+ 694 0069 02       		.uleb128 0x2
+ 695 006a 04       		.byte	0x4
+ 696 006b 07       		.byte	0x7
+ 697 006c 26030000 		.4byte	.LASF8
+ 698 0070 02       		.uleb128 0x2
+ 699 0071 08       		.byte	0x8
+ 700 0072 05       		.byte	0x5
+ 701 0073 C0000000 		.4byte	.LASF9
+ 702 0077 02       		.uleb128 0x2
+ 703 0078 08       		.byte	0x8
+ 704 0079 07       		.byte	0x7
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 21
+
+
+ 705 007a 27020000 		.4byte	.LASF10
+ 706 007e 04       		.uleb128 0x4
+ 707 007f 04       		.byte	0x4
+ 708 0080 05       		.byte	0x5
+ 709 0081 696E7400 		.ascii	"int\000"
+ 710 0085 02       		.uleb128 0x2
+ 711 0086 04       		.byte	0x4
+ 712 0087 07       		.byte	0x7
+ 713 0088 47020000 		.4byte	.LASF11
+ 714 008c 03       		.uleb128 0x3
+ 715 008d 7D000000 		.4byte	.LASF12
+ 716 0091 04       		.byte	0x4
+ 717 0092 15       		.byte	0x15
+ 718 0093 2C000000 		.4byte	0x2c
+ 719 0097 03       		.uleb128 0x3
+ 720 0098 A2020000 		.4byte	.LASF13
+ 721 009c 04       		.byte	0x4
+ 722 009d 2C       		.byte	0x2c
+ 723 009e 4C000000 		.4byte	0x4c
+ 724 00a2 03       		.uleb128 0x3
+ 725 00a3 3E020000 		.4byte	.LASF14
+ 726 00a7 04       		.byte	0x4
+ 727 00a8 2D       		.byte	0x2d
+ 728 00a9 5E000000 		.4byte	0x5e
+ 729 00ad 02       		.uleb128 0x2
+ 730 00ae 04       		.byte	0x4
+ 731 00af 04       		.byte	0x4
+ 732 00b0 BA000000 		.4byte	.LASF15
+ 733 00b4 02       		.uleb128 0x2
+ 734 00b5 08       		.byte	0x8
+ 735 00b6 04       		.byte	0x4
+ 736 00b7 38030000 		.4byte	.LASF16
+ 737 00bb 02       		.uleb128 0x2
+ 738 00bc 01       		.byte	0x1
+ 739 00bd 08       		.byte	0x8
+ 740 00be 8D020000 		.4byte	.LASF17
+ 741 00c2 05       		.uleb128 0x5
+ 742 00c3 66000000 		.4byte	.LASF18
+ 743 00c7 05       		.byte	0x5
+ 744 00c8 4E02     		.2byte	0x24e
+ 745 00ca CE000000 		.4byte	0xce
+ 746 00ce 06       		.uleb128 0x6
+ 747 00cf 04       		.byte	0x4
+ 748 00d0 D4000000 		.4byte	0xd4
+ 749 00d4 07       		.uleb128 0x7
+ 750 00d5 02       		.uleb128 0x2
+ 751 00d6 04       		.byte	0x4
+ 752 00d7 07       		.byte	0x7
+ 753 00d8 23000000 		.4byte	.LASF19
+ 754 00dc 08       		.uleb128 0x8
+ 755 00dd 04       		.byte	0x4
+ 756 00de 06       		.uleb128 0x6
+ 757 00df 04       		.byte	0x4
+ 758 00e0 BB000000 		.4byte	0xbb
+ 759 00e4 03       		.uleb128 0x3
+ 760 00e5 54020000 		.4byte	.LASF20
+ 761 00e9 02       		.byte	0x2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 22
+
+
+ 762 00ea 38       		.byte	0x38
+ 763 00eb 57000000 		.4byte	0x57
+ 764 00ef 03       		.uleb128 0x3
+ 765 00f0 D9010000 		.4byte	.LASF21
+ 766 00f4 02       		.byte	0x2
+ 767 00f5 3F       		.byte	0x3f
+ 768 00f6 A2000000 		.4byte	0xa2
+ 769 00fa 03       		.uleb128 0x3
+ 770 00fb 40000000 		.4byte	.LASF22
+ 771 00ff 06       		.byte	0x6
+ 772 0100 3E       		.byte	0x3e
+ 773 0101 05010000 		.4byte	0x105
+ 774 0105 06       		.uleb128 0x6
+ 775 0106 04       		.byte	0x4
+ 776 0107 0B010000 		.4byte	0x10b
+ 777 010b 09       		.uleb128 0x9
+ 778 010c 8A010000 		.4byte	.LASF59
+ 779 0110 03       		.uleb128 0x3
+ 780 0111 54030000 		.4byte	.LASF23
+ 781 0115 07       		.byte	0x7
+ 782 0116 2E       		.byte	0x2e
+ 783 0117 DC000000 		.4byte	0xdc
+ 784 011b 03       		.uleb128 0x3
+ 785 011c EE010000 		.4byte	.LASF24
+ 786 0120 08       		.byte	0x8
+ 787 0121 25       		.byte	0x25
+ 788 0122 10010000 		.4byte	0x110
+ 789 0126 03       		.uleb128 0x3
+ 790 0127 BD020000 		.4byte	.LASF25
+ 791 012b 09       		.byte	0x9
+ 792 012c 1F       		.byte	0x1f
+ 793 012d DC000000 		.4byte	0xdc
+ 794 0131 0A       		.uleb128 0xa
+ 795 0132 24       		.byte	0x24
+ 796 0133 0A       		.byte	0xa
+ 797 0134 03       		.byte	0x3
+ 798 0135 A6010000 		.4byte	0x1a6
+ 799 0139 0B       		.uleb128 0xb
+ 800 013a 00020000 		.4byte	.LASF26
+ 801 013e 0A       		.byte	0xa
+ 802 013f 04       		.byte	0x4
+ 803 0140 57000000 		.4byte	0x57
+ 804 0144 00       		.byte	0
+ 805 0145 0B       		.uleb128 0xb
+ 806 0146 1A000000 		.4byte	.LASF27
+ 807 014a 0A       		.byte	0xa
+ 808 014b 05       		.byte	0x5
+ 809 014c 57000000 		.4byte	0x57
+ 810 0150 04       		.byte	0x4
+ 811 0151 0B       		.uleb128 0xb
+ 812 0152 6F020000 		.4byte	.LASF28
+ 813 0156 0A       		.byte	0xa
+ 814 0157 06       		.byte	0x6
+ 815 0158 7E000000 		.4byte	0x7e
+ 816 015c 08       		.byte	0x8
+ 817 015d 0B       		.uleb128 0xb
+ 818 015e 62030000 		.4byte	.LASF29
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 23
+
+
+ 819 0162 0A       		.byte	0xa
+ 820 0163 07       		.byte	0x7
+ 821 0164 7E000000 		.4byte	0x7e
+ 822 0168 0C       		.byte	0xc
+ 823 0169 0B       		.uleb128 0xb
+ 824 016a E4010000 		.4byte	.LASF30
+ 825 016e 0A       		.byte	0xa
+ 826 016f 08       		.byte	0x8
+ 827 0170 7E000000 		.4byte	0x7e
+ 828 0174 10       		.byte	0x10
+ 829 0175 0B       		.uleb128 0xb
+ 830 0176 92020000 		.4byte	.LASF31
+ 831 017a 0A       		.byte	0xa
+ 832 017b 09       		.byte	0x9
+ 833 017c 7E000000 		.4byte	0x7e
+ 834 0180 14       		.byte	0x14
+ 835 0181 0C       		.uleb128 0xc
+ 836 0182 696E6300 		.ascii	"inc\000"
+ 837 0186 0A       		.byte	0xa
+ 838 0187 0A       		.byte	0xa
+ 839 0188 7E000000 		.4byte	0x7e
+ 840 018c 18       		.byte	0x18
+ 841 018d 0B       		.uleb128 0xb
+ 842 018e 6A020000 		.4byte	.LASF32
+ 843 0192 0A       		.byte	0xa
+ 844 0193 0B       		.byte	0xb
+ 845 0194 A2000000 		.4byte	0xa2
+ 846 0198 1C       		.byte	0x1c
+ 847 0199 0B       		.uleb128 0xb
+ 848 019a 80010000 		.4byte	.LASF33
+ 849 019e 0A       		.byte	0xa
+ 850 019f 0C       		.byte	0xc
+ 851 01a0 57000000 		.4byte	0x57
+ 852 01a4 20       		.byte	0x20
+ 853 01a5 00       		.byte	0
+ 854 01a6 03       		.uleb128 0x3
+ 855 01a7 75010000 		.4byte	.LASF34
+ 856 01ab 0A       		.byte	0xa
+ 857 01ac 0D       		.byte	0xd
+ 858 01ad 31010000 		.4byte	0x131
+ 859 01b1 0A       		.uleb128 0xa
+ 860 01b2 18       		.byte	0x18
+ 861 01b3 0A       		.byte	0xa
+ 862 01b4 0F       		.byte	0xf
+ 863 01b5 DB010000 		.4byte	0x1db
+ 864 01b9 0C       		.uleb128 0xc
+ 865 01ba 4B6900   		.ascii	"Ki\000"
+ 866 01bd 0A       		.byte	0xa
+ 867 01be 10       		.byte	0x10
+ 868 01bf B4000000 		.4byte	0xb4
+ 869 01c3 00       		.byte	0
+ 870 01c4 0C       		.uleb128 0xc
+ 871 01c5 4B7000   		.ascii	"Kp\000"
+ 872 01c8 0A       		.byte	0xa
+ 873 01c9 11       		.byte	0x11
+ 874 01ca B4000000 		.4byte	0xb4
+ 875 01ce 08       		.byte	0x8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 24
+
+
+ 876 01cf 0C       		.uleb128 0xc
+ 877 01d0 4B6400   		.ascii	"Kd\000"
+ 878 01d3 0A       		.byte	0xa
+ 879 01d4 12       		.byte	0x12
+ 880 01d5 B4000000 		.4byte	0xb4
+ 881 01d9 10       		.byte	0x10
+ 882 01da 00       		.byte	0
+ 883 01db 03       		.uleb128 0x3
+ 884 01dc 5D000000 		.4byte	.LASF35
+ 885 01e0 0A       		.byte	0xa
+ 886 01e1 13       		.byte	0x13
+ 887 01e2 B1010000 		.4byte	0x1b1
+ 888 01e6 0D       		.uleb128 0xd
+ 889 01e7 68030000 		.4byte	.LASF60
+ 890 01eb 02       		.byte	0x2
+ 891 01ec BF       		.byte	0xbf
+ 892 01ed 03       		.byte	0x3
+ 893 01ee FE010000 		.4byte	0x1fe
+ 894 01f2 0E       		.uleb128 0xe
+ 895 01f3 B6030000 		.4byte	.LASF61
+ 896 01f7 02       		.byte	0x2
+ 897 01f8 C1       		.byte	0xc1
+ 898 01f9 A2000000 		.4byte	0xa2
+ 899 01fd 00       		.byte	0
+ 900 01fe 0F       		.uleb128 0xf
+ 901 01ff 4D000000 		.4byte	.LASF62
+ 902 0203 01       		.byte	0x1
+ 903 0204 4C       		.byte	0x4c
+ 904 0205 7E000000 		.4byte	0x7e
+ 905 0209 00000000 		.4byte	.LFB68
+ 906 020d 8C000000 		.4byte	.LFE68-.LFB68
+ 907 0211 01       		.uleb128 0x1
+ 908 0212 9C       		.byte	0x9c
+ 909 0213 27020000 		.4byte	0x227
+ 910 0217 10       		.uleb128 0x10
+ 911 0218 72756E00 		.ascii	"run\000"
+ 912 021c 01       		.byte	0x1
+ 913 021d 4F       		.byte	0x4f
+ 914 021e 27020000 		.4byte	0x227
+ 915 0222 03       		.uleb128 0x3
+ 916 0223 91       		.byte	0x91
+ 917 0224 F07D     		.sleb128 -272
+ 918 0226 00       		.byte	0
+ 919 0227 11       		.uleb128 0x11
+ 920 0228 37020000 		.4byte	0x237
+ 921 022c 37020000 		.4byte	0x237
+ 922 0230 12       		.uleb128 0x12
+ 923 0231 D5000000 		.4byte	0xd5
+ 924 0235 3F       		.byte	0x3f
+ 925 0236 00       		.byte	0
+ 926 0237 06       		.uleb128 0x6
+ 927 0238 04       		.byte	0x4
+ 928 0239 3D020000 		.4byte	0x23d
+ 929 023d 13       		.uleb128 0x13
+ 930 023e 25000000 		.4byte	0x25
+ 931 0242 14       		.uleb128 0x14
+ 932 0243 0D000000 		.4byte	.LASF38
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 25
+
+
+ 933 0247 01       		.byte	0x1
+ 934 0248 5D       		.byte	0x5d
+ 935 0249 00000000 		.4byte	.LFB69
+ 936 024d 90010000 		.4byte	.LFE69-.LFB69
+ 937 0251 01       		.uleb128 0x1
+ 938 0252 9C       		.byte	0x9c
+ 939 0253 9B020000 		.4byte	0x29b
+ 940 0257 15       		.uleb128 0x15
+ 941 0258 7000     		.ascii	"p\000"
+ 942 025a 01       		.byte	0x1
+ 943 025b 5D       		.byte	0x5d
+ 944 025c DC000000 		.4byte	0xdc
+ 945 0260 03       		.uleb128 0x3
+ 946 0261 91       		.byte	0x91
+ 947 0262 E47D     		.sleb128 -284
+ 948 0264 16       		.uleb128 0x16
+ 949 0265 DB000000 		.4byte	.LASF36
+ 950 0269 01       		.byte	0x1
+ 951 026a 61       		.byte	0x61
+ 952 026b 27020000 		.4byte	0x227
+ 953 026f 03       		.uleb128 0x3
+ 954 0270 91       		.byte	0x91
+ 955 0271 EC7D     		.sleb128 -276
+ 956 0273 10       		.uleb128 0x10
+ 957 0274 6900     		.ascii	"i\000"
+ 958 0276 01       		.byte	0x1
+ 959 0277 62       		.byte	0x62
+ 960 0278 7E000000 		.4byte	0x7e
+ 961 027c 02       		.uleb128 0x2
+ 962 027d 91       		.byte	0x91
+ 963 027e 74       		.sleb128 -12
+ 964 027f 10       		.uleb128 0x10
+ 965 0280 676F00   		.ascii	"go\000"
+ 966 0283 01       		.byte	0x1
+ 967 0284 63       		.byte	0x63
+ 968 0285 7E000000 		.4byte	0x7e
+ 969 0289 02       		.uleb128 0x2
+ 970 028a 91       		.byte	0x91
+ 971 028b 70       		.sleb128 -16
+ 972 028c 16       		.uleb128 0x16
+ 973 028d 9D020000 		.4byte	.LASF37
+ 974 0291 01       		.byte	0x1
+ 975 0292 64       		.byte	0x64
+ 976 0293 25000000 		.4byte	0x25
+ 977 0297 02       		.uleb128 0x2
+ 978 0298 91       		.byte	0x91
+ 979 0299 6F       		.sleb128 -17
+ 980 029a 00       		.byte	0
+ 981 029b 14       		.uleb128 0x14
+ 982 029c A7030000 		.4byte	.LASF39
+ 983 02a0 01       		.byte	0x1
+ 984 02a1 8D       		.byte	0x8d
+ 985 02a2 00000000 		.4byte	.LFB70
+ 986 02a6 D0000000 		.4byte	.LFE70-.LFB70
+ 987 02aa 01       		.uleb128 0x1
+ 988 02ab 9C       		.byte	0x9c
+ 989 02ac CD020000 		.4byte	0x2cd
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 26
+
+
+ 990 02b0 15       		.uleb128 0x15
+ 991 02b1 7000     		.ascii	"p\000"
+ 992 02b3 01       		.byte	0x1
+ 993 02b4 8D       		.byte	0x8d
+ 994 02b5 DC000000 		.4byte	0xdc
+ 995 02b9 03       		.uleb128 0x3
+ 996 02ba 91       		.byte	0x91
+ 997 02bb F47D     		.sleb128 -268
+ 998 02bd 16       		.uleb128 0x16
+ 999 02be DB000000 		.4byte	.LASF36
+ 1000 02c2 01       		.byte	0x1
+ 1001 02c3 98       		.byte	0x98
+ 1002 02c4 CD020000 		.4byte	0x2cd
+ 1003 02c8 03       		.uleb128 0x3
+ 1004 02c9 91       		.byte	0x91
+ 1005 02ca F87D     		.sleb128 -264
+ 1006 02cc 00       		.byte	0
+ 1007 02cd 11       		.uleb128 0x11
+ 1008 02ce DD020000 		.4byte	0x2dd
+ 1009 02d2 DD020000 		.4byte	0x2dd
+ 1010 02d6 12       		.uleb128 0x12
+ 1011 02d7 D5000000 		.4byte	0xd5
+ 1012 02db 3F       		.byte	0x3f
+ 1013 02dc 00       		.byte	0
+ 1014 02dd 06       		.uleb128 0x6
+ 1015 02de 04       		.byte	0x4
+ 1016 02df 25000000 		.4byte	0x25
+ 1017 02e3 17       		.uleb128 0x17
+ 1018 02e4 0A020000 		.4byte	.LASF63
+ 1019 02e8 01       		.byte	0x1
+ 1020 02e9 A8       		.byte	0xa8
+ 1021 02ea 00000000 		.4byte	.LFB71
+ 1022 02ee 68000000 		.4byte	.LFE71-.LFB71
+ 1023 02f2 01       		.uleb128 0x1
+ 1024 02f3 9C       		.byte	0x9c
+ 1025 02f4 19030000 		.4byte	0x319
+ 1026 02f8 18       		.uleb128 0x18
+ 1027 02f9 AA020000 		.4byte	.LASF40
+ 1028 02fd 01       		.byte	0x1
+ 1029 02fe AA       		.byte	0xaa
+ 1030 02ff 18       		.uleb128 0x18
+ 1031 0300 2C000000 		.4byte	.LASF41
+ 1032 0304 01       		.byte	0x1
+ 1033 0305 AB       		.byte	0xab
+ 1034 0306 18       		.uleb128 0x18
+ 1035 0307 85000000 		.4byte	.LASF42
+ 1036 030b 01       		.byte	0x1
+ 1037 030c AC       		.byte	0xac
+ 1038 030d 19       		.uleb128 0x19
+ 1039 030e 00000000 		.4byte	.LASF48
+ 1040 0312 01       		.byte	0x1
+ 1041 0313 AD       		.byte	0xad
+ 1042 0314 19030000 		.4byte	0x319
+ 1043 0318 00       		.byte	0
+ 1044 0319 11       		.uleb128 0x11
+ 1045 031a C2000000 		.4byte	0xc2
+ 1046 031e 24030000 		.4byte	0x324
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 27
+
+
+ 1047 0322 1A       		.uleb128 0x1a
+ 1048 0323 00       		.byte	0
+ 1049 0324 1B       		.uleb128 0x1b
+ 1050 0325 95000000 		.4byte	.LASF43
+ 1051 0329 01       		.byte	0x1
+ 1052 032a CE       		.byte	0xce
+ 1053 032b 00000000 		.4byte	.LFB72
+ 1054 032f 1E000000 		.4byte	.LFE72-.LFB72
+ 1055 0333 01       		.uleb128 0x1
+ 1056 0334 9C       		.byte	0x9c
+ 1057 0335 78030000 		.4byte	0x378
+ 1058 0339 1C       		.uleb128 0x1c
+ 1059 033a B3000000 		.4byte	.LASF44
+ 1060 033e 01       		.byte	0x1
+ 1061 033f CE       		.byte	0xce
+ 1062 0340 FA000000 		.4byte	0xfa
+ 1063 0344 02       		.uleb128 0x2
+ 1064 0345 91       		.byte	0x91
+ 1065 0346 6C       		.sleb128 -20
+ 1066 0347 1C       		.uleb128 0x1c
+ 1067 0348 C3030000 		.4byte	.LASF45
+ 1068 034c 01       		.byte	0x1
+ 1069 034d CE       		.byte	0xce
+ 1070 034e DE000000 		.4byte	0xde
+ 1071 0352 02       		.uleb128 0x2
+ 1072 0353 91       		.byte	0x91
+ 1073 0354 68       		.sleb128 -24
+ 1074 0355 1D       		.uleb128 0x1d
+ 1075 0356 E6010000 		.4byte	0x1e6
+ 1076 035a 0A000000 		.4byte	.LBB6
+ 1077 035e 12000000 		.4byte	.LBE6-.LBB6
+ 1078 0362 01       		.byte	0x1
+ 1079 0363 D0       		.byte	0xd0
+ 1080 0364 1E       		.uleb128 0x1e
+ 1081 0365 0A000000 		.4byte	.LBB7
+ 1082 0369 12000000 		.4byte	.LBE7-.LBB7
+ 1083 036d 1F       		.uleb128 0x1f
+ 1084 036e F2010000 		.4byte	0x1f2
+ 1085 0372 02       		.uleb128 0x2
+ 1086 0373 91       		.byte	0x91
+ 1087 0374 74       		.sleb128 -12
+ 1088 0375 00       		.byte	0
+ 1089 0376 00       		.byte	0
+ 1090 0377 00       		.byte	0
+ 1091 0378 1B       		.uleb128 0x1b
+ 1092 0379 AE010000 		.4byte	.LASF46
+ 1093 037d 01       		.byte	0x1
+ 1094 037e D3       		.byte	0xd3
+ 1095 037f 00000000 		.4byte	.LFB73
+ 1096 0383 1A000000 		.4byte	.LFE73-.LFB73
+ 1097 0387 01       		.uleb128 0x1
+ 1098 0388 9C       		.byte	0x9c
+ 1099 0389 B0030000 		.4byte	0x3b0
+ 1100 038d 1D       		.uleb128 0x1d
+ 1101 038e E6010000 		.4byte	0x1e6
+ 1102 0392 06000000 		.4byte	.LBB8
+ 1103 0396 12000000 		.4byte	.LBE8-.LBB8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 28
+
+
+ 1104 039a 01       		.byte	0x1
+ 1105 039b D5       		.byte	0xd5
+ 1106 039c 1E       		.uleb128 0x1e
+ 1107 039d 06000000 		.4byte	.LBB9
+ 1108 03a1 12000000 		.4byte	.LBE9-.LBB9
+ 1109 03a5 1F       		.uleb128 0x1f
+ 1110 03a6 F2010000 		.4byte	0x1f2
+ 1111 03aa 02       		.uleb128 0x2
+ 1112 03ab 91       		.byte	0x91
+ 1113 03ac 74       		.sleb128 -12
+ 1114 03ad 00       		.byte	0
+ 1115 03ae 00       		.byte	0
+ 1116 03af 00       		.byte	0
+ 1117 03b0 16       		.uleb128 0x16
+ 1118 03b1 A7010000 		.4byte	.LASF47
+ 1119 03b5 01       		.byte	0x1
+ 1120 03b6 3E       		.byte	0x3e
+ 1121 03b7 26010000 		.4byte	0x126
+ 1122 03bb 05       		.uleb128 0x5
+ 1123 03bc 03       		.byte	0x3
+ 1124 03bd 00000000 		.4byte	pxPort
+ 1125 03c1 20       		.uleb128 0x20
+ 1126 03c2 8F030000 		.4byte	.LASF49
+ 1127 03c6 0B       		.byte	0xb
+ 1128 03c7 9606     		.2byte	0x696
+ 1129 03c9 CD030000 		.4byte	0x3cd
+ 1130 03cd 21       		.uleb128 0x21
+ 1131 03ce 97000000 		.4byte	0x97
+ 1132 03d2 22       		.uleb128 0x22
+ 1133 03d3 5F020000 		.4byte	.LASF50
+ 1134 03d7 01       		.byte	0x1
+ 1135 03d8 3F       		.byte	0x3f
+ 1136 03d9 1B010000 		.4byte	0x11b
+ 1137 03dd 05       		.uleb128 0x5
+ 1138 03de 03       		.byte	0x3
+ 1139 03df 00000000 		.4byte	gatekeeper
+ 1140 03e3 22       		.uleb128 0x22
+ 1141 03e4 CE000000 		.4byte	.LASF51
+ 1142 03e8 01       		.byte	0x1
+ 1143 03e9 40       		.byte	0x40
+ 1144 03ea 10010000 		.4byte	0x110
+ 1145 03ee 05       		.uleb128 0x5
+ 1146 03ef 03       		.byte	0x3
+ 1147 03f0 00000000 		.4byte	queue_handle
+ 1148 03f4 22       		.uleb128 0x22
+ 1149 03f5 3F030000 		.4byte	.LASF52
+ 1150 03f9 01       		.byte	0x1
+ 1151 03fa 44       		.byte	0x44
+ 1152 03fb 25000000 		.4byte	0x25
+ 1153 03ff 05       		.uleb128 0x5
+ 1154 0400 03       		.byte	0x3
+ 1155 0401 00000000 		.4byte	rx_receive
+ 1156 0405 11       		.uleb128 0x11
+ 1157 0406 37000000 		.4byte	0x37
+ 1158 040a 15040000 		.4byte	0x415
+ 1159 040e 12       		.uleb128 0x12
+ 1160 040f D5000000 		.4byte	0xd5
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 29
+
+
+ 1161 0413 3F       		.byte	0x3f
+ 1162 0414 00       		.byte	0
+ 1163 0415 22       		.uleb128 0x22
+ 1164 0416 18030000 		.4byte	.LASF53
+ 1165 041a 01       		.byte	0x1
+ 1166 041b 45       		.byte	0x45
+ 1167 041c 05040000 		.4byte	0x405
+ 1168 0420 05       		.uleb128 0x5
+ 1169 0421 03       		.byte	0x3
+ 1170 0422 00000000 		.4byte	buffer
+ 1171 0426 22       		.uleb128 0x22
+ 1172 0427 9C030000 		.4byte	.LASF54
+ 1173 042b 01       		.byte	0x1
+ 1174 042c 47       		.byte	0x47
+ 1175 042d A6010000 		.4byte	0x1a6
+ 1176 0431 05       		.uleb128 0x5
+ 1177 0432 03       		.byte	0x3
+ 1178 0433 00000000 		.4byte	left_wheel
+ 1179 0437 22       		.uleb128 0x22
+ 1180 0438 7A030000 		.4byte	.LASF55
+ 1181 043c 01       		.byte	0x1
+ 1182 043d 48       		.byte	0x48
+ 1183 043e A6010000 		.4byte	0x1a6
+ 1184 0442 05       		.uleb128 0x5
+ 1185 0443 03       		.byte	0x3
+ 1186 0444 00000000 		.4byte	right_wheel
+ 1187 0448 23       		.uleb128 0x23
+ 1188 0449 6B00     		.ascii	"k\000"
+ 1189 044b 01       		.byte	0x1
+ 1190 044c 49       		.byte	0x49
+ 1191 044d DB010000 		.4byte	0x1db
+ 1192 0451 05       		.uleb128 0x5
+ 1193 0452 03       		.byte	0x3
+ 1194 0453 00000000 		.4byte	k
+ 1195 0457 19       		.uleb128 0x19
+ 1196 0458 00000000 		.4byte	.LASF48
+ 1197 045c 01       		.byte	0x1
+ 1198 045d AD       		.byte	0xad
+ 1199 045e 19030000 		.4byte	0x319
+ 1200 0462 00       		.byte	0
+ 1201              		.section	.debug_abbrev,"",%progbits
+ 1202              	.Ldebug_abbrev0:
+ 1203 0000 01       		.uleb128 0x1
+ 1204 0001 11       		.uleb128 0x11
+ 1205 0002 01       		.byte	0x1
+ 1206 0003 25       		.uleb128 0x25
+ 1207 0004 0E       		.uleb128 0xe
+ 1208 0005 13       		.uleb128 0x13
+ 1209 0006 0B       		.uleb128 0xb
+ 1210 0007 03       		.uleb128 0x3
+ 1211 0008 0E       		.uleb128 0xe
+ 1212 0009 1B       		.uleb128 0x1b
+ 1213 000a 0E       		.uleb128 0xe
+ 1214 000b 55       		.uleb128 0x55
+ 1215 000c 17       		.uleb128 0x17
+ 1216 000d 11       		.uleb128 0x11
+ 1217 000e 01       		.uleb128 0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 30
+
+
+ 1218 000f 10       		.uleb128 0x10
+ 1219 0010 17       		.uleb128 0x17
+ 1220 0011 00       		.byte	0
+ 1221 0012 00       		.byte	0
+ 1222 0013 02       		.uleb128 0x2
+ 1223 0014 24       		.uleb128 0x24
+ 1224 0015 00       		.byte	0
+ 1225 0016 0B       		.uleb128 0xb
+ 1226 0017 0B       		.uleb128 0xb
+ 1227 0018 3E       		.uleb128 0x3e
+ 1228 0019 0B       		.uleb128 0xb
+ 1229 001a 03       		.uleb128 0x3
+ 1230 001b 0E       		.uleb128 0xe
+ 1231 001c 00       		.byte	0
+ 1232 001d 00       		.byte	0
+ 1233 001e 03       		.uleb128 0x3
+ 1234 001f 16       		.uleb128 0x16
+ 1235 0020 00       		.byte	0
+ 1236 0021 03       		.uleb128 0x3
+ 1237 0022 0E       		.uleb128 0xe
+ 1238 0023 3A       		.uleb128 0x3a
+ 1239 0024 0B       		.uleb128 0xb
+ 1240 0025 3B       		.uleb128 0x3b
+ 1241 0026 0B       		.uleb128 0xb
+ 1242 0027 49       		.uleb128 0x49
+ 1243 0028 13       		.uleb128 0x13
+ 1244 0029 00       		.byte	0
+ 1245 002a 00       		.byte	0
+ 1246 002b 04       		.uleb128 0x4
+ 1247 002c 24       		.uleb128 0x24
+ 1248 002d 00       		.byte	0
+ 1249 002e 0B       		.uleb128 0xb
+ 1250 002f 0B       		.uleb128 0xb
+ 1251 0030 3E       		.uleb128 0x3e
+ 1252 0031 0B       		.uleb128 0xb
+ 1253 0032 03       		.uleb128 0x3
+ 1254 0033 08       		.uleb128 0x8
+ 1255 0034 00       		.byte	0
+ 1256 0035 00       		.byte	0
+ 1257 0036 05       		.uleb128 0x5
+ 1258 0037 16       		.uleb128 0x16
+ 1259 0038 00       		.byte	0
+ 1260 0039 03       		.uleb128 0x3
+ 1261 003a 0E       		.uleb128 0xe
+ 1262 003b 3A       		.uleb128 0x3a
+ 1263 003c 0B       		.uleb128 0xb
+ 1264 003d 3B       		.uleb128 0x3b
+ 1265 003e 05       		.uleb128 0x5
+ 1266 003f 49       		.uleb128 0x49
+ 1267 0040 13       		.uleb128 0x13
+ 1268 0041 00       		.byte	0
+ 1269 0042 00       		.byte	0
+ 1270 0043 06       		.uleb128 0x6
+ 1271 0044 0F       		.uleb128 0xf
+ 1272 0045 00       		.byte	0
+ 1273 0046 0B       		.uleb128 0xb
+ 1274 0047 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 31
+
+
+ 1275 0048 49       		.uleb128 0x49
+ 1276 0049 13       		.uleb128 0x13
+ 1277 004a 00       		.byte	0
+ 1278 004b 00       		.byte	0
+ 1279 004c 07       		.uleb128 0x7
+ 1280 004d 15       		.uleb128 0x15
+ 1281 004e 00       		.byte	0
+ 1282 004f 27       		.uleb128 0x27
+ 1283 0050 19       		.uleb128 0x19
+ 1284 0051 00       		.byte	0
+ 1285 0052 00       		.byte	0
+ 1286 0053 08       		.uleb128 0x8
+ 1287 0054 0F       		.uleb128 0xf
+ 1288 0055 00       		.byte	0
+ 1289 0056 0B       		.uleb128 0xb
+ 1290 0057 0B       		.uleb128 0xb
+ 1291 0058 00       		.byte	0
+ 1292 0059 00       		.byte	0
+ 1293 005a 09       		.uleb128 0x9
+ 1294 005b 13       		.uleb128 0x13
+ 1295 005c 00       		.byte	0
+ 1296 005d 03       		.uleb128 0x3
+ 1297 005e 0E       		.uleb128 0xe
+ 1298 005f 3C       		.uleb128 0x3c
+ 1299 0060 19       		.uleb128 0x19
+ 1300 0061 00       		.byte	0
+ 1301 0062 00       		.byte	0
+ 1302 0063 0A       		.uleb128 0xa
+ 1303 0064 13       		.uleb128 0x13
+ 1304 0065 01       		.byte	0x1
+ 1305 0066 0B       		.uleb128 0xb
+ 1306 0067 0B       		.uleb128 0xb
+ 1307 0068 3A       		.uleb128 0x3a
+ 1308 0069 0B       		.uleb128 0xb
+ 1309 006a 3B       		.uleb128 0x3b
+ 1310 006b 0B       		.uleb128 0xb
+ 1311 006c 01       		.uleb128 0x1
+ 1312 006d 13       		.uleb128 0x13
+ 1313 006e 00       		.byte	0
+ 1314 006f 00       		.byte	0
+ 1315 0070 0B       		.uleb128 0xb
+ 1316 0071 0D       		.uleb128 0xd
+ 1317 0072 00       		.byte	0
+ 1318 0073 03       		.uleb128 0x3
+ 1319 0074 0E       		.uleb128 0xe
+ 1320 0075 3A       		.uleb128 0x3a
+ 1321 0076 0B       		.uleb128 0xb
+ 1322 0077 3B       		.uleb128 0x3b
+ 1323 0078 0B       		.uleb128 0xb
+ 1324 0079 49       		.uleb128 0x49
+ 1325 007a 13       		.uleb128 0x13
+ 1326 007b 38       		.uleb128 0x38
+ 1327 007c 0B       		.uleb128 0xb
+ 1328 007d 00       		.byte	0
+ 1329 007e 00       		.byte	0
+ 1330 007f 0C       		.uleb128 0xc
+ 1331 0080 0D       		.uleb128 0xd
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 32
+
+
+ 1332 0081 00       		.byte	0
+ 1333 0082 03       		.uleb128 0x3
+ 1334 0083 08       		.uleb128 0x8
+ 1335 0084 3A       		.uleb128 0x3a
+ 1336 0085 0B       		.uleb128 0xb
+ 1337 0086 3B       		.uleb128 0x3b
+ 1338 0087 0B       		.uleb128 0xb
+ 1339 0088 49       		.uleb128 0x49
+ 1340 0089 13       		.uleb128 0x13
+ 1341 008a 38       		.uleb128 0x38
+ 1342 008b 0B       		.uleb128 0xb
+ 1343 008c 00       		.byte	0
+ 1344 008d 00       		.byte	0
+ 1345 008e 0D       		.uleb128 0xd
+ 1346 008f 2E       		.uleb128 0x2e
+ 1347 0090 01       		.byte	0x1
+ 1348 0091 03       		.uleb128 0x3
+ 1349 0092 0E       		.uleb128 0xe
+ 1350 0093 3A       		.uleb128 0x3a
+ 1351 0094 0B       		.uleb128 0xb
+ 1352 0095 3B       		.uleb128 0x3b
+ 1353 0096 0B       		.uleb128 0xb
+ 1354 0097 27       		.uleb128 0x27
+ 1355 0098 19       		.uleb128 0x19
+ 1356 0099 20       		.uleb128 0x20
+ 1357 009a 0B       		.uleb128 0xb
+ 1358 009b 01       		.uleb128 0x1
+ 1359 009c 13       		.uleb128 0x13
+ 1360 009d 00       		.byte	0
+ 1361 009e 00       		.byte	0
+ 1362 009f 0E       		.uleb128 0xe
+ 1363 00a0 34       		.uleb128 0x34
+ 1364 00a1 00       		.byte	0
+ 1365 00a2 03       		.uleb128 0x3
+ 1366 00a3 0E       		.uleb128 0xe
+ 1367 00a4 3A       		.uleb128 0x3a
+ 1368 00a5 0B       		.uleb128 0xb
+ 1369 00a6 3B       		.uleb128 0x3b
+ 1370 00a7 0B       		.uleb128 0xb
+ 1371 00a8 49       		.uleb128 0x49
+ 1372 00a9 13       		.uleb128 0x13
+ 1373 00aa 00       		.byte	0
+ 1374 00ab 00       		.byte	0
+ 1375 00ac 0F       		.uleb128 0xf
+ 1376 00ad 2E       		.uleb128 0x2e
+ 1377 00ae 01       		.byte	0x1
+ 1378 00af 3F       		.uleb128 0x3f
+ 1379 00b0 19       		.uleb128 0x19
+ 1380 00b1 03       		.uleb128 0x3
+ 1381 00b2 0E       		.uleb128 0xe
+ 1382 00b3 3A       		.uleb128 0x3a
+ 1383 00b4 0B       		.uleb128 0xb
+ 1384 00b5 3B       		.uleb128 0x3b
+ 1385 00b6 0B       		.uleb128 0xb
+ 1386 00b7 27       		.uleb128 0x27
+ 1387 00b8 19       		.uleb128 0x19
+ 1388 00b9 49       		.uleb128 0x49
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 33
+
+
+ 1389 00ba 13       		.uleb128 0x13
+ 1390 00bb 11       		.uleb128 0x11
+ 1391 00bc 01       		.uleb128 0x1
+ 1392 00bd 12       		.uleb128 0x12
+ 1393 00be 06       		.uleb128 0x6
+ 1394 00bf 40       		.uleb128 0x40
+ 1395 00c0 18       		.uleb128 0x18
+ 1396 00c1 9642     		.uleb128 0x2116
+ 1397 00c3 19       		.uleb128 0x19
+ 1398 00c4 01       		.uleb128 0x1
+ 1399 00c5 13       		.uleb128 0x13
+ 1400 00c6 00       		.byte	0
+ 1401 00c7 00       		.byte	0
+ 1402 00c8 10       		.uleb128 0x10
+ 1403 00c9 34       		.uleb128 0x34
+ 1404 00ca 00       		.byte	0
+ 1405 00cb 03       		.uleb128 0x3
+ 1406 00cc 08       		.uleb128 0x8
+ 1407 00cd 3A       		.uleb128 0x3a
+ 1408 00ce 0B       		.uleb128 0xb
+ 1409 00cf 3B       		.uleb128 0x3b
+ 1410 00d0 0B       		.uleb128 0xb
+ 1411 00d1 49       		.uleb128 0x49
+ 1412 00d2 13       		.uleb128 0x13
+ 1413 00d3 02       		.uleb128 0x2
+ 1414 00d4 18       		.uleb128 0x18
+ 1415 00d5 00       		.byte	0
+ 1416 00d6 00       		.byte	0
+ 1417 00d7 11       		.uleb128 0x11
+ 1418 00d8 01       		.uleb128 0x1
+ 1419 00d9 01       		.byte	0x1
+ 1420 00da 49       		.uleb128 0x49
+ 1421 00db 13       		.uleb128 0x13
+ 1422 00dc 01       		.uleb128 0x1
+ 1423 00dd 13       		.uleb128 0x13
+ 1424 00de 00       		.byte	0
+ 1425 00df 00       		.byte	0
+ 1426 00e0 12       		.uleb128 0x12
+ 1427 00e1 21       		.uleb128 0x21
+ 1428 00e2 00       		.byte	0
+ 1429 00e3 49       		.uleb128 0x49
+ 1430 00e4 13       		.uleb128 0x13
+ 1431 00e5 2F       		.uleb128 0x2f
+ 1432 00e6 0B       		.uleb128 0xb
+ 1433 00e7 00       		.byte	0
+ 1434 00e8 00       		.byte	0
+ 1435 00e9 13       		.uleb128 0x13
+ 1436 00ea 26       		.uleb128 0x26
+ 1437 00eb 00       		.byte	0
+ 1438 00ec 49       		.uleb128 0x49
+ 1439 00ed 13       		.uleb128 0x13
+ 1440 00ee 00       		.byte	0
+ 1441 00ef 00       		.byte	0
+ 1442 00f0 14       		.uleb128 0x14
+ 1443 00f1 2E       		.uleb128 0x2e
+ 1444 00f2 01       		.byte	0x1
+ 1445 00f3 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 34
+
+
+ 1446 00f4 19       		.uleb128 0x19
+ 1447 00f5 03       		.uleb128 0x3
+ 1448 00f6 0E       		.uleb128 0xe
+ 1449 00f7 3A       		.uleb128 0x3a
+ 1450 00f8 0B       		.uleb128 0xb
+ 1451 00f9 3B       		.uleb128 0x3b
+ 1452 00fa 0B       		.uleb128 0xb
+ 1453 00fb 27       		.uleb128 0x27
+ 1454 00fc 19       		.uleb128 0x19
+ 1455 00fd 11       		.uleb128 0x11
+ 1456 00fe 01       		.uleb128 0x1
+ 1457 00ff 12       		.uleb128 0x12
+ 1458 0100 06       		.uleb128 0x6
+ 1459 0101 40       		.uleb128 0x40
+ 1460 0102 18       		.uleb128 0x18
+ 1461 0103 9642     		.uleb128 0x2116
+ 1462 0105 19       		.uleb128 0x19
+ 1463 0106 01       		.uleb128 0x1
+ 1464 0107 13       		.uleb128 0x13
+ 1465 0108 00       		.byte	0
+ 1466 0109 00       		.byte	0
+ 1467 010a 15       		.uleb128 0x15
+ 1468 010b 05       		.uleb128 0x5
+ 1469 010c 00       		.byte	0
+ 1470 010d 03       		.uleb128 0x3
+ 1471 010e 08       		.uleb128 0x8
+ 1472 010f 3A       		.uleb128 0x3a
+ 1473 0110 0B       		.uleb128 0xb
+ 1474 0111 3B       		.uleb128 0x3b
+ 1475 0112 0B       		.uleb128 0xb
+ 1476 0113 49       		.uleb128 0x49
+ 1477 0114 13       		.uleb128 0x13
+ 1478 0115 02       		.uleb128 0x2
+ 1479 0116 18       		.uleb128 0x18
+ 1480 0117 00       		.byte	0
+ 1481 0118 00       		.byte	0
+ 1482 0119 16       		.uleb128 0x16
+ 1483 011a 34       		.uleb128 0x34
+ 1484 011b 00       		.byte	0
+ 1485 011c 03       		.uleb128 0x3
+ 1486 011d 0E       		.uleb128 0xe
+ 1487 011e 3A       		.uleb128 0x3a
+ 1488 011f 0B       		.uleb128 0xb
+ 1489 0120 3B       		.uleb128 0x3b
+ 1490 0121 0B       		.uleb128 0xb
+ 1491 0122 49       		.uleb128 0x49
+ 1492 0123 13       		.uleb128 0x13
+ 1493 0124 02       		.uleb128 0x2
+ 1494 0125 18       		.uleb128 0x18
+ 1495 0126 00       		.byte	0
+ 1496 0127 00       		.byte	0
+ 1497 0128 17       		.uleb128 0x17
+ 1498 0129 2E       		.uleb128 0x2e
+ 1499 012a 01       		.byte	0x1
+ 1500 012b 03       		.uleb128 0x3
+ 1501 012c 0E       		.uleb128 0xe
+ 1502 012d 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 35
+
+
+ 1503 012e 0B       		.uleb128 0xb
+ 1504 012f 3B       		.uleb128 0x3b
+ 1505 0130 0B       		.uleb128 0xb
+ 1506 0131 27       		.uleb128 0x27
+ 1507 0132 19       		.uleb128 0x19
+ 1508 0133 11       		.uleb128 0x11
+ 1509 0134 01       		.uleb128 0x1
+ 1510 0135 12       		.uleb128 0x12
+ 1511 0136 06       		.uleb128 0x6
+ 1512 0137 40       		.uleb128 0x40
+ 1513 0138 18       		.uleb128 0x18
+ 1514 0139 9642     		.uleb128 0x2116
+ 1515 013b 19       		.uleb128 0x19
+ 1516 013c 01       		.uleb128 0x1
+ 1517 013d 13       		.uleb128 0x13
+ 1518 013e 00       		.byte	0
+ 1519 013f 00       		.byte	0
+ 1520 0140 18       		.uleb128 0x18
+ 1521 0141 2E       		.uleb128 0x2e
+ 1522 0142 00       		.byte	0
+ 1523 0143 3F       		.uleb128 0x3f
+ 1524 0144 19       		.uleb128 0x19
+ 1525 0145 03       		.uleb128 0x3
+ 1526 0146 0E       		.uleb128 0xe
+ 1527 0147 3A       		.uleb128 0x3a
+ 1528 0148 0B       		.uleb128 0xb
+ 1529 0149 3B       		.uleb128 0x3b
+ 1530 014a 0B       		.uleb128 0xb
+ 1531 014b 27       		.uleb128 0x27
+ 1532 014c 19       		.uleb128 0x19
+ 1533 014d 3C       		.uleb128 0x3c
+ 1534 014e 19       		.uleb128 0x19
+ 1535 014f 00       		.byte	0
+ 1536 0150 00       		.byte	0
+ 1537 0151 19       		.uleb128 0x19
+ 1538 0152 34       		.uleb128 0x34
+ 1539 0153 00       		.byte	0
+ 1540 0154 03       		.uleb128 0x3
+ 1541 0155 0E       		.uleb128 0xe
+ 1542 0156 3A       		.uleb128 0x3a
+ 1543 0157 0B       		.uleb128 0xb
+ 1544 0158 3B       		.uleb128 0x3b
+ 1545 0159 0B       		.uleb128 0xb
+ 1546 015a 49       		.uleb128 0x49
+ 1547 015b 13       		.uleb128 0x13
+ 1548 015c 3F       		.uleb128 0x3f
+ 1549 015d 19       		.uleb128 0x19
+ 1550 015e 3C       		.uleb128 0x3c
+ 1551 015f 19       		.uleb128 0x19
+ 1552 0160 00       		.byte	0
+ 1553 0161 00       		.byte	0
+ 1554 0162 1A       		.uleb128 0x1a
+ 1555 0163 21       		.uleb128 0x21
+ 1556 0164 00       		.byte	0
+ 1557 0165 00       		.byte	0
+ 1558 0166 00       		.byte	0
+ 1559 0167 1B       		.uleb128 0x1b
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 36
+
+
+ 1560 0168 2E       		.uleb128 0x2e
+ 1561 0169 01       		.byte	0x1
+ 1562 016a 3F       		.uleb128 0x3f
+ 1563 016b 19       		.uleb128 0x19
+ 1564 016c 03       		.uleb128 0x3
+ 1565 016d 0E       		.uleb128 0xe
+ 1566 016e 3A       		.uleb128 0x3a
+ 1567 016f 0B       		.uleb128 0xb
+ 1568 0170 3B       		.uleb128 0x3b
+ 1569 0171 0B       		.uleb128 0xb
+ 1570 0172 27       		.uleb128 0x27
+ 1571 0173 19       		.uleb128 0x19
+ 1572 0174 11       		.uleb128 0x11
+ 1573 0175 01       		.uleb128 0x1
+ 1574 0176 12       		.uleb128 0x12
+ 1575 0177 06       		.uleb128 0x6
+ 1576 0178 40       		.uleb128 0x40
+ 1577 0179 18       		.uleb128 0x18
+ 1578 017a 9742     		.uleb128 0x2117
+ 1579 017c 19       		.uleb128 0x19
+ 1580 017d 01       		.uleb128 0x1
+ 1581 017e 13       		.uleb128 0x13
+ 1582 017f 00       		.byte	0
+ 1583 0180 00       		.byte	0
+ 1584 0181 1C       		.uleb128 0x1c
+ 1585 0182 05       		.uleb128 0x5
+ 1586 0183 00       		.byte	0
+ 1587 0184 03       		.uleb128 0x3
+ 1588 0185 0E       		.uleb128 0xe
+ 1589 0186 3A       		.uleb128 0x3a
+ 1590 0187 0B       		.uleb128 0xb
+ 1591 0188 3B       		.uleb128 0x3b
+ 1592 0189 0B       		.uleb128 0xb
+ 1593 018a 49       		.uleb128 0x49
+ 1594 018b 13       		.uleb128 0x13
+ 1595 018c 02       		.uleb128 0x2
+ 1596 018d 18       		.uleb128 0x18
+ 1597 018e 00       		.byte	0
+ 1598 018f 00       		.byte	0
+ 1599 0190 1D       		.uleb128 0x1d
+ 1600 0191 1D       		.uleb128 0x1d
+ 1601 0192 01       		.byte	0x1
+ 1602 0193 31       		.uleb128 0x31
+ 1603 0194 13       		.uleb128 0x13
+ 1604 0195 11       		.uleb128 0x11
+ 1605 0196 01       		.uleb128 0x1
+ 1606 0197 12       		.uleb128 0x12
+ 1607 0198 06       		.uleb128 0x6
+ 1608 0199 58       		.uleb128 0x58
+ 1609 019a 0B       		.uleb128 0xb
+ 1610 019b 59       		.uleb128 0x59
+ 1611 019c 0B       		.uleb128 0xb
+ 1612 019d 00       		.byte	0
+ 1613 019e 00       		.byte	0
+ 1614 019f 1E       		.uleb128 0x1e
+ 1615 01a0 0B       		.uleb128 0xb
+ 1616 01a1 01       		.byte	0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 37
+
+
+ 1617 01a2 11       		.uleb128 0x11
+ 1618 01a3 01       		.uleb128 0x1
+ 1619 01a4 12       		.uleb128 0x12
+ 1620 01a5 06       		.uleb128 0x6
+ 1621 01a6 00       		.byte	0
+ 1622 01a7 00       		.byte	0
+ 1623 01a8 1F       		.uleb128 0x1f
+ 1624 01a9 34       		.uleb128 0x34
+ 1625 01aa 00       		.byte	0
+ 1626 01ab 31       		.uleb128 0x31
+ 1627 01ac 13       		.uleb128 0x13
+ 1628 01ad 02       		.uleb128 0x2
+ 1629 01ae 18       		.uleb128 0x18
+ 1630 01af 00       		.byte	0
+ 1631 01b0 00       		.byte	0
+ 1632 01b1 20       		.uleb128 0x20
+ 1633 01b2 34       		.uleb128 0x34
+ 1634 01b3 00       		.byte	0
+ 1635 01b4 03       		.uleb128 0x3
+ 1636 01b5 0E       		.uleb128 0xe
+ 1637 01b6 3A       		.uleb128 0x3a
+ 1638 01b7 0B       		.uleb128 0xb
+ 1639 01b8 3B       		.uleb128 0x3b
+ 1640 01b9 05       		.uleb128 0x5
+ 1641 01ba 49       		.uleb128 0x49
+ 1642 01bb 13       		.uleb128 0x13
+ 1643 01bc 3F       		.uleb128 0x3f
+ 1644 01bd 19       		.uleb128 0x19
+ 1645 01be 3C       		.uleb128 0x3c
+ 1646 01bf 19       		.uleb128 0x19
+ 1647 01c0 00       		.byte	0
+ 1648 01c1 00       		.byte	0
+ 1649 01c2 21       		.uleb128 0x21
+ 1650 01c3 35       		.uleb128 0x35
+ 1651 01c4 00       		.byte	0
+ 1652 01c5 49       		.uleb128 0x49
+ 1653 01c6 13       		.uleb128 0x13
+ 1654 01c7 00       		.byte	0
+ 1655 01c8 00       		.byte	0
+ 1656 01c9 22       		.uleb128 0x22
+ 1657 01ca 34       		.uleb128 0x34
+ 1658 01cb 00       		.byte	0
+ 1659 01cc 03       		.uleb128 0x3
+ 1660 01cd 0E       		.uleb128 0xe
+ 1661 01ce 3A       		.uleb128 0x3a
+ 1662 01cf 0B       		.uleb128 0xb
+ 1663 01d0 3B       		.uleb128 0x3b
+ 1664 01d1 0B       		.uleb128 0xb
+ 1665 01d2 49       		.uleb128 0x49
+ 1666 01d3 13       		.uleb128 0x13
+ 1667 01d4 3F       		.uleb128 0x3f
+ 1668 01d5 19       		.uleb128 0x19
+ 1669 01d6 02       		.uleb128 0x2
+ 1670 01d7 18       		.uleb128 0x18
+ 1671 01d8 00       		.byte	0
+ 1672 01d9 00       		.byte	0
+ 1673 01da 23       		.uleb128 0x23
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 38
+
+
+ 1674 01db 34       		.uleb128 0x34
+ 1675 01dc 00       		.byte	0
+ 1676 01dd 03       		.uleb128 0x3
+ 1677 01de 08       		.uleb128 0x8
+ 1678 01df 3A       		.uleb128 0x3a
+ 1679 01e0 0B       		.uleb128 0xb
+ 1680 01e1 3B       		.uleb128 0x3b
+ 1681 01e2 0B       		.uleb128 0xb
+ 1682 01e3 49       		.uleb128 0x49
+ 1683 01e4 13       		.uleb128 0x13
+ 1684 01e5 3F       		.uleb128 0x3f
+ 1685 01e6 19       		.uleb128 0x19
+ 1686 01e7 02       		.uleb128 0x2
+ 1687 01e8 18       		.uleb128 0x18
+ 1688 01e9 00       		.byte	0
+ 1689 01ea 00       		.byte	0
+ 1690 01eb 00       		.byte	0
+ 1691              		.section	.debug_aranges,"",%progbits
+ 1692 0000 44000000 		.4byte	0x44
+ 1693 0004 0200     		.2byte	0x2
+ 1694 0006 00000000 		.4byte	.Ldebug_info0
+ 1695 000a 04       		.byte	0x4
+ 1696 000b 00       		.byte	0
+ 1697 000c 0000     		.2byte	0
+ 1698 000e 0000     		.2byte	0
+ 1699 0010 00000000 		.4byte	.LFB68
+ 1700 0014 8C000000 		.4byte	.LFE68-.LFB68
+ 1701 0018 00000000 		.4byte	.LFB69
+ 1702 001c 90010000 		.4byte	.LFE69-.LFB69
+ 1703 0020 00000000 		.4byte	.LFB70
+ 1704 0024 D0000000 		.4byte	.LFE70-.LFB70
+ 1705 0028 00000000 		.4byte	.LFB71
+ 1706 002c 68000000 		.4byte	.LFE71-.LFB71
+ 1707 0030 00000000 		.4byte	.LFB72
+ 1708 0034 1E000000 		.4byte	.LFE72-.LFB72
+ 1709 0038 00000000 		.4byte	.LFB73
+ 1710 003c 1A000000 		.4byte	.LFE73-.LFB73
+ 1711 0040 00000000 		.4byte	0
+ 1712 0044 00000000 		.4byte	0
+ 1713              		.section	.debug_ranges,"",%progbits
+ 1714              	.Ldebug_ranges0:
+ 1715 0000 00000000 		.4byte	.LFB68
+ 1716 0004 8C000000 		.4byte	.LFE68
+ 1717 0008 00000000 		.4byte	.LFB69
+ 1718 000c 90010000 		.4byte	.LFE69
+ 1719 0010 00000000 		.4byte	.LFB70
+ 1720 0014 D0000000 		.4byte	.LFE70
+ 1721 0018 00000000 		.4byte	.LFB71
+ 1722 001c 68000000 		.4byte	.LFE71
+ 1723 0020 00000000 		.4byte	.LFB72
+ 1724 0024 1E000000 		.4byte	.LFE72
+ 1725 0028 00000000 		.4byte	.LFB73
+ 1726 002c 1A000000 		.4byte	.LFE73
+ 1727 0030 00000000 		.4byte	0
+ 1728 0034 00000000 		.4byte	0
+ 1729              		.section	.debug_line,"",%progbits
+ 1730              	.Ldebug_line0:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 39
+
+
+ 1731 0000 C5020000 		.section	.debug_str,"MS",%progbits,1
+ 1731      0200DA01 
+ 1731      00000201 
+ 1731      FB0E0D00 
+ 1731      01010101 
+ 1732              	.LASF48:
+ 1733 0000 43795261 		.ascii	"CyRamVectors\000"
+ 1733      6D566563 
+ 1733      746F7273 
+ 1733      00
+ 1734              	.LASF38:
+ 1735 000d 72656365 		.ascii	"receive_data\000"
+ 1735      6976655F 
+ 1735      64617461 
+ 1735      00
+ 1736              	.LASF27:
+ 1737 001a 6375725F 		.ascii	"cur_dest\000"
+ 1737      64657374 
+ 1737      00
+ 1738              	.LASF19:
+ 1739 0023 73697A65 		.ascii	"sizetype\000"
+ 1739      74797065 
+ 1739      00
+ 1740              	.LASF41:
+ 1741 002c 78506F72 		.ascii	"xPortSysTickHandler\000"
+ 1741      74537973 
+ 1741      5469636B 
+ 1741      48616E64 
+ 1741      6C657200 
+ 1742              	.LASF22:
+ 1743 0040 5461736B 		.ascii	"TaskHandle_t\000"
+ 1743      48616E64 
+ 1743      6C655F74 
+ 1743      00
+ 1744              	.LASF62:
+ 1745 004d 6D61696E 		.ascii	"main\000"
+ 1745      00
+ 1746              	.LASF7:
+ 1747 0052 5F5F7569 		.ascii	"__uint32_t\000"
+ 1747      6E743332 
+ 1747      5F7400
+ 1748              	.LASF35:
+ 1749 005d 5049445F 		.ascii	"PID_data\000"
+ 1749      64617461 
+ 1749      00
+ 1750              	.LASF18:
+ 1751 0066 63796973 		.ascii	"cyisraddress\000"
+ 1751      72616464 
+ 1751      72657373 
+ 1751      00
+ 1752              	.LASF2:
+ 1753 0073 73686F72 		.ascii	"short int\000"
+ 1753      7420696E 
+ 1753      7400
+ 1754              	.LASF12:
+ 1755 007d 75696E74 		.ascii	"uint8_t\000"
+ 1755      385F7400 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 40
+
+
+ 1756              	.LASF42:
+ 1757 0085 76506F72 		.ascii	"vPortSVCHandler\000"
+ 1757      74535643 
+ 1757      48616E64 
+ 1757      6C657200 
+ 1758              	.LASF43:
+ 1759 0095 76417070 		.ascii	"vApplicationStackOverflowHook\000"
+ 1759      6C696361 
+ 1759      74696F6E 
+ 1759      53746163 
+ 1759      6B4F7665 
+ 1760              	.LASF44:
+ 1761 00b3 70785461 		.ascii	"pxTask\000"
+ 1761      736B00
+ 1762              	.LASF15:
+ 1763 00ba 666C6F61 		.ascii	"float\000"
+ 1763      7400
+ 1764              	.LASF9:
+ 1765 00c0 6C6F6E67 		.ascii	"long long int\000"
+ 1765      206C6F6E 
+ 1765      6720696E 
+ 1765      7400
+ 1766              	.LASF51:
+ 1767 00ce 71756575 		.ascii	"queue_handle\000"
+ 1767      655F6861 
+ 1767      6E646C65 
+ 1767      00
+ 1768              	.LASF36:
+ 1769 00db 6C6F6361 		.ascii	"local_write\000"
+ 1769      6C5F7772 
+ 1769      69746500 
+ 1770              	.LASF56:
+ 1771 00e7 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1771      4320342E 
+ 1771      392E3320 
+ 1771      32303135 
+ 1771      30333033 
+ 1772 011a 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1772      20726576 
+ 1772      6973696F 
+ 1772      6E203232 
+ 1772      31323230 
+ 1773 014d 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 1773      66756E63 
+ 1773      74696F6E 
+ 1773      2D736563 
+ 1773      74696F6E 
+ 1774              	.LASF34:
+ 1775 0175 77686565 		.ascii	"wheel_data\000"
+ 1775      6C5F6461 
+ 1775      746100
+ 1776              	.LASF33:
+ 1777 0180 74696D65 		.ascii	"time_prev\000"
+ 1777      5F707265 
+ 1777      7600
+ 1778              	.LASF59:
+ 1779 018a 5461736B 		.ascii	"TaskControlBlock_t\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 41
+
+
+ 1779      436F6E74 
+ 1779      726F6C42 
+ 1779      6C6F636B 
+ 1779      5F7400
+ 1780              	.LASF4:
+ 1781 019d 5F5F7569 		.ascii	"__uint8_t\000"
+ 1781      6E74385F 
+ 1781      7400
+ 1782              	.LASF47:
+ 1783 01a7 7078506F 		.ascii	"pxPort\000"
+ 1783      727400
+ 1784              	.LASF46:
+ 1785 01ae 76417070 		.ascii	"vApplicationMallocFailedHook\000"
+ 1785      6C696361 
+ 1785      74696F6E 
+ 1785      4D616C6C 
+ 1785      6F634661 
+ 1786              	.LASF1:
+ 1787 01cb 756E7369 		.ascii	"unsigned char\000"
+ 1787      676E6564 
+ 1787      20636861 
+ 1787      7200
+ 1788              	.LASF21:
+ 1789 01d9 5469636B 		.ascii	"TickType_t\000"
+ 1789      54797065 
+ 1789      5F7400
+ 1790              	.LASF30:
+ 1791 01e4 6572726F 		.ascii	"error_sum\000"
+ 1791      725F7375 
+ 1791      6D00
+ 1792              	.LASF24:
+ 1793 01ee 53656D61 		.ascii	"SemaphoreHandle_t\000"
+ 1793      70686F72 
+ 1793      6548616E 
+ 1793      646C655F 
+ 1793      7400
+ 1794              	.LASF26:
+ 1795 0200 70726576 		.ascii	"prev_dest\000"
+ 1795      5F646573 
+ 1795      7400
+ 1796              	.LASF63:
+ 1797 020a 70727648 		.ascii	"prvHardwareSetup\000"
+ 1797      61726477 
+ 1797      61726553 
+ 1797      65747570 
+ 1797      00
+ 1798              	.LASF0:
+ 1799 021b 7369676E 		.ascii	"signed char\000"
+ 1799      65642063 
+ 1799      68617200 
+ 1800              	.LASF10:
+ 1801 0227 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1801      206C6F6E 
+ 1801      6720756E 
+ 1801      7369676E 
+ 1801      65642069 
+ 1802              	.LASF14:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 42
+
+
+ 1803 023e 75696E74 		.ascii	"uint32_t\000"
+ 1803      33325F74 
+ 1803      00
+ 1804              	.LASF11:
+ 1805 0247 756E7369 		.ascii	"unsigned int\000"
+ 1805      676E6564 
+ 1805      20696E74 
+ 1805      00
+ 1806              	.LASF20:
+ 1807 0254 42617365 		.ascii	"BaseType_t\000"
+ 1807      54797065 
+ 1807      5F7400
+ 1808              	.LASF50:
+ 1809 025f 67617465 		.ascii	"gatekeeper\000"
+ 1809      6B656570 
+ 1809      657200
+ 1810              	.LASF32:
+ 1811 026a 74696D65 		.ascii	"time\000"
+ 1811      00
+ 1812              	.LASF28:
+ 1813 026f 6572726F 		.ascii	"error_prev\000"
+ 1813      725F7072 
+ 1813      657600
+ 1814              	.LASF3:
+ 1815 027a 73686F72 		.ascii	"short unsigned int\000"
+ 1815      7420756E 
+ 1815      7369676E 
+ 1815      65642069 
+ 1815      6E7400
+ 1816              	.LASF17:
+ 1817 028d 63686172 		.ascii	"char\000"
+ 1817      00
+ 1818              	.LASF31:
+ 1819 0292 6D6F746F 		.ascii	"motor_volt\000"
+ 1819      725F766F 
+ 1819      6C7400
+ 1820              	.LASF37:
+ 1821 029d 74797065 		.ascii	"type\000"
+ 1821      00
+ 1822              	.LASF13:
+ 1823 02a2 696E7433 		.ascii	"int32_t\000"
+ 1823      325F7400 
+ 1824              	.LASF40:
+ 1825 02aa 78506F72 		.ascii	"xPortPendSVHandler\000"
+ 1825      7450656E 
+ 1825      64535648 
+ 1825      616E646C 
+ 1825      657200
+ 1826              	.LASF25:
+ 1827 02bd 78436F6D 		.ascii	"xComPortHandle\000"
+ 1827      506F7274 
+ 1827      48616E64 
+ 1827      6C6500
+ 1828              	.LASF58:
+ 1829 02cc 453A5C47 		.ascii	"E:\\GitHub\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 1829      69744875 
+ 1829      625C4659 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 43
+
+
+ 1829      505F4E65 
+ 1829      775F5465 
+ 1830 02fc 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1830      4743435C 
+ 1830      46726565 
+ 1830      52544F53 
+ 1830      5F44656D 
+ 1831              	.LASF53:
+ 1832 0318 62756666 		.ascii	"buffer\000"
+ 1832      657200
+ 1833              	.LASF57:
+ 1834 031f 6D61696E 		.ascii	"main.c\000"
+ 1834      2E6300
+ 1835              	.LASF8:
+ 1836 0326 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1836      20756E73 
+ 1836      69676E65 
+ 1836      6420696E 
+ 1836      7400
+ 1837              	.LASF16:
+ 1838 0338 646F7562 		.ascii	"double\000"
+ 1838      6C6500
+ 1839              	.LASF52:
+ 1840 033f 72785F72 		.ascii	"rx_receive\000"
+ 1840      65636569 
+ 1840      766500
+ 1841              	.LASF5:
+ 1842 034a 5F5F696E 		.ascii	"__int32_t\000"
+ 1842      7433325F 
+ 1842      7400
+ 1843              	.LASF23:
+ 1844 0354 51756575 		.ascii	"QueueHandle_t\000"
+ 1844      6548616E 
+ 1844      646C655F 
+ 1844      7400
+ 1845              	.LASF29:
+ 1846 0362 6572726F 		.ascii	"error\000"
+ 1846      7200
+ 1847              	.LASF60:
+ 1848 0368 76506F72 		.ascii	"vPortRaiseBASEPRI\000"
+ 1848      74526169 
+ 1848      73654241 
+ 1848      53455052 
+ 1848      4900
+ 1849              	.LASF55:
+ 1850 037a 72696768 		.ascii	"right_wheel\000"
+ 1850      745F7768 
+ 1850      65656C00 
+ 1851              	.LASF6:
+ 1852 0386 6C6F6E67 		.ascii	"long int\000"
+ 1852      20696E74 
+ 1852      00
+ 1853              	.LASF49:
+ 1854 038f 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1854      52784275 
+ 1854      66666572 
+ 1854      00
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccGi6Uyv.s 			page 44
+
+
+ 1855              	.LASF54:
+ 1856 039c 6C656674 		.ascii	"left_wheel\000"
+ 1856      5F776865 
+ 1856      656C00
+ 1857              	.LASF39:
+ 1858 03a7 5049445F 		.ascii	"PID_initialise\000"
+ 1858      696E6974 
+ 1858      69616C69 
+ 1858      736500
+ 1859              	.LASF61:
+ 1860 03b6 756C4E65 		.ascii	"ulNewBASEPRI\000"
+ 1860      77424153 
+ 1860      45505249 
+ 1860      00
+ 1861              	.LASF45:
+ 1862 03c3 70635461 		.ascii	"pcTaskName\000"
+ 1862      736B4E61 
+ 1862      6D6500
+ 1863              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

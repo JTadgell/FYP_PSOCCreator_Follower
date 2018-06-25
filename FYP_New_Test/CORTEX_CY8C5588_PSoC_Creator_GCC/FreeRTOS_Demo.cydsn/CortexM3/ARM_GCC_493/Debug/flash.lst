@@ -1,0 +1,933 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"flash.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	uxFlashTaskNumber:
+  21 0000 00000000 		.space	4
+  22              		.section	.rodata
+  23              		.align	2
+  24              	.LC0:
+  25 0000 4C454478 		.ascii	"LEDx\000"
+  25      00
+  26 0005 000000   		.section	.text.vStartLEDFlashTasks,"ax",%progbits
+  27              		.align	2
+  28              		.global	vStartLEDFlashTasks
+  29              		.thumb
+  30              		.thumb_func
+  31              		.type	vStartLEDFlashTasks, %function
+  32              	vStartLEDFlashTasks:
+  33              	.LFB68:
+  34              		.file 1 "..\\..\\Common\\Minimal\\flash.c"
+   1:..\..\Common\Minimal/flash.c **** /*
+   2:..\..\Common\Minimal/flash.c ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\Common\Minimal/flash.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\Common\Minimal/flash.c ****  *
+   5:..\..\Common\Minimal/flash.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\Common\Minimal/flash.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\Common\Minimal/flash.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\Common\Minimal/flash.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\Common\Minimal/flash.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\Common\Minimal/flash.c ****  * subject to the following conditions:
+  11:..\..\Common\Minimal/flash.c ****  *
+  12:..\..\Common\Minimal/flash.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\Common\Minimal/flash.c ****  * copies or substantial portions of the Software.
+  14:..\..\Common\Minimal/flash.c ****  *
+  15:..\..\Common\Minimal/flash.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\Common\Minimal/flash.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\Common\Minimal/flash.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\Common\Minimal/flash.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\Common\Minimal/flash.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\Common\Minimal/flash.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\Common\Minimal/flash.c ****  *
+  22:..\..\Common\Minimal/flash.c ****  * http://www.FreeRTOS.org
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 2
+
+
+  23:..\..\Common\Minimal/flash.c ****  * http://aws.amazon.com/freertos
+  24:..\..\Common\Minimal/flash.c ****  *
+  25:..\..\Common\Minimal/flash.c ****  * 1 tab == 4 spaces!
+  26:..\..\Common\Minimal/flash.c ****  */
+  27:..\..\Common\Minimal/flash.c **** 
+  28:..\..\Common\Minimal/flash.c **** /**
+  29:..\..\Common\Minimal/flash.c ****  * This version of flash .c is for use on systems that have limited stack space
+  30:..\..\Common\Minimal/flash.c ****  * and no display facilities.  The complete version can be found in the
+  31:..\..\Common\Minimal/flash.c ****  * Demo/Common/Full directory.
+  32:..\..\Common\Minimal/flash.c ****  *
+  33:..\..\Common\Minimal/flash.c ****  * Three tasks are created, each of which flash an LED at a different rate.  The first
+  34:..\..\Common\Minimal/flash.c ****  * LED flashes every 200ms, the second every 400ms, the third every 600ms.
+  35:..\..\Common\Minimal/flash.c ****  *
+  36:..\..\Common\Minimal/flash.c ****  * The LED flash tasks provide instant visual feedback.  They show that the scheduler
+  37:..\..\Common\Minimal/flash.c ****  * is still operational.
+  38:..\..\Common\Minimal/flash.c ****  *
+  39:..\..\Common\Minimal/flash.c ****  */
+  40:..\..\Common\Minimal/flash.c **** 
+  41:..\..\Common\Minimal/flash.c **** 
+  42:..\..\Common\Minimal/flash.c **** #include <stdlib.h>
+  43:..\..\Common\Minimal/flash.c **** 
+  44:..\..\Common\Minimal/flash.c **** /* Scheduler include files. */
+  45:..\..\Common\Minimal/flash.c **** #include "FreeRTOS.h"
+  46:..\..\Common\Minimal/flash.c **** #include "task.h"
+  47:..\..\Common\Minimal/flash.c **** 
+  48:..\..\Common\Minimal/flash.c **** /* Demo program include files. */
+  49:..\..\Common\Minimal/flash.c **** #include "partest.h"
+  50:..\..\Common\Minimal/flash.c **** #include "flash.h"
+  51:..\..\Common\Minimal/flash.c **** 
+  52:..\..\Common\Minimal/flash.c **** #define ledSTACK_SIZE		configMINIMAL_STACK_SIZE
+  53:..\..\Common\Minimal/flash.c **** #define ledNUMBER_OF_LEDS	( 3 )
+  54:..\..\Common\Minimal/flash.c **** #define ledFLASH_RATE_BASE	( ( TickType_t ) 333 )
+  55:..\..\Common\Minimal/flash.c **** 
+  56:..\..\Common\Minimal/flash.c **** /* Variable used by the created tasks to calculate the LED number to use, and
+  57:..\..\Common\Minimal/flash.c **** the rate at which they should flash the LED. */
+  58:..\..\Common\Minimal/flash.c **** static volatile UBaseType_t uxFlashTaskNumber = 0;
+  59:..\..\Common\Minimal/flash.c **** 
+  60:..\..\Common\Minimal/flash.c **** /* The task that is created three times. */
+  61:..\..\Common\Minimal/flash.c **** static portTASK_FUNCTION_PROTO( vLEDFlashTask, pvParameters );
+  62:..\..\Common\Minimal/flash.c **** 
+  63:..\..\Common\Minimal/flash.c **** /*-----------------------------------------------------------*/
+  64:..\..\Common\Minimal/flash.c **** 
+  65:..\..\Common\Minimal/flash.c **** void vStartLEDFlashTasks( UBaseType_t uxPriority )
+  66:..\..\Common\Minimal/flash.c **** {
+  35              		.loc 1 66 0
+  36              		.cfi_startproc
+  37              		@ args = 0, pretend = 0, frame = 16
+  38              		@ frame_needed = 1, uses_anonymous_args = 0
+  39 0000 80B5     		push	{r7, lr}
+  40              		.cfi_def_cfa_offset 8
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43 0002 86B0     		sub	sp, sp, #24
+  44              		.cfi_def_cfa_offset 32
+  45 0004 02AF     		add	r7, sp, #8
+  46              		.cfi_def_cfa 7, 24
+  47 0006 7860     		str	r0, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 3
+
+
+  67:..\..\Common\Minimal/flash.c **** BaseType_t xLEDTask;
+  68:..\..\Common\Minimal/flash.c **** 
+  69:..\..\Common\Minimal/flash.c **** 	/* Create the three tasks. */
+  70:..\..\Common\Minimal/flash.c **** 	for( xLEDTask = 0; xLEDTask < ledNUMBER_OF_LEDS; ++xLEDTask )
+  48              		.loc 1 70 0
+  49 0008 0023     		movs	r3, #0
+  50 000a FB60     		str	r3, [r7, #12]
+  51 000c 0CE0     		b	.L2
+  52              	.L3:
+  71:..\..\Common\Minimal/flash.c **** 	{
+  72:..\..\Common\Minimal/flash.c **** 		/* Spawn the task. */
+  73:..\..\Common\Minimal/flash.c **** 		xTaskCreate( vLEDFlashTask, "LEDx", ledSTACK_SIZE, NULL, uxPriority, ( TaskHandle_t * ) NULL );
+  53              		.loc 1 73 0 discriminator 3
+  54 000e 7B68     		ldr	r3, [r7, #4]
+  55 0010 0093     		str	r3, [sp]
+  56 0012 0023     		movs	r3, #0
+  57 0014 0193     		str	r3, [sp, #4]
+  58 0016 0748     		ldr	r0, .L4
+  59 0018 0749     		ldr	r1, .L4+4
+  60 001a 6422     		movs	r2, #100
+  61 001c 0023     		movs	r3, #0
+  62 001e FFF7FEFF 		bl	xTaskCreate
+  70:..\..\Common\Minimal/flash.c **** 	{
+  63              		.loc 1 70 0 discriminator 3
+  64 0022 FB68     		ldr	r3, [r7, #12]
+  65 0024 0133     		adds	r3, r3, #1
+  66 0026 FB60     		str	r3, [r7, #12]
+  67              	.L2:
+  70:..\..\Common\Minimal/flash.c **** 	{
+  68              		.loc 1 70 0 is_stmt 0 discriminator 1
+  69 0028 FB68     		ldr	r3, [r7, #12]
+  70 002a 022B     		cmp	r3, #2
+  71 002c EFDD     		ble	.L3
+  74:..\..\Common\Minimal/flash.c **** 	}
+  75:..\..\Common\Minimal/flash.c **** }
+  72              		.loc 1 75 0 is_stmt 1
+  73 002e 1037     		adds	r7, r7, #16
+  74              		.cfi_def_cfa_offset 8
+  75 0030 BD46     		mov	sp, r7
+  76              		.cfi_def_cfa_register 13
+  77              		@ sp needed
+  78 0032 80BD     		pop	{r7, pc}
+  79              	.L5:
+  80              		.align	2
+  81              	.L4:
+  82 0034 00000000 		.word	vLEDFlashTask
+  83 0038 00000000 		.word	.LC0
+  84              		.cfi_endproc
+  85              	.LFE68:
+  86              		.size	vStartLEDFlashTasks, .-vStartLEDFlashTasks
+  87              		.section	.text.vLEDFlashTask,"ax",%progbits
+  88              		.align	2
+  89              		.thumb
+  90              		.thumb_func
+  91              		.type	vLEDFlashTask, %function
+  92              	vLEDFlashTask:
+  93              	.LFB69:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 4
+
+
+  76:..\..\Common\Minimal/flash.c **** /*-----------------------------------------------------------*/
+  77:..\..\Common\Minimal/flash.c **** 
+  78:..\..\Common\Minimal/flash.c **** static portTASK_FUNCTION( vLEDFlashTask, pvParameters )
+  79:..\..\Common\Minimal/flash.c **** {
+  94              		.loc 1 79 0
+  95              		.cfi_startproc
+  96              		@ args = 0, pretend = 0, frame = 24
+  97              		@ frame_needed = 1, uses_anonymous_args = 0
+  98 0000 80B5     		push	{r7, lr}
+  99              		.cfi_def_cfa_offset 8
+ 100              		.cfi_offset 7, -8
+ 101              		.cfi_offset 14, -4
+ 102 0002 86B0     		sub	sp, sp, #24
+ 103              		.cfi_def_cfa_offset 32
+ 104 0004 00AF     		add	r7, sp, #0
+ 105              		.cfi_def_cfa_register 7
+ 106 0006 7860     		str	r0, [r7, #4]
+  80:..\..\Common\Minimal/flash.c **** TickType_t xFlashRate, xLastFlashTime;
+  81:..\..\Common\Minimal/flash.c **** UBaseType_t uxLED;
+  82:..\..\Common\Minimal/flash.c **** 
+  83:..\..\Common\Minimal/flash.c **** 	/* The parameters are not used. */
+  84:..\..\Common\Minimal/flash.c **** 	( void ) pvParameters;
+  85:..\..\Common\Minimal/flash.c **** 
+  86:..\..\Common\Minimal/flash.c **** 	/* Calculate the LED and flash rate. */
+  87:..\..\Common\Minimal/flash.c **** 	portENTER_CRITICAL();
+ 107              		.loc 1 87 0
+ 108 0008 FFF7FEFF 		bl	vPortEnterCritical
+  88:..\..\Common\Minimal/flash.c **** 	{
+  89:..\..\Common\Minimal/flash.c **** 		/* See which of the eight LED's we should use. */
+  90:..\..\Common\Minimal/flash.c **** 		uxLED = uxFlashTaskNumber;
+ 109              		.loc 1 90 0
+ 110 000c 154B     		ldr	r3, .L8
+ 111 000e 1B68     		ldr	r3, [r3]
+ 112 0010 7B61     		str	r3, [r7, #20]
+  91:..\..\Common\Minimal/flash.c **** 
+  92:..\..\Common\Minimal/flash.c **** 		/* Update so the next task uses the next LED. */
+  93:..\..\Common\Minimal/flash.c **** 		uxFlashTaskNumber++;
+ 113              		.loc 1 93 0
+ 114 0012 144B     		ldr	r3, .L8
+ 115 0014 1B68     		ldr	r3, [r3]
+ 116 0016 0133     		adds	r3, r3, #1
+ 117 0018 124A     		ldr	r2, .L8
+ 118 001a 1360     		str	r3, [r2]
+  94:..\..\Common\Minimal/flash.c **** 	}
+  95:..\..\Common\Minimal/flash.c **** 	portEXIT_CRITICAL();
+ 119              		.loc 1 95 0
+ 120 001c FFF7FEFF 		bl	vPortExitCritical
+  96:..\..\Common\Minimal/flash.c **** 
+  97:..\..\Common\Minimal/flash.c **** 	xFlashRate = ledFLASH_RATE_BASE + ( ledFLASH_RATE_BASE * ( TickType_t ) uxLED );
+ 121              		.loc 1 97 0
+ 122 0020 7B69     		ldr	r3, [r7, #20]
+ 123 0022 0133     		adds	r3, r3, #1
+ 124 0024 40F24D12 		movw	r2, #333
+ 125 0028 02FB03F3 		mul	r3, r2, r3
+ 126 002c 3B61     		str	r3, [r7, #16]
+  98:..\..\Common\Minimal/flash.c **** 	xFlashRate /= portTICK_PERIOD_MS;
+  99:..\..\Common\Minimal/flash.c **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 5
+
+
+ 100:..\..\Common\Minimal/flash.c **** 	/* We will turn the LED on and off again in the delay period, so each
+ 101:..\..\Common\Minimal/flash.c **** 	delay is only half the total period. */
+ 102:..\..\Common\Minimal/flash.c **** 	xFlashRate /= ( TickType_t ) 2;
+ 127              		.loc 1 102 0
+ 128 002e 3B69     		ldr	r3, [r7, #16]
+ 129 0030 5B08     		lsrs	r3, r3, #1
+ 130 0032 3B61     		str	r3, [r7, #16]
+ 103:..\..\Common\Minimal/flash.c **** 
+ 104:..\..\Common\Minimal/flash.c **** 	/* We need to initialise xLastFlashTime prior to the first call to
+ 105:..\..\Common\Minimal/flash.c **** 	vTaskDelayUntil(). */
+ 106:..\..\Common\Minimal/flash.c **** 	xLastFlashTime = xTaskGetTickCount();
+ 131              		.loc 1 106 0
+ 132 0034 FFF7FEFF 		bl	xTaskGetTickCount
+ 133 0038 0346     		mov	r3, r0
+ 134 003a FB60     		str	r3, [r7, #12]
+ 135              	.L7:
+ 107:..\..\Common\Minimal/flash.c **** 
+ 108:..\..\Common\Minimal/flash.c **** 	for(;;)
+ 109:..\..\Common\Minimal/flash.c **** 	{
+ 110:..\..\Common\Minimal/flash.c **** 		/* Delay for half the flash period then turn the LED on. */
+ 111:..\..\Common\Minimal/flash.c **** 		vTaskDelayUntil( &xLastFlashTime, xFlashRate );
+ 136              		.loc 1 111 0 discriminator 1
+ 137 003c 07F10C03 		add	r3, r7, #12
+ 138 0040 1846     		mov	r0, r3
+ 139 0042 3969     		ldr	r1, [r7, #16]
+ 140 0044 FFF7FEFF 		bl	vTaskDelayUntil
+ 112:..\..\Common\Minimal/flash.c **** 		vParTestToggleLED( uxLED );
+ 141              		.loc 1 112 0 discriminator 1
+ 142 0048 7869     		ldr	r0, [r7, #20]
+ 143 004a FFF7FEFF 		bl	vParTestToggleLED
+ 113:..\..\Common\Minimal/flash.c **** 
+ 114:..\..\Common\Minimal/flash.c **** 		/* Delay for half the flash period then turn the LED off. */
+ 115:..\..\Common\Minimal/flash.c **** 		vTaskDelayUntil( &xLastFlashTime, xFlashRate );
+ 144              		.loc 1 115 0 discriminator 1
+ 145 004e 07F10C03 		add	r3, r7, #12
+ 146 0052 1846     		mov	r0, r3
+ 147 0054 3969     		ldr	r1, [r7, #16]
+ 148 0056 FFF7FEFF 		bl	vTaskDelayUntil
+ 116:..\..\Common\Minimal/flash.c **** 		vParTestToggleLED( uxLED );
+ 149              		.loc 1 116 0 discriminator 1
+ 150 005a 7869     		ldr	r0, [r7, #20]
+ 151 005c FFF7FEFF 		bl	vParTestToggleLED
+ 117:..\..\Common\Minimal/flash.c **** 	}
+ 152              		.loc 1 117 0 discriminator 1
+ 153 0060 ECE7     		b	.L7
+ 154              	.L9:
+ 155 0062 00BF     		.align	2
+ 156              	.L8:
+ 157 0064 00000000 		.word	uxFlashTaskNumber
+ 158              		.cfi_endproc
+ 159              	.LFE69:
+ 160              		.size	vLEDFlashTask, .-vLEDFlashTask
+ 161              		.text
+ 162              	.Letext0:
+ 163              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 164              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 165              		.file 4 "../../../Source/portable/GCC/ARM_CM3/portmacro.h"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 6
+
+
+ 166              		.file 5 "../../../Source/include/task.h"
+ 167              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 168              		.section	.debug_info,"",%progbits
+ 169              	.Ldebug_info0:
+ 170 0000 90010000 		.4byte	0x190
+ 171 0004 0400     		.2byte	0x4
+ 172 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 173 000a 04       		.byte	0x4
+ 174 000b 01       		.uleb128 0x1
+ 175 000c 32000000 		.4byte	.LASF28
+ 176 0010 01       		.byte	0x1
+ 177 0011 DA000000 		.4byte	.LASF29
+ 178 0015 8B010000 		.4byte	.LASF30
+ 179 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 180 001d 00000000 		.4byte	0
+ 181 0021 00000000 		.4byte	.Ldebug_line0
+ 182 0025 02       		.uleb128 0x2
+ 183 0026 04       		.byte	0x4
+ 184 0027 07       		.byte	0x7
+ 185 0028 67010000 		.4byte	.LASF0
+ 186 002c 03       		.uleb128 0x3
+ 187 002d 04       		.byte	0x4
+ 188 002e 05       		.byte	0x5
+ 189 002f 696E7400 		.ascii	"int\000"
+ 190 0033 02       		.uleb128 0x2
+ 191 0034 01       		.byte	0x1
+ 192 0035 06       		.byte	0x6
+ 193 0036 87020000 		.4byte	.LASF1
+ 194 003a 02       		.uleb128 0x2
+ 195 003b 01       		.byte	0x1
+ 196 003c 08       		.byte	0x8
+ 197 003d 29010000 		.4byte	.LASF2
+ 198 0041 02       		.uleb128 0x2
+ 199 0042 02       		.byte	0x2
+ 200 0043 05       		.byte	0x5
+ 201 0044 53020000 		.4byte	.LASF3
+ 202 0048 02       		.uleb128 0x2
+ 203 0049 02       		.byte	0x2
+ 204 004a 07       		.byte	0x7
+ 205 004b 09010000 		.4byte	.LASF4
+ 206 004f 04       		.uleb128 0x4
+ 207 0050 28000000 		.4byte	.LASF6
+ 208 0054 02       		.byte	0x2
+ 209 0055 3F       		.byte	0x3f
+ 210 0056 5A000000 		.4byte	0x5a
+ 211 005a 02       		.uleb128 0x2
+ 212 005b 04       		.byte	0x4
+ 213 005c 05       		.byte	0x5
+ 214 005d 7E020000 		.4byte	.LASF5
+ 215 0061 04       		.uleb128 0x4
+ 216 0062 3E010000 		.4byte	.LASF7
+ 217 0066 02       		.byte	0x2
+ 218 0067 41       		.byte	0x41
+ 219 0068 6C000000 		.4byte	0x6c
+ 220 006c 02       		.uleb128 0x2
+ 221 006d 04       		.byte	0x4
+ 222 006e 07       		.byte	0x7
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 7
+
+
+ 223 006f F7000000 		.4byte	.LASF8
+ 224 0073 02       		.uleb128 0x2
+ 225 0074 08       		.byte	0x8
+ 226 0075 05       		.byte	0x5
+ 227 0076 24020000 		.4byte	.LASF9
+ 228 007a 02       		.uleb128 0x2
+ 229 007b 08       		.byte	0x8
+ 230 007c 07       		.byte	0x7
+ 231 007d 74010000 		.4byte	.LASF10
+ 232 0081 02       		.uleb128 0x2
+ 233 0082 04       		.byte	0x4
+ 234 0083 07       		.byte	0x7
+ 235 0084 1B020000 		.4byte	.LASF11
+ 236 0088 05       		.uleb128 0x5
+ 237 0089 04       		.byte	0x4
+ 238 008a 02       		.uleb128 0x2
+ 239 008b 01       		.byte	0x1
+ 240 008c 08       		.byte	0x8
+ 241 008d 32020000 		.4byte	.LASF12
+ 242 0091 04       		.uleb128 0x4
+ 243 0092 13020000 		.4byte	.LASF13
+ 244 0096 03       		.byte	0x3
+ 245 0097 2C       		.byte	0x2c
+ 246 0098 4F000000 		.4byte	0x4f
+ 247 009c 04       		.uleb128 0x4
+ 248 009d 75020000 		.4byte	.LASF14
+ 249 00a1 03       		.byte	0x3
+ 250 00a2 2D       		.byte	0x2d
+ 251 00a3 61000000 		.4byte	0x61
+ 252 00a7 02       		.uleb128 0x2
+ 253 00a8 04       		.byte	0x4
+ 254 00a9 04       		.byte	0x4
+ 255 00aa D4000000 		.4byte	.LASF15
+ 256 00ae 02       		.uleb128 0x2
+ 257 00af 08       		.byte	0x8
+ 258 00b0 04       		.byte	0x4
+ 259 00b1 37010000 		.4byte	.LASF16
+ 260 00b5 04       		.uleb128 0x4
+ 261 00b6 9F020000 		.4byte	.LASF17
+ 262 00ba 04       		.byte	0x4
+ 263 00bb 38       		.byte	0x38
+ 264 00bc 5A000000 		.4byte	0x5a
+ 265 00c0 04       		.uleb128 0x4
+ 266 00c1 93020000 		.4byte	.LASF18
+ 267 00c5 04       		.byte	0x4
+ 268 00c6 39       		.byte	0x39
+ 269 00c7 6C000000 		.4byte	0x6c
+ 270 00cb 04       		.uleb128 0x4
+ 271 00cc 0E000000 		.4byte	.LASF19
+ 272 00d0 04       		.byte	0x4
+ 273 00d1 3F       		.byte	0x3f
+ 274 00d2 9C000000 		.4byte	0x9c
+ 275 00d6 06       		.uleb128 0x6
+ 276 00d7 C0000000 		.4byte	0xc0
+ 277 00db 04       		.uleb128 0x4
+ 278 00dc 68020000 		.4byte	.LASF20
+ 279 00e0 05       		.byte	0x5
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 8
+
+
+ 280 00e1 3E       		.byte	0x3e
+ 281 00e2 E6000000 		.4byte	0xe6
+ 282 00e6 07       		.uleb128 0x7
+ 283 00e7 04       		.byte	0x4
+ 284 00e8 EC000000 		.4byte	0xec
+ 285 00ec 08       		.uleb128 0x8
+ 286 00ed 49010000 		.4byte	.LASF31
+ 287 00f1 09       		.uleb128 0x9
+ 288 00f2 C0000000 		.4byte	.LASF32
+ 289 00f6 01       		.byte	0x1
+ 290 00f7 41       		.byte	0x41
+ 291 00f8 00000000 		.4byte	.LFB68
+ 292 00fc 3C000000 		.4byte	.LFE68-.LFB68
+ 293 0100 01       		.uleb128 0x1
+ 294 0101 9C       		.byte	0x9c
+ 295 0102 23010000 		.4byte	0x123
+ 296 0106 0A       		.uleb128 0xa
+ 297 0107 5C010000 		.4byte	.LASF21
+ 298 010b 01       		.byte	0x1
+ 299 010c 41       		.byte	0x41
+ 300 010d C0000000 		.4byte	0xc0
+ 301 0111 02       		.uleb128 0x2
+ 302 0112 91       		.byte	0x91
+ 303 0113 6C       		.sleb128 -20
+ 304 0114 0B       		.uleb128 0xb
+ 305 0115 19000000 		.4byte	.LASF23
+ 306 0119 01       		.byte	0x1
+ 307 011a 43       		.byte	0x43
+ 308 011b B5000000 		.4byte	0xb5
+ 309 011f 02       		.uleb128 0x2
+ 310 0120 91       		.byte	0x91
+ 311 0121 74       		.sleb128 -12
+ 312 0122 00       		.byte	0
+ 313 0123 0C       		.uleb128 0xc
+ 314 0124 00000000 		.4byte	.LASF33
+ 315 0128 01       		.byte	0x1
+ 316 0129 4E       		.byte	0x4e
+ 317 012a 00000000 		.4byte	.LFB69
+ 318 012e 68000000 		.4byte	.LFE69-.LFB69
+ 319 0132 01       		.uleb128 0x1
+ 320 0133 9C       		.byte	0x9c
+ 321 0134 71010000 		.4byte	0x171
+ 322 0138 0A       		.uleb128 0xa
+ 323 0139 37020000 		.4byte	.LASF22
+ 324 013d 01       		.byte	0x1
+ 325 013e 4E       		.byte	0x4e
+ 326 013f 88000000 		.4byte	0x88
+ 327 0143 02       		.uleb128 0x2
+ 328 0144 91       		.byte	0x91
+ 329 0145 64       		.sleb128 -28
+ 330 0146 0B       		.uleb128 0xb
+ 331 0147 5D020000 		.4byte	.LASF24
+ 332 014b 01       		.byte	0x1
+ 333 014c 50       		.byte	0x50
+ 334 014d CB000000 		.4byte	0xcb
+ 335 0151 02       		.uleb128 0x2
+ 336 0152 91       		.byte	0x91
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 9
+
+
+ 337 0153 70       		.sleb128 -16
+ 338 0154 0B       		.uleb128 0xb
+ 339 0155 44020000 		.4byte	.LASF25
+ 340 0159 01       		.byte	0x1
+ 341 015a 50       		.byte	0x50
+ 342 015b CB000000 		.4byte	0xcb
+ 343 015f 02       		.uleb128 0x2
+ 344 0160 91       		.byte	0x91
+ 345 0161 6C       		.sleb128 -20
+ 346 0162 0B       		.uleb128 0xb
+ 347 0163 22000000 		.4byte	.LASF26
+ 348 0167 01       		.byte	0x1
+ 349 0168 51       		.byte	0x51
+ 350 0169 C0000000 		.4byte	0xc0
+ 351 016d 02       		.uleb128 0x2
+ 352 016e 91       		.byte	0x91
+ 353 016f 74       		.sleb128 -12
+ 354 0170 00       		.byte	0
+ 355 0171 0B       		.uleb128 0xb
+ 356 0172 AA020000 		.4byte	.LASF27
+ 357 0176 01       		.byte	0x1
+ 358 0177 3A       		.byte	0x3a
+ 359 0178 D6000000 		.4byte	0xd6
+ 360 017c 05       		.uleb128 0x5
+ 361 017d 03       		.byte	0x3
+ 362 017e 00000000 		.4byte	uxFlashTaskNumber
+ 363 0182 0D       		.uleb128 0xd
+ 364 0183 1C010000 		.4byte	.LASF34
+ 365 0187 06       		.byte	0x6
+ 366 0188 9606     		.2byte	0x696
+ 367 018a 8E010000 		.4byte	0x18e
+ 368 018e 06       		.uleb128 0x6
+ 369 018f 91000000 		.4byte	0x91
+ 370 0193 00       		.byte	0
+ 371              		.section	.debug_abbrev,"",%progbits
+ 372              	.Ldebug_abbrev0:
+ 373 0000 01       		.uleb128 0x1
+ 374 0001 11       		.uleb128 0x11
+ 375 0002 01       		.byte	0x1
+ 376 0003 25       		.uleb128 0x25
+ 377 0004 0E       		.uleb128 0xe
+ 378 0005 13       		.uleb128 0x13
+ 379 0006 0B       		.uleb128 0xb
+ 380 0007 03       		.uleb128 0x3
+ 381 0008 0E       		.uleb128 0xe
+ 382 0009 1B       		.uleb128 0x1b
+ 383 000a 0E       		.uleb128 0xe
+ 384 000b 55       		.uleb128 0x55
+ 385 000c 17       		.uleb128 0x17
+ 386 000d 11       		.uleb128 0x11
+ 387 000e 01       		.uleb128 0x1
+ 388 000f 10       		.uleb128 0x10
+ 389 0010 17       		.uleb128 0x17
+ 390 0011 00       		.byte	0
+ 391 0012 00       		.byte	0
+ 392 0013 02       		.uleb128 0x2
+ 393 0014 24       		.uleb128 0x24
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 10
+
+
+ 394 0015 00       		.byte	0
+ 395 0016 0B       		.uleb128 0xb
+ 396 0017 0B       		.uleb128 0xb
+ 397 0018 3E       		.uleb128 0x3e
+ 398 0019 0B       		.uleb128 0xb
+ 399 001a 03       		.uleb128 0x3
+ 400 001b 0E       		.uleb128 0xe
+ 401 001c 00       		.byte	0
+ 402 001d 00       		.byte	0
+ 403 001e 03       		.uleb128 0x3
+ 404 001f 24       		.uleb128 0x24
+ 405 0020 00       		.byte	0
+ 406 0021 0B       		.uleb128 0xb
+ 407 0022 0B       		.uleb128 0xb
+ 408 0023 3E       		.uleb128 0x3e
+ 409 0024 0B       		.uleb128 0xb
+ 410 0025 03       		.uleb128 0x3
+ 411 0026 08       		.uleb128 0x8
+ 412 0027 00       		.byte	0
+ 413 0028 00       		.byte	0
+ 414 0029 04       		.uleb128 0x4
+ 415 002a 16       		.uleb128 0x16
+ 416 002b 00       		.byte	0
+ 417 002c 03       		.uleb128 0x3
+ 418 002d 0E       		.uleb128 0xe
+ 419 002e 3A       		.uleb128 0x3a
+ 420 002f 0B       		.uleb128 0xb
+ 421 0030 3B       		.uleb128 0x3b
+ 422 0031 0B       		.uleb128 0xb
+ 423 0032 49       		.uleb128 0x49
+ 424 0033 13       		.uleb128 0x13
+ 425 0034 00       		.byte	0
+ 426 0035 00       		.byte	0
+ 427 0036 05       		.uleb128 0x5
+ 428 0037 0F       		.uleb128 0xf
+ 429 0038 00       		.byte	0
+ 430 0039 0B       		.uleb128 0xb
+ 431 003a 0B       		.uleb128 0xb
+ 432 003b 00       		.byte	0
+ 433 003c 00       		.byte	0
+ 434 003d 06       		.uleb128 0x6
+ 435 003e 35       		.uleb128 0x35
+ 436 003f 00       		.byte	0
+ 437 0040 49       		.uleb128 0x49
+ 438 0041 13       		.uleb128 0x13
+ 439 0042 00       		.byte	0
+ 440 0043 00       		.byte	0
+ 441 0044 07       		.uleb128 0x7
+ 442 0045 0F       		.uleb128 0xf
+ 443 0046 00       		.byte	0
+ 444 0047 0B       		.uleb128 0xb
+ 445 0048 0B       		.uleb128 0xb
+ 446 0049 49       		.uleb128 0x49
+ 447 004a 13       		.uleb128 0x13
+ 448 004b 00       		.byte	0
+ 449 004c 00       		.byte	0
+ 450 004d 08       		.uleb128 0x8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 11
+
+
+ 451 004e 13       		.uleb128 0x13
+ 452 004f 00       		.byte	0
+ 453 0050 03       		.uleb128 0x3
+ 454 0051 0E       		.uleb128 0xe
+ 455 0052 3C       		.uleb128 0x3c
+ 456 0053 19       		.uleb128 0x19
+ 457 0054 00       		.byte	0
+ 458 0055 00       		.byte	0
+ 459 0056 09       		.uleb128 0x9
+ 460 0057 2E       		.uleb128 0x2e
+ 461 0058 01       		.byte	0x1
+ 462 0059 3F       		.uleb128 0x3f
+ 463 005a 19       		.uleb128 0x19
+ 464 005b 03       		.uleb128 0x3
+ 465 005c 0E       		.uleb128 0xe
+ 466 005d 3A       		.uleb128 0x3a
+ 467 005e 0B       		.uleb128 0xb
+ 468 005f 3B       		.uleb128 0x3b
+ 469 0060 0B       		.uleb128 0xb
+ 470 0061 27       		.uleb128 0x27
+ 471 0062 19       		.uleb128 0x19
+ 472 0063 11       		.uleb128 0x11
+ 473 0064 01       		.uleb128 0x1
+ 474 0065 12       		.uleb128 0x12
+ 475 0066 06       		.uleb128 0x6
+ 476 0067 40       		.uleb128 0x40
+ 477 0068 18       		.uleb128 0x18
+ 478 0069 9642     		.uleb128 0x2116
+ 479 006b 19       		.uleb128 0x19
+ 480 006c 01       		.uleb128 0x1
+ 481 006d 13       		.uleb128 0x13
+ 482 006e 00       		.byte	0
+ 483 006f 00       		.byte	0
+ 484 0070 0A       		.uleb128 0xa
+ 485 0071 05       		.uleb128 0x5
+ 486 0072 00       		.byte	0
+ 487 0073 03       		.uleb128 0x3
+ 488 0074 0E       		.uleb128 0xe
+ 489 0075 3A       		.uleb128 0x3a
+ 490 0076 0B       		.uleb128 0xb
+ 491 0077 3B       		.uleb128 0x3b
+ 492 0078 0B       		.uleb128 0xb
+ 493 0079 49       		.uleb128 0x49
+ 494 007a 13       		.uleb128 0x13
+ 495 007b 02       		.uleb128 0x2
+ 496 007c 18       		.uleb128 0x18
+ 497 007d 00       		.byte	0
+ 498 007e 00       		.byte	0
+ 499 007f 0B       		.uleb128 0xb
+ 500 0080 34       		.uleb128 0x34
+ 501 0081 00       		.byte	0
+ 502 0082 03       		.uleb128 0x3
+ 503 0083 0E       		.uleb128 0xe
+ 504 0084 3A       		.uleb128 0x3a
+ 505 0085 0B       		.uleb128 0xb
+ 506 0086 3B       		.uleb128 0x3b
+ 507 0087 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 12
+
+
+ 508 0088 49       		.uleb128 0x49
+ 509 0089 13       		.uleb128 0x13
+ 510 008a 02       		.uleb128 0x2
+ 511 008b 18       		.uleb128 0x18
+ 512 008c 00       		.byte	0
+ 513 008d 00       		.byte	0
+ 514 008e 0C       		.uleb128 0xc
+ 515 008f 2E       		.uleb128 0x2e
+ 516 0090 01       		.byte	0x1
+ 517 0091 03       		.uleb128 0x3
+ 518 0092 0E       		.uleb128 0xe
+ 519 0093 3A       		.uleb128 0x3a
+ 520 0094 0B       		.uleb128 0xb
+ 521 0095 3B       		.uleb128 0x3b
+ 522 0096 0B       		.uleb128 0xb
+ 523 0097 27       		.uleb128 0x27
+ 524 0098 19       		.uleb128 0x19
+ 525 0099 11       		.uleb128 0x11
+ 526 009a 01       		.uleb128 0x1
+ 527 009b 12       		.uleb128 0x12
+ 528 009c 06       		.uleb128 0x6
+ 529 009d 40       		.uleb128 0x40
+ 530 009e 18       		.uleb128 0x18
+ 531 009f 9642     		.uleb128 0x2116
+ 532 00a1 19       		.uleb128 0x19
+ 533 00a2 01       		.uleb128 0x1
+ 534 00a3 13       		.uleb128 0x13
+ 535 00a4 00       		.byte	0
+ 536 00a5 00       		.byte	0
+ 537 00a6 0D       		.uleb128 0xd
+ 538 00a7 34       		.uleb128 0x34
+ 539 00a8 00       		.byte	0
+ 540 00a9 03       		.uleb128 0x3
+ 541 00aa 0E       		.uleb128 0xe
+ 542 00ab 3A       		.uleb128 0x3a
+ 543 00ac 0B       		.uleb128 0xb
+ 544 00ad 3B       		.uleb128 0x3b
+ 545 00ae 05       		.uleb128 0x5
+ 546 00af 49       		.uleb128 0x49
+ 547 00b0 13       		.uleb128 0x13
+ 548 00b1 3F       		.uleb128 0x3f
+ 549 00b2 19       		.uleb128 0x19
+ 550 00b3 3C       		.uleb128 0x3c
+ 551 00b4 19       		.uleb128 0x19
+ 552 00b5 00       		.byte	0
+ 553 00b6 00       		.byte	0
+ 554 00b7 00       		.byte	0
+ 555              		.section	.debug_aranges,"",%progbits
+ 556 0000 24000000 		.4byte	0x24
+ 557 0004 0200     		.2byte	0x2
+ 558 0006 00000000 		.4byte	.Ldebug_info0
+ 559 000a 04       		.byte	0x4
+ 560 000b 00       		.byte	0
+ 561 000c 0000     		.2byte	0
+ 562 000e 0000     		.2byte	0
+ 563 0010 00000000 		.4byte	.LFB68
+ 564 0014 3C000000 		.4byte	.LFE68-.LFB68
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 13
+
+
+ 565 0018 00000000 		.4byte	.LFB69
+ 566 001c 68000000 		.4byte	.LFE69-.LFB69
+ 567 0020 00000000 		.4byte	0
+ 568 0024 00000000 		.4byte	0
+ 569              		.section	.debug_ranges,"",%progbits
+ 570              	.Ldebug_ranges0:
+ 571 0000 00000000 		.4byte	.LFB68
+ 572 0004 3C000000 		.4byte	.LFE68
+ 573 0008 00000000 		.4byte	.LFB69
+ 574 000c 68000000 		.4byte	.LFE69
+ 575 0010 00000000 		.4byte	0
+ 576 0014 00000000 		.4byte	0
+ 577              		.section	.debug_line,"",%progbits
+ 578              	.Ldebug_line0:
+ 579 0000 FF010000 		.section	.debug_str,"MS",%progbits,1
+ 579      0200A601 
+ 579      00000201 
+ 579      FB0E0D00 
+ 579      01010101 
+ 580              	.LASF33:
+ 581 0000 764C4544 		.ascii	"vLEDFlashTask\000"
+ 581      466C6173 
+ 581      68546173 
+ 581      6B00
+ 582              	.LASF19:
+ 583 000e 5469636B 		.ascii	"TickType_t\000"
+ 583      54797065 
+ 583      5F7400
+ 584              	.LASF23:
+ 585 0019 784C4544 		.ascii	"xLEDTask\000"
+ 585      5461736B 
+ 585      00
+ 586              	.LASF26:
+ 587 0022 75784C45 		.ascii	"uxLED\000"
+ 587      4400
+ 588              	.LASF6:
+ 589 0028 5F5F696E 		.ascii	"__int32_t\000"
+ 589      7433325F 
+ 589      7400
+ 590              	.LASF28:
+ 591 0032 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 591      4320342E 
+ 591      392E3320 
+ 591      32303135 
+ 591      30333033 
+ 592 0065 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 592      20726576 
+ 592      6973696F 
+ 592      6E203232 
+ 592      31323230 
+ 593 0098 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 593      66756E63 
+ 593      74696F6E 
+ 593      2D736563 
+ 593      74696F6E 
+ 594              	.LASF32:
+ 595 00c0 76537461 		.ascii	"vStartLEDFlashTasks\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 14
+
+
+ 595      72744C45 
+ 595      44466C61 
+ 595      73685461 
+ 595      736B7300 
+ 596              	.LASF15:
+ 597 00d4 666C6F61 		.ascii	"float\000"
+ 597      7400
+ 598              	.LASF29:
+ 599 00da 2E2E5C2E 		.ascii	"..\\..\\Common\\Minimal\\flash.c\000"
+ 599      2E5C436F 
+ 599      6D6D6F6E 
+ 599      5C4D696E 
+ 599      696D616C 
+ 600              	.LASF8:
+ 601 00f7 6C6F6E67 		.ascii	"long unsigned int\000"
+ 601      20756E73 
+ 601      69676E65 
+ 601      6420696E 
+ 601      7400
+ 602              	.LASF4:
+ 603 0109 73686F72 		.ascii	"short unsigned int\000"
+ 603      7420756E 
+ 603      7369676E 
+ 603      65642069 
+ 603      6E7400
+ 604              	.LASF34:
+ 605 011c 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 605      52784275 
+ 605      66666572 
+ 605      00
+ 606              	.LASF2:
+ 607 0129 756E7369 		.ascii	"unsigned char\000"
+ 607      676E6564 
+ 607      20636861 
+ 607      7200
+ 608              	.LASF16:
+ 609 0137 646F7562 		.ascii	"double\000"
+ 609      6C6500
+ 610              	.LASF7:
+ 611 013e 5F5F7569 		.ascii	"__uint32_t\000"
+ 611      6E743332 
+ 611      5F7400
+ 612              	.LASF31:
+ 613 0149 5461736B 		.ascii	"TaskControlBlock_t\000"
+ 613      436F6E74 
+ 613      726F6C42 
+ 613      6C6F636B 
+ 613      5F7400
+ 614              	.LASF21:
+ 615 015c 75785072 		.ascii	"uxPriority\000"
+ 615      696F7269 
+ 615      747900
+ 616              	.LASF0:
+ 617 0167 756E7369 		.ascii	"unsigned int\000"
+ 617      676E6564 
+ 617      20696E74 
+ 617      00
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 15
+
+
+ 618              	.LASF10:
+ 619 0174 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 619      206C6F6E 
+ 619      6720756E 
+ 619      7369676E 
+ 619      65642069 
+ 620              	.LASF30:
+ 621 018b 453A5C47 		.ascii	"E:\\GitHub\\FreeRTOS\\freertos-code-2543-trunk\\fre"
+ 621      69744875 
+ 621      625C4672 
+ 621      65655254 
+ 621      4F535C66 
+ 622 01ba 6572746F 		.ascii	"ertos-code-2543-trunk\\FreeRTOS\\Demo\\CORTEX_CY8C5"
+ 622      732D636F 
+ 622      64652D32 
+ 622      3534332D 
+ 622      7472756E 
+ 623 01ea 3538385F 		.ascii	"588_PSoC_Creator_GCC\\FreeRTOS_Demo.cydsn\000"
+ 623      50536F43 
+ 623      5F437265 
+ 623      61746F72 
+ 623      5F474343 
+ 624              	.LASF13:
+ 625 0213 696E7433 		.ascii	"int32_t\000"
+ 625      325F7400 
+ 626              	.LASF11:
+ 627 021b 73697A65 		.ascii	"sizetype\000"
+ 627      74797065 
+ 627      00
+ 628              	.LASF9:
+ 629 0224 6C6F6E67 		.ascii	"long long int\000"
+ 629      206C6F6E 
+ 629      6720696E 
+ 629      7400
+ 630              	.LASF12:
+ 631 0232 63686172 		.ascii	"char\000"
+ 631      00
+ 632              	.LASF22:
+ 633 0237 70765061 		.ascii	"pvParameters\000"
+ 633      72616D65 
+ 633      74657273 
+ 633      00
+ 634              	.LASF25:
+ 635 0244 784C6173 		.ascii	"xLastFlashTime\000"
+ 635      74466C61 
+ 635      73685469 
+ 635      6D6500
+ 636              	.LASF3:
+ 637 0253 73686F72 		.ascii	"short int\000"
+ 637      7420696E 
+ 637      7400
+ 638              	.LASF24:
+ 639 025d 78466C61 		.ascii	"xFlashRate\000"
+ 639      73685261 
+ 639      746500
+ 640              	.LASF20:
+ 641 0268 5461736B 		.ascii	"TaskHandle_t\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccM5AyQz.s 			page 16
+
+
+ 641      48616E64 
+ 641      6C655F74 
+ 641      00
+ 642              	.LASF14:
+ 643 0275 75696E74 		.ascii	"uint32_t\000"
+ 643      33325F74 
+ 643      00
+ 644              	.LASF5:
+ 645 027e 6C6F6E67 		.ascii	"long int\000"
+ 645      20696E74 
+ 645      00
+ 646              	.LASF1:
+ 647 0287 7369676E 		.ascii	"signed char\000"
+ 647      65642063 
+ 647      68617200 
+ 648              	.LASF18:
+ 649 0293 55426173 		.ascii	"UBaseType_t\000"
+ 649      65547970 
+ 649      655F7400 
+ 650              	.LASF17:
+ 651 029f 42617365 		.ascii	"BaseType_t\000"
+ 651      54797065 
+ 651      5F7400
+ 652              	.LASF27:
+ 653 02aa 7578466C 		.ascii	"uxFlashTaskNumber\000"
+ 653      61736854 
+ 653      61736B4E 
+ 653      756D6265 
+ 653      7200
+ 654              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

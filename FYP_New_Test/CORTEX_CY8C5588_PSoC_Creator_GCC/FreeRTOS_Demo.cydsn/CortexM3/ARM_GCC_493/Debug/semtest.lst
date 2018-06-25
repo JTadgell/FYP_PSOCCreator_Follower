@@ -1,0 +1,1812 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"semtest.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	sCheckVariables:
+  21 0000 00000000 		.space	8
+  21      00000000 
+  22              		.align	1
+  23              	sNextCheckVariable:
+  24 0008 0000     		.space	2
+  25              		.section	.rodata
+  26              		.align	2
+  27              	.LC0:
+  28 0000 506F6C53 		.ascii	"PolSEM1\000"
+  28      454D3100 
+  29              		.align	2
+  30              	.LC1:
+  31 0008 506F6C53 		.ascii	"PolSEM2\000"
+  31      454D3200 
+  32              		.align	2
+  33              	.LC2:
+  34 0010 436F756E 		.ascii	"Counting_Sem_1\000"
+  34      74696E67 
+  34      5F53656D 
+  34      5F3100
+  35 001f 00       		.align	2
+  36              	.LC3:
+  37 0020 426C6B53 		.ascii	"BlkSEM1\000"
+  37      454D3100 
+  38              		.align	2
+  39              	.LC4:
+  40 0028 426C6B53 		.ascii	"BlkSEM2\000"
+  40      454D3200 
+  41              		.align	2
+  42              	.LC5:
+  43 0030 436F756E 		.ascii	"Counting_Sem_2\000"
+  43      74696E67 
+  43      5F53656D 
+  43      5F3200
+  44 003f 00       		.section	.text.vStartSemaphoreTasks,"ax",%progbits
+  45              		.align	2
+  46              		.global	vStartSemaphoreTasks
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 2
+
+
+  47              		.thumb
+  48              		.thumb_func
+  49              		.type	vStartSemaphoreTasks, %function
+  50              	vStartSemaphoreTasks:
+  51              	.LFB68:
+  52              		.file 1 "..\\..\\Common\\Minimal\\semtest.c"
+   1:..\..\Common\Minimal/semtest.c **** /*
+   2:..\..\Common\Minimal/semtest.c ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\Common\Minimal/semtest.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\Common\Minimal/semtest.c ****  *
+   5:..\..\Common\Minimal/semtest.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\Common\Minimal/semtest.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\Common\Minimal/semtest.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\Common\Minimal/semtest.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\Common\Minimal/semtest.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\Common\Minimal/semtest.c ****  * subject to the following conditions:
+  11:..\..\Common\Minimal/semtest.c ****  *
+  12:..\..\Common\Minimal/semtest.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\Common\Minimal/semtest.c ****  * copies or substantial portions of the Software.
+  14:..\..\Common\Minimal/semtest.c ****  *
+  15:..\..\Common\Minimal/semtest.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\Common\Minimal/semtest.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\Common\Minimal/semtest.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\Common\Minimal/semtest.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\Common\Minimal/semtest.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\Common\Minimal/semtest.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\Common\Minimal/semtest.c ****  *
+  22:..\..\Common\Minimal/semtest.c ****  * http://www.FreeRTOS.org
+  23:..\..\Common\Minimal/semtest.c ****  * http://aws.amazon.com/freertos
+  24:..\..\Common\Minimal/semtest.c ****  *
+  25:..\..\Common\Minimal/semtest.c ****  * 1 tab == 4 spaces!
+  26:..\..\Common\Minimal/semtest.c ****  */
+  27:..\..\Common\Minimal/semtest.c **** 
+  28:..\..\Common\Minimal/semtest.c **** /*
+  29:..\..\Common\Minimal/semtest.c ****  * Creates two sets of two tasks.  The tasks within a set share a variable, access
+  30:..\..\Common\Minimal/semtest.c ****  * to which is guarded by a semaphore.
+  31:..\..\Common\Minimal/semtest.c ****  *
+  32:..\..\Common\Minimal/semtest.c ****  * Each task starts by attempting to obtain the semaphore.  On obtaining a
+  33:..\..\Common\Minimal/semtest.c ****  * semaphore a task checks to ensure that the guarded variable has an expected
+  34:..\..\Common\Minimal/semtest.c ****  * value.  It then clears the variable to zero before counting it back up to the
+  35:..\..\Common\Minimal/semtest.c ****  * expected value in increments of 1.  After each increment the variable is checked
+  36:..\..\Common\Minimal/semtest.c ****  * to ensure it contains the value to which it was just set. When the starting
+  37:..\..\Common\Minimal/semtest.c ****  * value is again reached the task releases the semaphore giving the other task in
+  38:..\..\Common\Minimal/semtest.c ****  * the set a chance to do exactly the same thing.  The starting value is high
+  39:..\..\Common\Minimal/semtest.c ****  * enough to ensure that a tick is likely to occur during the incrementing loop.
+  40:..\..\Common\Minimal/semtest.c ****  *
+  41:..\..\Common\Minimal/semtest.c ****  * An error is flagged if at any time during the process a shared variable is
+  42:..\..\Common\Minimal/semtest.c ****  * found to have a value other than that expected.  Such an occurrence would
+  43:..\..\Common\Minimal/semtest.c ****  * suggest an error in the mutual exclusion mechanism by which access to the
+  44:..\..\Common\Minimal/semtest.c ****  * variable is restricted.
+  45:..\..\Common\Minimal/semtest.c ****  *
+  46:..\..\Common\Minimal/semtest.c ****  * The first set of two tasks poll their semaphore.  The second set use blocking
+  47:..\..\Common\Minimal/semtest.c ****  * calls.
+  48:..\..\Common\Minimal/semtest.c ****  *
+  49:..\..\Common\Minimal/semtest.c ****  */
+  50:..\..\Common\Minimal/semtest.c **** 
+  51:..\..\Common\Minimal/semtest.c **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 3
+
+
+  52:..\..\Common\Minimal/semtest.c **** #include <stdlib.h>
+  53:..\..\Common\Minimal/semtest.c **** 
+  54:..\..\Common\Minimal/semtest.c **** /* Scheduler include files. */
+  55:..\..\Common\Minimal/semtest.c **** #include "FreeRTOS.h"
+  56:..\..\Common\Minimal/semtest.c **** #include "task.h"
+  57:..\..\Common\Minimal/semtest.c **** #include "semphr.h"
+  58:..\..\Common\Minimal/semtest.c **** 
+  59:..\..\Common\Minimal/semtest.c **** /* Demo app include files. */
+  60:..\..\Common\Minimal/semtest.c **** #include "semtest.h"
+  61:..\..\Common\Minimal/semtest.c **** 
+  62:..\..\Common\Minimal/semtest.c **** /* The value to which the shared variables are counted. */
+  63:..\..\Common\Minimal/semtest.c **** #define semtstBLOCKING_EXPECTED_VALUE		( ( uint32_t ) 0xfff )
+  64:..\..\Common\Minimal/semtest.c **** #define semtstNON_BLOCKING_EXPECTED_VALUE	( ( uint32_t ) 0xff  )
+  65:..\..\Common\Minimal/semtest.c **** 
+  66:..\..\Common\Minimal/semtest.c **** #define semtstSTACK_SIZE			configMINIMAL_STACK_SIZE
+  67:..\..\Common\Minimal/semtest.c **** 
+  68:..\..\Common\Minimal/semtest.c **** #define semtstNUM_TASKS				( 4 )
+  69:..\..\Common\Minimal/semtest.c **** 
+  70:..\..\Common\Minimal/semtest.c **** #define semtstDELAY_FACTOR			( ( TickType_t ) 10 )
+  71:..\..\Common\Minimal/semtest.c **** 
+  72:..\..\Common\Minimal/semtest.c **** /* The task function as described at the top of the file. */
+  73:..\..\Common\Minimal/semtest.c **** static portTASK_FUNCTION_PROTO( prvSemaphoreTest, pvParameters );
+  74:..\..\Common\Minimal/semtest.c **** 
+  75:..\..\Common\Minimal/semtest.c **** /* Structure used to pass parameters to each task. */
+  76:..\..\Common\Minimal/semtest.c **** typedef struct SEMAPHORE_PARAMETERS
+  77:..\..\Common\Minimal/semtest.c **** {
+  78:..\..\Common\Minimal/semtest.c **** 	SemaphoreHandle_t xSemaphore;
+  79:..\..\Common\Minimal/semtest.c **** 	volatile uint32_t *pulSharedVariable;
+  80:..\..\Common\Minimal/semtest.c **** 	TickType_t xBlockTime;
+  81:..\..\Common\Minimal/semtest.c **** } xSemaphoreParameters;
+  82:..\..\Common\Minimal/semtest.c **** 
+  83:..\..\Common\Minimal/semtest.c **** /* Variables used to check that all the tasks are still running without errors. */
+  84:..\..\Common\Minimal/semtest.c **** static volatile short sCheckVariables[ semtstNUM_TASKS ] = { 0 };
+  85:..\..\Common\Minimal/semtest.c **** static volatile short sNextCheckVariable = 0;
+  86:..\..\Common\Minimal/semtest.c **** 
+  87:..\..\Common\Minimal/semtest.c **** /*-----------------------------------------------------------*/
+  88:..\..\Common\Minimal/semtest.c **** 
+  89:..\..\Common\Minimal/semtest.c **** void vStartSemaphoreTasks( UBaseType_t uxPriority )
+  90:..\..\Common\Minimal/semtest.c **** {
+  53              		.loc 1 90 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 24
+  56              		@ frame_needed = 1, uses_anonymous_args = 0
+  57 0000 80B5     		push	{r7, lr}
+  58              		.cfi_def_cfa_offset 8
+  59              		.cfi_offset 7, -8
+  60              		.cfi_offset 14, -4
+  61 0002 88B0     		sub	sp, sp, #32
+  62              		.cfi_def_cfa_offset 40
+  63 0004 02AF     		add	r7, sp, #8
+  64              		.cfi_def_cfa 7, 32
+  65 0006 7860     		str	r0, [r7, #4]
+  91:..\..\Common\Minimal/semtest.c **** xSemaphoreParameters *pxFirstSemaphoreParameters, *pxSecondSemaphoreParameters;
+  92:..\..\Common\Minimal/semtest.c **** const TickType_t xBlockTime = ( TickType_t ) 100;
+  66              		.loc 1 92 0
+  67 0008 6423     		movs	r3, #100
+  68 000a 7B61     		str	r3, [r7, #20]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 4
+
+
+  93:..\..\Common\Minimal/semtest.c **** 
+  94:..\..\Common\Minimal/semtest.c **** 	/* Create the structure used to pass parameters to the first two tasks. */
+  95:..\..\Common\Minimal/semtest.c **** 	pxFirstSemaphoreParameters = ( xSemaphoreParameters * ) pvPortMalloc( sizeof( xSemaphoreParameters
+  69              		.loc 1 95 0
+  70 000c 0C20     		movs	r0, #12
+  71 000e FFF7FEFF 		bl	pvPortMalloc
+  72 0012 3861     		str	r0, [r7, #16]
+  96:..\..\Common\Minimal/semtest.c **** 
+  97:..\..\Common\Minimal/semtest.c **** 	if( pxFirstSemaphoreParameters != NULL )
+  73              		.loc 1 97 0
+  74 0014 3B69     		ldr	r3, [r7, #16]
+  75 0016 002B     		cmp	r3, #0
+  76 0018 3AD0     		beq	.L2
+  98:..\..\Common\Minimal/semtest.c **** 	{
+  99:..\..\Common\Minimal/semtest.c **** 		/* Create the semaphore used by the first two tasks. */
+ 100:..\..\Common\Minimal/semtest.c **** 		pxFirstSemaphoreParameters->xSemaphore = xSemaphoreCreateBinary();
+  77              		.loc 1 100 0
+  78 001a 0120     		movs	r0, #1
+  79 001c 0021     		movs	r1, #0
+  80 001e 0322     		movs	r2, #3
+  81 0020 FFF7FEFF 		bl	xQueueGenericCreate
+  82 0024 0246     		mov	r2, r0
+  83 0026 3B69     		ldr	r3, [r7, #16]
+  84 0028 1A60     		str	r2, [r3]
+ 101:..\..\Common\Minimal/semtest.c **** 
+ 102:..\..\Common\Minimal/semtest.c **** 		if( pxFirstSemaphoreParameters->xSemaphore != NULL )
+  85              		.loc 1 102 0
+  86 002a 3B69     		ldr	r3, [r7, #16]
+  87 002c 1B68     		ldr	r3, [r3]
+  88 002e 002B     		cmp	r3, #0
+  89 0030 2ED0     		beq	.L2
+ 103:..\..\Common\Minimal/semtest.c **** 		{
+ 104:..\..\Common\Minimal/semtest.c **** 			xSemaphoreGive( pxFirstSemaphoreParameters->xSemaphore );
+  90              		.loc 1 104 0
+  91 0032 3B69     		ldr	r3, [r7, #16]
+  92 0034 1B68     		ldr	r3, [r3]
+  93 0036 1846     		mov	r0, r3
+  94 0038 0021     		movs	r1, #0
+  95 003a 0022     		movs	r2, #0
+  96 003c 0023     		movs	r3, #0
+  97 003e FFF7FEFF 		bl	xQueueGenericSend
+ 105:..\..\Common\Minimal/semtest.c **** 
+ 106:..\..\Common\Minimal/semtest.c **** 			/* Create the variable which is to be shared by the first two tasks. */
+ 107:..\..\Common\Minimal/semtest.c **** 			pxFirstSemaphoreParameters->pulSharedVariable = ( uint32_t * ) pvPortMalloc( sizeof( uint32_t ) 
+  98              		.loc 1 107 0
+  99 0042 0420     		movs	r0, #4
+ 100 0044 FFF7FEFF 		bl	pvPortMalloc
+ 101 0048 0246     		mov	r2, r0
+ 102 004a 3B69     		ldr	r3, [r7, #16]
+ 103 004c 5A60     		str	r2, [r3, #4]
+ 108:..\..\Common\Minimal/semtest.c **** 
+ 109:..\..\Common\Minimal/semtest.c **** 			/* Initialise the share variable to the value the tasks expect. */
+ 110:..\..\Common\Minimal/semtest.c **** 			*( pxFirstSemaphoreParameters->pulSharedVariable ) = semtstNON_BLOCKING_EXPECTED_VALUE;
+ 104              		.loc 1 110 0
+ 105 004e 3B69     		ldr	r3, [r7, #16]
+ 106 0050 5B68     		ldr	r3, [r3, #4]
+ 107 0052 FF22     		movs	r2, #255
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 5
+
+
+ 108 0054 1A60     		str	r2, [r3]
+ 111:..\..\Common\Minimal/semtest.c **** 
+ 112:..\..\Common\Minimal/semtest.c **** 			/* The first two tasks do not block on semaphore calls. */
+ 113:..\..\Common\Minimal/semtest.c **** 			pxFirstSemaphoreParameters->xBlockTime = ( TickType_t ) 0;
+ 109              		.loc 1 113 0
+ 110 0056 3B69     		ldr	r3, [r7, #16]
+ 111 0058 0022     		movs	r2, #0
+ 112 005a 9A60     		str	r2, [r3, #8]
+ 114:..\..\Common\Minimal/semtest.c **** 
+ 115:..\..\Common\Minimal/semtest.c **** 			/* Spawn the first two tasks.  As they poll they operate at the idle priority. */
+ 116:..\..\Common\Minimal/semtest.c **** 			xTaskCreate( prvSemaphoreTest, "PolSEM1", semtstSTACK_SIZE, ( void * ) pxFirstSemaphoreParameter
+ 113              		.loc 1 116 0
+ 114 005c 0023     		movs	r3, #0
+ 115 005e 0093     		str	r3, [sp]
+ 116 0060 0023     		movs	r3, #0
+ 117 0062 0193     		str	r3, [sp, #4]
+ 118 0064 2D48     		ldr	r0, .L4
+ 119 0066 2E49     		ldr	r1, .L4+4
+ 120 0068 6422     		movs	r2, #100
+ 121 006a 3B69     		ldr	r3, [r7, #16]
+ 122 006c FFF7FEFF 		bl	xTaskCreate
+ 117:..\..\Common\Minimal/semtest.c **** 			xTaskCreate( prvSemaphoreTest, "PolSEM2", semtstSTACK_SIZE, ( void * ) pxFirstSemaphoreParameter
+ 123              		.loc 1 117 0
+ 124 0070 0023     		movs	r3, #0
+ 125 0072 0093     		str	r3, [sp]
+ 126 0074 0023     		movs	r3, #0
+ 127 0076 0193     		str	r3, [sp, #4]
+ 128 0078 2848     		ldr	r0, .L4
+ 129 007a 2A49     		ldr	r1, .L4+8
+ 130 007c 6422     		movs	r2, #100
+ 131 007e 3B69     		ldr	r3, [r7, #16]
+ 132 0080 FFF7FEFF 		bl	xTaskCreate
+ 118:..\..\Common\Minimal/semtest.c **** 
+ 119:..\..\Common\Minimal/semtest.c **** 			/* vQueueAddToRegistry() adds the semaphore to the registry, if one
+ 120:..\..\Common\Minimal/semtest.c **** 			is in use.  The registry is provided as a means for kernel aware
+ 121:..\..\Common\Minimal/semtest.c **** 			debuggers to locate semaphores and has no purpose if a kernel aware
+ 122:..\..\Common\Minimal/semtest.c **** 			debugger is not being used.  The call to vQueueAddToRegistry() will
+ 123:..\..\Common\Minimal/semtest.c **** 			be removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
+ 124:..\..\Common\Minimal/semtest.c **** 			defined or is defined to be less than 1. */
+ 125:..\..\Common\Minimal/semtest.c **** 			vQueueAddToRegistry( ( QueueHandle_t ) pxFirstSemaphoreParameters->xSemaphore, "Counting_Sem_1" 
+ 133              		.loc 1 125 0
+ 134 0084 3B69     		ldr	r3, [r7, #16]
+ 135 0086 1B68     		ldr	r3, [r3]
+ 136 0088 1846     		mov	r0, r3
+ 137 008a 2749     		ldr	r1, .L4+12
+ 138 008c FFF7FEFF 		bl	vQueueAddToRegistry
+ 139              	.L2:
+ 126:..\..\Common\Minimal/semtest.c **** 		}
+ 127:..\..\Common\Minimal/semtest.c **** 	}
+ 128:..\..\Common\Minimal/semtest.c **** 
+ 129:..\..\Common\Minimal/semtest.c **** 	/* Do exactly the same to create the second set of tasks, only this time
+ 130:..\..\Common\Minimal/semtest.c **** 	provide a block time for the semaphore calls. */
+ 131:..\..\Common\Minimal/semtest.c **** 	pxSecondSemaphoreParameters = ( xSemaphoreParameters * ) pvPortMalloc( sizeof( xSemaphoreParameter
+ 140              		.loc 1 131 0
+ 141 0090 0C20     		movs	r0, #12
+ 142 0092 FFF7FEFF 		bl	pvPortMalloc
+ 143 0096 F860     		str	r0, [r7, #12]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 6
+
+
+ 132:..\..\Common\Minimal/semtest.c **** 	if( pxSecondSemaphoreParameters != NULL )
+ 144              		.loc 1 132 0
+ 145 0098 FB68     		ldr	r3, [r7, #12]
+ 146 009a 002B     		cmp	r3, #0
+ 147 009c 3BD0     		beq	.L1
+ 133:..\..\Common\Minimal/semtest.c **** 	{
+ 134:..\..\Common\Minimal/semtest.c **** 		pxSecondSemaphoreParameters->xSemaphore = xSemaphoreCreateBinary();
+ 148              		.loc 1 134 0
+ 149 009e 0120     		movs	r0, #1
+ 150 00a0 0021     		movs	r1, #0
+ 151 00a2 0322     		movs	r2, #3
+ 152 00a4 FFF7FEFF 		bl	xQueueGenericCreate
+ 153 00a8 0246     		mov	r2, r0
+ 154 00aa FB68     		ldr	r3, [r7, #12]
+ 155 00ac 1A60     		str	r2, [r3]
+ 135:..\..\Common\Minimal/semtest.c **** 
+ 136:..\..\Common\Minimal/semtest.c **** 		if( pxSecondSemaphoreParameters->xSemaphore != NULL )
+ 156              		.loc 1 136 0
+ 157 00ae FB68     		ldr	r3, [r7, #12]
+ 158 00b0 1B68     		ldr	r3, [r3]
+ 159 00b2 002B     		cmp	r3, #0
+ 160 00b4 2FD0     		beq	.L1
+ 137:..\..\Common\Minimal/semtest.c **** 		{
+ 138:..\..\Common\Minimal/semtest.c **** 			xSemaphoreGive( pxSecondSemaphoreParameters->xSemaphore );
+ 161              		.loc 1 138 0
+ 162 00b6 FB68     		ldr	r3, [r7, #12]
+ 163 00b8 1B68     		ldr	r3, [r3]
+ 164 00ba 1846     		mov	r0, r3
+ 165 00bc 0021     		movs	r1, #0
+ 166 00be 0022     		movs	r2, #0
+ 167 00c0 0023     		movs	r3, #0
+ 168 00c2 FFF7FEFF 		bl	xQueueGenericSend
+ 139:..\..\Common\Minimal/semtest.c **** 
+ 140:..\..\Common\Minimal/semtest.c **** 			pxSecondSemaphoreParameters->pulSharedVariable = ( uint32_t * ) pvPortMalloc( sizeof( uint32_t )
+ 169              		.loc 1 140 0
+ 170 00c6 0420     		movs	r0, #4
+ 171 00c8 FFF7FEFF 		bl	pvPortMalloc
+ 172 00cc 0246     		mov	r2, r0
+ 173 00ce FB68     		ldr	r3, [r7, #12]
+ 174 00d0 5A60     		str	r2, [r3, #4]
+ 141:..\..\Common\Minimal/semtest.c **** 			*( pxSecondSemaphoreParameters->pulSharedVariable ) = semtstBLOCKING_EXPECTED_VALUE;
+ 175              		.loc 1 141 0
+ 176 00d2 FB68     		ldr	r3, [r7, #12]
+ 177 00d4 5B68     		ldr	r3, [r3, #4]
+ 178 00d6 40F6FF72 		movw	r2, #4095
+ 179 00da 1A60     		str	r2, [r3]
+ 142:..\..\Common\Minimal/semtest.c **** 			pxSecondSemaphoreParameters->xBlockTime = xBlockTime / portTICK_PERIOD_MS;
+ 180              		.loc 1 142 0
+ 181 00dc FB68     		ldr	r3, [r7, #12]
+ 182 00de 7A69     		ldr	r2, [r7, #20]
+ 183 00e0 9A60     		str	r2, [r3, #8]
+ 143:..\..\Common\Minimal/semtest.c **** 
+ 144:..\..\Common\Minimal/semtest.c **** 			xTaskCreate( prvSemaphoreTest, "BlkSEM1", semtstSTACK_SIZE, ( void * ) pxSecondSemaphoreParamete
+ 184              		.loc 1 144 0
+ 185 00e2 7B68     		ldr	r3, [r7, #4]
+ 186 00e4 0093     		str	r3, [sp]
+ 187 00e6 0023     		movs	r3, #0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 7
+
+
+ 188 00e8 0193     		str	r3, [sp, #4]
+ 189 00ea 0C48     		ldr	r0, .L4
+ 190 00ec 0F49     		ldr	r1, .L4+16
+ 191 00ee 6422     		movs	r2, #100
+ 192 00f0 FB68     		ldr	r3, [r7, #12]
+ 193 00f2 FFF7FEFF 		bl	xTaskCreate
+ 145:..\..\Common\Minimal/semtest.c **** 			xTaskCreate( prvSemaphoreTest, "BlkSEM2", semtstSTACK_SIZE, ( void * ) pxSecondSemaphoreParamete
+ 194              		.loc 1 145 0
+ 195 00f6 7B68     		ldr	r3, [r7, #4]
+ 196 00f8 0093     		str	r3, [sp]
+ 197 00fa 0023     		movs	r3, #0
+ 198 00fc 0193     		str	r3, [sp, #4]
+ 199 00fe 0748     		ldr	r0, .L4
+ 200 0100 0B49     		ldr	r1, .L4+20
+ 201 0102 6422     		movs	r2, #100
+ 202 0104 FB68     		ldr	r3, [r7, #12]
+ 203 0106 FFF7FEFF 		bl	xTaskCreate
+ 146:..\..\Common\Minimal/semtest.c **** 
+ 147:..\..\Common\Minimal/semtest.c **** 			/* vQueueAddToRegistry() adds the semaphore to the registry, if one
+ 148:..\..\Common\Minimal/semtest.c **** 			is in use.  The registry is provided as a means for kernel aware
+ 149:..\..\Common\Minimal/semtest.c **** 			debuggers to locate semaphores and has no purpose if a kernel aware
+ 150:..\..\Common\Minimal/semtest.c **** 			debugger is not being used.  The call to vQueueAddToRegistry() will
+ 151:..\..\Common\Minimal/semtest.c **** 			be removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
+ 152:..\..\Common\Minimal/semtest.c **** 			defined or is defined to be less than 1. */
+ 153:..\..\Common\Minimal/semtest.c **** 			vQueueAddToRegistry( ( QueueHandle_t ) pxSecondSemaphoreParameters->xSemaphore, "Counting_Sem_2"
+ 204              		.loc 1 153 0
+ 205 010a FB68     		ldr	r3, [r7, #12]
+ 206 010c 1B68     		ldr	r3, [r3]
+ 207 010e 1846     		mov	r0, r3
+ 208 0110 0849     		ldr	r1, .L4+24
+ 209 0112 FFF7FEFF 		bl	vQueueAddToRegistry
+ 210              	.L1:
+ 154:..\..\Common\Minimal/semtest.c **** 		}
+ 155:..\..\Common\Minimal/semtest.c **** 	}
+ 156:..\..\Common\Minimal/semtest.c **** }
+ 211              		.loc 1 156 0
+ 212 0116 1837     		adds	r7, r7, #24
+ 213              		.cfi_def_cfa_offset 8
+ 214 0118 BD46     		mov	sp, r7
+ 215              		.cfi_def_cfa_register 13
+ 216              		@ sp needed
+ 217 011a 80BD     		pop	{r7, pc}
+ 218              	.L5:
+ 219              		.align	2
+ 220              	.L4:
+ 221 011c 00000000 		.word	prvSemaphoreTest
+ 222 0120 00000000 		.word	.LC0
+ 223 0124 08000000 		.word	.LC1
+ 224 0128 10000000 		.word	.LC2
+ 225 012c 20000000 		.word	.LC3
+ 226 0130 28000000 		.word	.LC4
+ 227 0134 30000000 		.word	.LC5
+ 228              		.cfi_endproc
+ 229              	.LFE68:
+ 230              		.size	vStartSemaphoreTasks, .-vStartSemaphoreTasks
+ 231              		.section	.text.prvSemaphoreTest,"ax",%progbits
+ 232              		.align	2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 8
+
+
+ 233              		.thumb
+ 234              		.thumb_func
+ 235              		.type	prvSemaphoreTest, %function
+ 236              	prvSemaphoreTest:
+ 237              	.LFB69:
+ 157:..\..\Common\Minimal/semtest.c **** /*-----------------------------------------------------------*/
+ 158:..\..\Common\Minimal/semtest.c **** 
+ 159:..\..\Common\Minimal/semtest.c **** static portTASK_FUNCTION( prvSemaphoreTest, pvParameters )
+ 160:..\..\Common\Minimal/semtest.c **** {
+ 238              		.loc 1 160 0
+ 239              		.cfi_startproc
+ 240              		@ args = 0, pretend = 0, frame = 32
+ 241              		@ frame_needed = 1, uses_anonymous_args = 0
+ 242 0000 80B5     		push	{r7, lr}
+ 243              		.cfi_def_cfa_offset 8
+ 244              		.cfi_offset 7, -8
+ 245              		.cfi_offset 14, -4
+ 246 0002 88B0     		sub	sp, sp, #32
+ 247              		.cfi_def_cfa_offset 40
+ 248 0004 00AF     		add	r7, sp, #0
+ 249              		.cfi_def_cfa_register 7
+ 250 0006 7860     		str	r0, [r7, #4]
+ 161:..\..\Common\Minimal/semtest.c **** xSemaphoreParameters *pxParameters;
+ 162:..\..\Common\Minimal/semtest.c **** volatile uint32_t *pulSharedVariable, ulExpectedValue;
+ 163:..\..\Common\Minimal/semtest.c **** uint32_t ulCounter;
+ 164:..\..\Common\Minimal/semtest.c **** short sError = pdFALSE, sCheckVariableToUse;
+ 251              		.loc 1 164 0
+ 252 0008 0023     		movs	r3, #0
+ 253 000a 7B83     		strh	r3, [r7, #26]	@ movhi
+ 165:..\..\Common\Minimal/semtest.c **** 
+ 166:..\..\Common\Minimal/semtest.c **** 	/* See which check variable to use.  sNextCheckVariable is not semaphore
+ 167:..\..\Common\Minimal/semtest.c **** 	protected! */
+ 168:..\..\Common\Minimal/semtest.c **** 	portENTER_CRITICAL();
+ 254              		.loc 1 168 0
+ 255 000c FFF7FEFF 		bl	vPortEnterCritical
+ 169:..\..\Common\Minimal/semtest.c **** 		sCheckVariableToUse = sNextCheckVariable;
+ 256              		.loc 1 169 0
+ 257 0010 3E4B     		ldr	r3, .L17
+ 258 0012 1B88     		ldrh	r3, [r3]	@ movhi
+ 259 0014 3B83     		strh	r3, [r7, #24]	@ movhi
+ 170:..\..\Common\Minimal/semtest.c **** 		sNextCheckVariable++;
+ 260              		.loc 1 170 0
+ 261 0016 3D4B     		ldr	r3, .L17
+ 262 0018 1B88     		ldrh	r3, [r3]	@ movhi
+ 263 001a 9BB2     		uxth	r3, r3
+ 264 001c 9BB2     		uxth	r3, r3
+ 265 001e 9BB2     		uxth	r3, r3
+ 266 0020 0133     		adds	r3, r3, #1
+ 267 0022 9BB2     		uxth	r3, r3
+ 268 0024 9AB2     		uxth	r2, r3
+ 269 0026 394B     		ldr	r3, .L17
+ 270 0028 1A80     		strh	r2, [r3]	@ movhi
+ 171:..\..\Common\Minimal/semtest.c **** 	portEXIT_CRITICAL();
+ 271              		.loc 1 171 0
+ 272 002a FFF7FEFF 		bl	vPortExitCritical
+ 172:..\..\Common\Minimal/semtest.c **** 
+ 173:..\..\Common\Minimal/semtest.c **** 	/* A structure is passed in as the parameter.  This contains the shared
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 9
+
+
+ 174:..\..\Common\Minimal/semtest.c **** 	variable being guarded. */
+ 175:..\..\Common\Minimal/semtest.c **** 	pxParameters = ( xSemaphoreParameters * ) pvParameters;
+ 273              		.loc 1 175 0
+ 274 002e 7B68     		ldr	r3, [r7, #4]
+ 275 0030 7B61     		str	r3, [r7, #20]
+ 176:..\..\Common\Minimal/semtest.c **** 	pulSharedVariable = pxParameters->pulSharedVariable;
+ 276              		.loc 1 176 0
+ 277 0032 7B69     		ldr	r3, [r7, #20]
+ 278 0034 5B68     		ldr	r3, [r3, #4]
+ 279 0036 3B61     		str	r3, [r7, #16]
+ 177:..\..\Common\Minimal/semtest.c **** 
+ 178:..\..\Common\Minimal/semtest.c **** 	/* If we are blocking we use a much higher count to ensure loads of context
+ 179:..\..\Common\Minimal/semtest.c **** 	switches occur during the count. */
+ 180:..\..\Common\Minimal/semtest.c **** 	if( pxParameters->xBlockTime > ( TickType_t ) 0 )
+ 280              		.loc 1 180 0
+ 281 0038 7B69     		ldr	r3, [r7, #20]
+ 282 003a 9B68     		ldr	r3, [r3, #8]
+ 283 003c 002B     		cmp	r3, #0
+ 284 003e 03D0     		beq	.L7
+ 181:..\..\Common\Minimal/semtest.c **** 	{
+ 182:..\..\Common\Minimal/semtest.c **** 		ulExpectedValue = semtstBLOCKING_EXPECTED_VALUE;
+ 285              		.loc 1 182 0
+ 286 0040 40F6FF73 		movw	r3, #4095
+ 287 0044 FB60     		str	r3, [r7, #12]
+ 288 0046 01E0     		b	.L8
+ 289              	.L7:
+ 183:..\..\Common\Minimal/semtest.c **** 	}
+ 184:..\..\Common\Minimal/semtest.c **** 	else
+ 185:..\..\Common\Minimal/semtest.c **** 	{
+ 186:..\..\Common\Minimal/semtest.c **** 		ulExpectedValue = semtstNON_BLOCKING_EXPECTED_VALUE;
+ 290              		.loc 1 186 0
+ 291 0048 FF23     		movs	r3, #255
+ 292 004a FB60     		str	r3, [r7, #12]
+ 293              	.L8:
+ 187:..\..\Common\Minimal/semtest.c **** 	}
+ 188:..\..\Common\Minimal/semtest.c **** 
+ 189:..\..\Common\Minimal/semtest.c **** 	for( ;; )
+ 190:..\..\Common\Minimal/semtest.c **** 	{
+ 191:..\..\Common\Minimal/semtest.c **** 		/* Try to obtain the semaphore. */
+ 192:..\..\Common\Minimal/semtest.c **** 		if( xSemaphoreTake( pxParameters->xSemaphore, pxParameters->xBlockTime ) == pdPASS )
+ 294              		.loc 1 192 0
+ 295 004c 7B69     		ldr	r3, [r7, #20]
+ 296 004e 1A68     		ldr	r2, [r3]
+ 297 0050 7B69     		ldr	r3, [r7, #20]
+ 298 0052 9B68     		ldr	r3, [r3, #8]
+ 299 0054 1046     		mov	r0, r2
+ 300 0056 1946     		mov	r1, r3
+ 301 0058 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 302 005c 0346     		mov	r3, r0
+ 303 005e 012B     		cmp	r3, #1
+ 304 0060 47D1     		bne	.L9
+ 193:..\..\Common\Minimal/semtest.c **** 		{
+ 194:..\..\Common\Minimal/semtest.c **** 			/* We have the semaphore and so expect any other tasks using the
+ 195:..\..\Common\Minimal/semtest.c **** 			shared variable to have left it in the state we expect to find
+ 196:..\..\Common\Minimal/semtest.c **** 			it. */
+ 197:..\..\Common\Minimal/semtest.c **** 			if( *pulSharedVariable != ulExpectedValue )
+ 305              		.loc 1 197 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 10
+
+
+ 306 0062 3B69     		ldr	r3, [r7, #16]
+ 307 0064 1A68     		ldr	r2, [r3]
+ 308 0066 FB68     		ldr	r3, [r7, #12]
+ 309 0068 9A42     		cmp	r2, r3
+ 310 006a 01D0     		beq	.L10
+ 198:..\..\Common\Minimal/semtest.c **** 			{
+ 199:..\..\Common\Minimal/semtest.c **** 				sError = pdTRUE;
+ 311              		.loc 1 199 0
+ 312 006c 0123     		movs	r3, #1
+ 313 006e 7B83     		strh	r3, [r7, #26]	@ movhi
+ 314              	.L10:
+ 200:..\..\Common\Minimal/semtest.c **** 			}
+ 201:..\..\Common\Minimal/semtest.c **** 
+ 202:..\..\Common\Minimal/semtest.c **** 			/* Clear the variable, then count it back up to the expected value
+ 203:..\..\Common\Minimal/semtest.c **** 			before releasing the semaphore.  Would expect a context switch or
+ 204:..\..\Common\Minimal/semtest.c **** 			two during this time. */
+ 205:..\..\Common\Minimal/semtest.c **** 			for( ulCounter = ( uint32_t ) 0; ulCounter <= ulExpectedValue; ulCounter++ )
+ 315              		.loc 1 205 0
+ 316 0070 0023     		movs	r3, #0
+ 317 0072 FB61     		str	r3, [r7, #28]
+ 318 0074 0CE0     		b	.L11
+ 319              	.L13:
+ 206:..\..\Common\Minimal/semtest.c **** 			{
+ 207:..\..\Common\Minimal/semtest.c **** 				*pulSharedVariable = ulCounter;
+ 320              		.loc 1 207 0
+ 321 0076 3B69     		ldr	r3, [r7, #16]
+ 322 0078 FA69     		ldr	r2, [r7, #28]
+ 323 007a 1A60     		str	r2, [r3]
+ 208:..\..\Common\Minimal/semtest.c **** 				if( *pulSharedVariable != ulCounter )
+ 324              		.loc 1 208 0
+ 325 007c 3B69     		ldr	r3, [r7, #16]
+ 326 007e 1A68     		ldr	r2, [r3]
+ 327 0080 FB69     		ldr	r3, [r7, #28]
+ 328 0082 9A42     		cmp	r2, r3
+ 329 0084 01D0     		beq	.L12
+ 209:..\..\Common\Minimal/semtest.c **** 				{
+ 210:..\..\Common\Minimal/semtest.c **** 					sError = pdTRUE;
+ 330              		.loc 1 210 0
+ 331 0086 0123     		movs	r3, #1
+ 332 0088 7B83     		strh	r3, [r7, #26]	@ movhi
+ 333              	.L12:
+ 205:..\..\Common\Minimal/semtest.c **** 			{
+ 334              		.loc 1 205 0 discriminator 2
+ 335 008a FB69     		ldr	r3, [r7, #28]
+ 336 008c 0133     		adds	r3, r3, #1
+ 337 008e FB61     		str	r3, [r7, #28]
+ 338              	.L11:
+ 205:..\..\Common\Minimal/semtest.c **** 			{
+ 339              		.loc 1 205 0 is_stmt 0 discriminator 1
+ 340 0090 FB68     		ldr	r3, [r7, #12]
+ 341 0092 FA69     		ldr	r2, [r7, #28]
+ 342 0094 9A42     		cmp	r2, r3
+ 343 0096 EED9     		bls	.L13
+ 211:..\..\Common\Minimal/semtest.c **** 				}
+ 212:..\..\Common\Minimal/semtest.c **** 			}
+ 213:..\..\Common\Minimal/semtest.c **** 
+ 214:..\..\Common\Minimal/semtest.c **** 			/* Release the semaphore, and if no errors have occurred increment the check
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 11
+
+
+ 215:..\..\Common\Minimal/semtest.c **** 			variable. */
+ 216:..\..\Common\Minimal/semtest.c **** 			if(	xSemaphoreGive( pxParameters->xSemaphore ) == pdFALSE )
+ 344              		.loc 1 216 0 is_stmt 1
+ 345 0098 7B69     		ldr	r3, [r7, #20]
+ 346 009a 1B68     		ldr	r3, [r3]
+ 347 009c 1846     		mov	r0, r3
+ 348 009e 0021     		movs	r1, #0
+ 349 00a0 0022     		movs	r2, #0
+ 350 00a2 0023     		movs	r3, #0
+ 351 00a4 FFF7FEFF 		bl	xQueueGenericSend
+ 352 00a8 0346     		mov	r3, r0
+ 353 00aa 002B     		cmp	r3, #0
+ 354 00ac 01D1     		bne	.L14
+ 217:..\..\Common\Minimal/semtest.c **** 			{
+ 218:..\..\Common\Minimal/semtest.c **** 				sError = pdTRUE;
+ 355              		.loc 1 218 0
+ 356 00ae 0123     		movs	r3, #1
+ 357 00b0 7B83     		strh	r3, [r7, #26]	@ movhi
+ 358              	.L14:
+ 219:..\..\Common\Minimal/semtest.c **** 			}
+ 220:..\..\Common\Minimal/semtest.c **** 
+ 221:..\..\Common\Minimal/semtest.c **** 			if( sError == pdFALSE )
+ 359              		.loc 1 221 0
+ 360 00b2 B7F91A30 		ldrsh	r3, [r7, #26]
+ 361 00b6 002B     		cmp	r3, #0
+ 362 00b8 11D1     		bne	.L15
+ 222:..\..\Common\Minimal/semtest.c **** 			{
+ 223:..\..\Common\Minimal/semtest.c **** 				if( sCheckVariableToUse < semtstNUM_TASKS )
+ 363              		.loc 1 223 0
+ 364 00ba B7F91830 		ldrsh	r3, [r7, #24]
+ 365 00be 032B     		cmp	r3, #3
+ 366 00c0 0DDC     		bgt	.L15
+ 224:..\..\Common\Minimal/semtest.c **** 				{
+ 225:..\..\Common\Minimal/semtest.c **** 					( sCheckVariables[ sCheckVariableToUse ] )++;
+ 367              		.loc 1 225 0
+ 368 00c2 B7F91820 		ldrsh	r2, [r7, #24]
+ 369 00c6 124B     		ldr	r3, .L17+4
+ 370 00c8 33F81230 		ldrh	r3, [r3, r2, lsl #1]	@ movhi
+ 371 00cc 9BB2     		uxth	r3, r3
+ 372 00ce 9BB2     		uxth	r3, r3
+ 373 00d0 9BB2     		uxth	r3, r3
+ 374 00d2 0133     		adds	r3, r3, #1
+ 375 00d4 9BB2     		uxth	r3, r3
+ 376 00d6 99B2     		uxth	r1, r3
+ 377 00d8 0D4B     		ldr	r3, .L17+4
+ 378 00da 23F81210 		strh	r1, [r3, r2, lsl #1]	@ movhi
+ 379              	.L15:
+ 226:..\..\Common\Minimal/semtest.c **** 				}
+ 227:..\..\Common\Minimal/semtest.c **** 			}
+ 228:..\..\Common\Minimal/semtest.c **** 
+ 229:..\..\Common\Minimal/semtest.c **** 			/* If we have a block time then we are running at a priority higher
+ 230:..\..\Common\Minimal/semtest.c **** 			than the idle priority.  This task takes a long time to complete
+ 231:..\..\Common\Minimal/semtest.c **** 			a cycle	(deliberately so to test the guarding) so will be starving
+ 232:..\..\Common\Minimal/semtest.c **** 			out lower priority tasks.  Block for some time to allow give lower
+ 233:..\..\Common\Minimal/semtest.c **** 			priority tasks some processor time. */
+ 234:..\..\Common\Minimal/semtest.c **** 			vTaskDelay( pxParameters->xBlockTime * semtstDELAY_FACTOR );
+ 380              		.loc 1 234 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 12
+
+
+ 381 00de 7B69     		ldr	r3, [r7, #20]
+ 382 00e0 9A68     		ldr	r2, [r3, #8]
+ 383 00e2 1346     		mov	r3, r2
+ 384 00e4 9B00     		lsls	r3, r3, #2
+ 385 00e6 1344     		add	r3, r3, r2
+ 386 00e8 5B00     		lsls	r3, r3, #1
+ 387 00ea 1846     		mov	r0, r3
+ 388 00ec FFF7FEFF 		bl	vTaskDelay
+ 389 00f0 0BE0     		b	.L16
+ 390              	.L9:
+ 235:..\..\Common\Minimal/semtest.c **** 		}
+ 236:..\..\Common\Minimal/semtest.c **** 		else
+ 237:..\..\Common\Minimal/semtest.c **** 		{
+ 238:..\..\Common\Minimal/semtest.c **** 			if( pxParameters->xBlockTime == ( TickType_t ) 0 )
+ 391              		.loc 1 238 0
+ 392 00f2 7B69     		ldr	r3, [r7, #20]
+ 393 00f4 9B68     		ldr	r3, [r3, #8]
+ 394 00f6 002B     		cmp	r3, #0
+ 395 00f8 07D1     		bne	.L16
+ 239:..\..\Common\Minimal/semtest.c **** 			{
+ 240:..\..\Common\Minimal/semtest.c **** 				/* We have not got the semaphore yet, so no point using the
+ 241:..\..\Common\Minimal/semtest.c **** 				processor.  We are not blocking when attempting to obtain the
+ 242:..\..\Common\Minimal/semtest.c **** 				semaphore. */
+ 243:..\..\Common\Minimal/semtest.c **** 				taskYIELD();
+ 396              		.loc 1 243 0
+ 397 00fa 064B     		ldr	r3, .L17+8
+ 398 00fc 4FF08052 		mov	r2, #268435456
+ 399 0100 1A60     		str	r2, [r3]
+ 400              	@ 243 "..\..\Common\Minimal\semtest.c" 1
+ 401 0102 BFF34F8F 		dsb
+ 402              	@ 0 "" 2
+ 403              	@ 243 "..\..\Common\Minimal\semtest.c" 1
+ 404 0106 BFF36F8F 		isb
+ 405              	@ 0 "" 2
+ 406              		.thumb
+ 407              	.L16:
+ 244:..\..\Common\Minimal/semtest.c **** 			}
+ 245:..\..\Common\Minimal/semtest.c **** 		}
+ 246:..\..\Common\Minimal/semtest.c **** 	}
+ 408              		.loc 1 246 0
+ 409 010a 9FE7     		b	.L8
+ 410              	.L18:
+ 411              		.align	2
+ 412              	.L17:
+ 413 010c 08000000 		.word	sNextCheckVariable
+ 414 0110 00000000 		.word	sCheckVariables
+ 415 0114 04ED00E0 		.word	-536810236
+ 416              		.cfi_endproc
+ 417              	.LFE69:
+ 418              		.size	prvSemaphoreTest, .-prvSemaphoreTest
+ 419              		.section	.text.xAreSemaphoreTasksStillRunning,"ax",%progbits
+ 420              		.align	2
+ 421              		.global	xAreSemaphoreTasksStillRunning
+ 422              		.thumb
+ 423              		.thumb_func
+ 424              		.type	xAreSemaphoreTasksStillRunning, %function
+ 425              	xAreSemaphoreTasksStillRunning:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 13
+
+
+ 426              	.LFB70:
+ 247:..\..\Common\Minimal/semtest.c **** }
+ 248:..\..\Common\Minimal/semtest.c **** /*-----------------------------------------------------------*/
+ 249:..\..\Common\Minimal/semtest.c **** 
+ 250:..\..\Common\Minimal/semtest.c **** /* This is called to check that all the created tasks are still running. */
+ 251:..\..\Common\Minimal/semtest.c **** BaseType_t xAreSemaphoreTasksStillRunning( void )
+ 252:..\..\Common\Minimal/semtest.c **** {
+ 427              		.loc 1 252 0
+ 428              		.cfi_startproc
+ 429              		@ args = 0, pretend = 0, frame = 8
+ 430              		@ frame_needed = 1, uses_anonymous_args = 0
+ 431              		@ link register save eliminated.
+ 432 0000 80B4     		push	{r7}
+ 433              		.cfi_def_cfa_offset 4
+ 434              		.cfi_offset 7, -4
+ 435 0002 83B0     		sub	sp, sp, #12
+ 436              		.cfi_def_cfa_offset 16
+ 437 0004 00AF     		add	r7, sp, #0
+ 438              		.cfi_def_cfa_register 7
+ 253:..\..\Common\Minimal/semtest.c **** static short sLastCheckVariables[ semtstNUM_TASKS ] = { 0 };
+ 254:..\..\Common\Minimal/semtest.c **** BaseType_t xTask, xReturn = pdTRUE;
+ 439              		.loc 1 254 0
+ 440 0006 0123     		movs	r3, #1
+ 441 0008 3B60     		str	r3, [r7]
+ 255:..\..\Common\Minimal/semtest.c **** 
+ 256:..\..\Common\Minimal/semtest.c **** 	for( xTask = 0; xTask < semtstNUM_TASKS; xTask++ )
+ 442              		.loc 1 256 0
+ 443 000a 0023     		movs	r3, #0
+ 444 000c 7B60     		str	r3, [r7, #4]
+ 445 000e 1AE0     		b	.L20
+ 446              	.L22:
+ 257:..\..\Common\Minimal/semtest.c **** 	{
+ 258:..\..\Common\Minimal/semtest.c **** 		if( sLastCheckVariables[ xTask ] == sCheckVariables[ xTask ] )
+ 447              		.loc 1 258 0
+ 448 0010 124A     		ldr	r2, .L24
+ 449 0012 7B68     		ldr	r3, [r7, #4]
+ 450 0014 32F81310 		ldrh	r1, [r2, r3, lsl #1]
+ 451 0018 114A     		ldr	r2, .L24+4
+ 452 001a 7B68     		ldr	r3, [r7, #4]
+ 453 001c 32F81330 		ldrh	r3, [r2, r3, lsl #1]	@ movhi
+ 454 0020 9BB2     		uxth	r3, r3
+ 455 0022 0AB2     		sxth	r2, r1
+ 456 0024 1BB2     		sxth	r3, r3
+ 457 0026 9A42     		cmp	r2, r3
+ 458 0028 01D1     		bne	.L21
+ 259:..\..\Common\Minimal/semtest.c **** 		{
+ 260:..\..\Common\Minimal/semtest.c **** 			xReturn = pdFALSE;
+ 459              		.loc 1 260 0
+ 460 002a 0023     		movs	r3, #0
+ 461 002c 3B60     		str	r3, [r7]
+ 462              	.L21:
+ 261:..\..\Common\Minimal/semtest.c **** 		}
+ 262:..\..\Common\Minimal/semtest.c **** 
+ 263:..\..\Common\Minimal/semtest.c **** 		sLastCheckVariables[ xTask ] = sCheckVariables[ xTask ];
+ 463              		.loc 1 263 0 discriminator 2
+ 464 002e 0C4A     		ldr	r2, .L24+4
+ 465 0030 7B68     		ldr	r3, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 14
+
+
+ 466 0032 32F81330 		ldrh	r3, [r2, r3, lsl #1]	@ movhi
+ 467 0036 99B2     		uxth	r1, r3
+ 468 0038 084A     		ldr	r2, .L24
+ 469 003a 7B68     		ldr	r3, [r7, #4]
+ 470 003c 22F81310 		strh	r1, [r2, r3, lsl #1]	@ movhi
+ 256:..\..\Common\Minimal/semtest.c **** 	{
+ 471              		.loc 1 256 0 discriminator 2
+ 472 0040 7B68     		ldr	r3, [r7, #4]
+ 473 0042 0133     		adds	r3, r3, #1
+ 474 0044 7B60     		str	r3, [r7, #4]
+ 475              	.L20:
+ 256:..\..\Common\Minimal/semtest.c **** 	{
+ 476              		.loc 1 256 0 is_stmt 0 discriminator 1
+ 477 0046 7B68     		ldr	r3, [r7, #4]
+ 478 0048 032B     		cmp	r3, #3
+ 479 004a E1DD     		ble	.L22
+ 264:..\..\Common\Minimal/semtest.c **** 	}
+ 265:..\..\Common\Minimal/semtest.c **** 
+ 266:..\..\Common\Minimal/semtest.c **** 	return xReturn;
+ 480              		.loc 1 266 0 is_stmt 1
+ 481 004c 3B68     		ldr	r3, [r7]
+ 267:..\..\Common\Minimal/semtest.c **** }
+ 482              		.loc 1 267 0
+ 483 004e 1846     		mov	r0, r3
+ 484 0050 0C37     		adds	r7, r7, #12
+ 485              		.cfi_def_cfa_offset 4
+ 486 0052 BD46     		mov	sp, r7
+ 487              		.cfi_def_cfa_register 13
+ 488              		@ sp needed
+ 489 0054 5DF8047B 		ldr	r7, [sp], #4
+ 490              		.cfi_restore 7
+ 491              		.cfi_def_cfa_offset 0
+ 492 0058 7047     		bx	lr
+ 493              	.L25:
+ 494 005a 00BF     		.align	2
+ 495              	.L24:
+ 496 005c 0C000000 		.word	sLastCheckVariables.6797
+ 497 0060 00000000 		.word	sCheckVariables
+ 498              		.cfi_endproc
+ 499              	.LFE70:
+ 500              		.size	xAreSemaphoreTasksStillRunning, .-xAreSemaphoreTasksStillRunning
+ 501              		.bss
+ 502 000a 0000     		.align	2
+ 503              	sLastCheckVariables.6797:
+ 504 000c 00000000 		.space	8
+ 504      00000000 
+ 505              		.text
+ 506              	.Letext0:
+ 507              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 508              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 509              		.file 4 "../../../Source/portable/GCC/ARM_CM3/portmacro.h"
+ 510              		.file 5 "../../../Source/include/task.h"
+ 511              		.file 6 "../../../Source/include/queue.h"
+ 512              		.file 7 "../../../Source/include/semphr.h"
+ 513              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 514              		.section	.debug_info,"",%progbits
+ 515              	.Ldebug_info0:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 15
+
+
+ 516 0000 C1020000 		.4byte	0x2c1
+ 517 0004 0400     		.2byte	0x4
+ 518 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 519 000a 04       		.byte	0x4
+ 520 000b 01       		.uleb128 0x1
+ 521 000c 69000000 		.4byte	.LASF43
+ 522 0010 01       		.byte	0x1
+ 523 0011 9D030000 		.4byte	.LASF44
+ 524 0015 57020000 		.4byte	.LASF45
+ 525 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 526 001d 00000000 		.4byte	0
+ 527 0021 00000000 		.4byte	.Ldebug_line0
+ 528 0025 02       		.uleb128 0x2
+ 529 0026 04       		.byte	0x4
+ 530 0027 07       		.byte	0x7
+ 531 0028 2B020000 		.4byte	.LASF0
+ 532 002c 03       		.uleb128 0x3
+ 533 002d 04       		.byte	0x4
+ 534 002e 05       		.byte	0x5
+ 535 002f 696E7400 		.ascii	"int\000"
+ 536 0033 02       		.uleb128 0x2
+ 537 0034 01       		.byte	0x1
+ 538 0035 06       		.byte	0x6
+ 539 0036 7C030000 		.4byte	.LASF1
+ 540 003a 04       		.uleb128 0x4
+ 541 003b 2B000000 		.4byte	.LASF5
+ 542 003f 02       		.byte	0x2
+ 543 0040 1D       		.byte	0x1d
+ 544 0041 45000000 		.4byte	0x45
+ 545 0045 02       		.uleb128 0x2
+ 546 0046 01       		.byte	0x1
+ 547 0047 08       		.byte	0x8
+ 548 0048 6B010000 		.4byte	.LASF2
+ 549 004c 02       		.uleb128 0x2
+ 550 004d 02       		.byte	0x2
+ 551 004e 05       		.byte	0x5
+ 552 004f 53030000 		.4byte	.LASF3
+ 553 0053 02       		.uleb128 0x2
+ 554 0054 02       		.byte	0x2
+ 555 0055 07       		.byte	0x7
+ 556 0056 8B010000 		.4byte	.LASF4
+ 557 005a 04       		.uleb128 0x4
+ 558 005b 5F000000 		.4byte	.LASF6
+ 559 005f 02       		.byte	0x2
+ 560 0060 3F       		.byte	0x3f
+ 561 0061 65000000 		.4byte	0x65
+ 562 0065 02       		.uleb128 0x2
+ 563 0066 04       		.byte	0x4
+ 564 0067 05       		.byte	0x5
+ 565 0068 73030000 		.4byte	.LASF7
+ 566 006c 04       		.uleb128 0x4
+ 567 006d FA010000 		.4byte	.LASF8
+ 568 0071 02       		.byte	0x2
+ 569 0072 41       		.byte	0x41
+ 570 0073 77000000 		.4byte	0x77
+ 571 0077 02       		.uleb128 0x2
+ 572 0078 04       		.byte	0x4
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 16
+
+
+ 573 0079 07       		.byte	0x7
+ 574 007a 79010000 		.4byte	.LASF9
+ 575 007e 02       		.uleb128 0x2
+ 576 007f 08       		.byte	0x8
+ 577 0080 05       		.byte	0x5
+ 578 0081 0F030000 		.4byte	.LASF10
+ 579 0085 02       		.uleb128 0x2
+ 580 0086 08       		.byte	0x8
+ 581 0087 07       		.byte	0x7
+ 582 0088 38020000 		.4byte	.LASF11
+ 583 008c 02       		.uleb128 0x2
+ 584 008d 04       		.byte	0x4
+ 585 008e 07       		.byte	0x7
+ 586 008f 06030000 		.4byte	.LASF12
+ 587 0093 05       		.uleb128 0x5
+ 588 0094 04       		.byte	0x4
+ 589 0095 02       		.uleb128 0x2
+ 590 0096 01       		.byte	0x1
+ 591 0097 08       		.byte	0x8
+ 592 0098 1D030000 		.4byte	.LASF13
+ 593 009c 04       		.uleb128 0x4
+ 594 009d 4F020000 		.4byte	.LASF14
+ 595 00a1 03       		.byte	0x3
+ 596 00a2 15       		.byte	0x15
+ 597 00a3 3A000000 		.4byte	0x3a
+ 598 00a7 04       		.uleb128 0x4
+ 599 00a8 49010000 		.4byte	.LASF15
+ 600 00ac 03       		.byte	0x3
+ 601 00ad 2C       		.byte	0x2c
+ 602 00ae 5A000000 		.4byte	0x5a
+ 603 00b2 04       		.uleb128 0x4
+ 604 00b3 6A030000 		.4byte	.LASF16
+ 605 00b7 03       		.byte	0x3
+ 606 00b8 2D       		.byte	0x2d
+ 607 00b9 6C000000 		.4byte	0x6c
+ 608 00bd 02       		.uleb128 0x2
+ 609 00be 04       		.byte	0x4
+ 610 00bf 04       		.byte	0x4
+ 611 00c0 51010000 		.4byte	.LASF17
+ 612 00c4 02       		.uleb128 0x2
+ 613 00c5 08       		.byte	0x8
+ 614 00c6 04       		.byte	0x4
+ 615 00c7 E2010000 		.4byte	.LASF18
+ 616 00cb 06       		.uleb128 0x6
+ 617 00cc B2000000 		.4byte	0xb2
+ 618 00d0 04       		.uleb128 0x4
+ 619 00d1 C8030000 		.4byte	.LASF19
+ 620 00d5 04       		.byte	0x4
+ 621 00d6 38       		.byte	0x38
+ 622 00d7 65000000 		.4byte	0x65
+ 623 00db 04       		.uleb128 0x4
+ 624 00dc BC030000 		.4byte	.LASF20
+ 625 00e0 04       		.byte	0x4
+ 626 00e1 39       		.byte	0x39
+ 627 00e2 77000000 		.4byte	0x77
+ 628 00e6 04       		.uleb128 0x4
+ 629 00e7 35000000 		.4byte	.LASF21
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 17
+
+
+ 630 00eb 04       		.byte	0x4
+ 631 00ec 3F       		.byte	0x3f
+ 632 00ed B2000000 		.4byte	0xb2
+ 633 00f1 04       		.uleb128 0x4
+ 634 00f2 5D030000 		.4byte	.LASF22
+ 635 00f6 05       		.byte	0x5
+ 636 00f7 3E       		.byte	0x3e
+ 637 00f8 FC000000 		.4byte	0xfc
+ 638 00fc 07       		.uleb128 0x7
+ 639 00fd 04       		.byte	0x4
+ 640 00fe 02010000 		.4byte	0x102
+ 641 0102 08       		.uleb128 0x8
+ 642 0103 05020000 		.4byte	.LASF46
+ 643 0107 04       		.uleb128 0x4
+ 644 0108 F7000000 		.4byte	.LASF23
+ 645 010c 06       		.byte	0x6
+ 646 010d 2E       		.byte	0x2e
+ 647 010e 93000000 		.4byte	0x93
+ 648 0112 04       		.uleb128 0x4
+ 649 0113 05010000 		.4byte	.LASF24
+ 650 0117 07       		.byte	0x7
+ 651 0118 25       		.byte	0x25
+ 652 0119 07010000 		.4byte	0x107
+ 653 011d 09       		.uleb128 0x9
+ 654 011e D3030000 		.4byte	.LASF47
+ 655 0122 0C       		.byte	0xc
+ 656 0123 01       		.byte	0x1
+ 657 0124 4C       		.byte	0x4c
+ 658 0125 4E010000 		.4byte	0x14e
+ 659 0129 0A       		.uleb128 0xa
+ 660 012a 00000000 		.4byte	.LASF25
+ 661 012e 01       		.byte	0x1
+ 662 012f 4E       		.byte	0x4e
+ 663 0130 12010000 		.4byte	0x112
+ 664 0134 00       		.byte	0
+ 665 0135 0A       		.uleb128 0xa
+ 666 0136 4D000000 		.4byte	.LASF26
+ 667 013a 01       		.byte	0x1
+ 668 013b 4F       		.byte	0x4f
+ 669 013c 4E010000 		.4byte	0x14e
+ 670 0140 04       		.byte	0x4
+ 671 0141 0A       		.uleb128 0xa
+ 672 0142 FB020000 		.4byte	.LASF27
+ 673 0146 01       		.byte	0x1
+ 674 0147 50       		.byte	0x50
+ 675 0148 E6000000 		.4byte	0xe6
+ 676 014c 08       		.byte	0x8
+ 677 014d 00       		.byte	0
+ 678 014e 07       		.uleb128 0x7
+ 679 014f 04       		.byte	0x4
+ 680 0150 CB000000 		.4byte	0xcb
+ 681 0154 04       		.uleb128 0x4
+ 682 0155 E6020000 		.4byte	.LASF28
+ 683 0159 01       		.byte	0x1
+ 684 015a 51       		.byte	0x51
+ 685 015b 1D010000 		.4byte	0x11d
+ 686 015f 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 18
+
+
+ 687 0160 88030000 		.4byte	.LASF48
+ 688 0164 01       		.byte	0x1
+ 689 0165 59       		.byte	0x59
+ 690 0166 00000000 		.4byte	.LFB68
+ 691 016a 38010000 		.4byte	.LFE68-.LFB68
+ 692 016e 01       		.uleb128 0x1
+ 693 016f 9C       		.byte	0x9c
+ 694 0170 AD010000 		.4byte	0x1ad
+ 695 0174 0C       		.uleb128 0xc
+ 696 0175 20020000 		.4byte	.LASF31
+ 697 0179 01       		.byte	0x1
+ 698 017a 59       		.byte	0x59
+ 699 017b DB000000 		.4byte	0xdb
+ 700 017f 02       		.uleb128 0x2
+ 701 0180 91       		.byte	0x91
+ 702 0181 64       		.sleb128 -28
+ 703 0182 0D       		.uleb128 0xd
+ 704 0183 9E010000 		.4byte	.LASF29
+ 705 0187 01       		.byte	0x1
+ 706 0188 5B       		.byte	0x5b
+ 707 0189 AD010000 		.4byte	0x1ad
+ 708 018d 02       		.uleb128 0x2
+ 709 018e 91       		.byte	0x91
+ 710 018f 70       		.sleb128 -16
+ 711 0190 0D       		.uleb128 0xd
+ 712 0191 C6010000 		.4byte	.LASF30
+ 713 0195 01       		.byte	0x1
+ 714 0196 5B       		.byte	0x5b
+ 715 0197 AD010000 		.4byte	0x1ad
+ 716 019b 02       		.uleb128 0x2
+ 717 019c 91       		.byte	0x91
+ 718 019d 6C       		.sleb128 -20
+ 719 019e 0D       		.uleb128 0xd
+ 720 019f FB020000 		.4byte	.LASF27
+ 721 01a3 01       		.byte	0x1
+ 722 01a4 5C       		.byte	0x5c
+ 723 01a5 B3010000 		.4byte	0x1b3
+ 724 01a9 02       		.uleb128 0x2
+ 725 01aa 91       		.byte	0x91
+ 726 01ab 74       		.sleb128 -12
+ 727 01ac 00       		.byte	0
+ 728 01ad 07       		.uleb128 0x7
+ 729 01ae 04       		.byte	0x4
+ 730 01af 54010000 		.4byte	0x154
+ 731 01b3 0E       		.uleb128 0xe
+ 732 01b4 E6000000 		.4byte	0xe6
+ 733 01b8 0F       		.uleb128 0xf
+ 734 01b9 E9010000 		.4byte	.LASF49
+ 735 01bd 01       		.byte	0x1
+ 736 01be 9F       		.byte	0x9f
+ 737 01bf 00000000 		.4byte	.LFB69
+ 738 01c3 18010000 		.4byte	.LFE69-.LFB69
+ 739 01c7 01       		.uleb128 0x1
+ 740 01c8 9C       		.byte	0x9c
+ 741 01c9 30020000 		.4byte	0x230
+ 742 01cd 0C       		.uleb128 0xc
+ 743 01ce 22030000 		.4byte	.LASF32
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 19
+
+
+ 744 01d2 01       		.byte	0x1
+ 745 01d3 9F       		.byte	0x9f
+ 746 01d4 93000000 		.4byte	0x93
+ 747 01d8 02       		.uleb128 0x2
+ 748 01d9 91       		.byte	0x91
+ 749 01da 5C       		.sleb128 -36
+ 750 01db 0D       		.uleb128 0xd
+ 751 01dc 40000000 		.4byte	.LASF33
+ 752 01e0 01       		.byte	0x1
+ 753 01e1 A1       		.byte	0xa1
+ 754 01e2 AD010000 		.4byte	0x1ad
+ 755 01e6 02       		.uleb128 0x2
+ 756 01e7 91       		.byte	0x91
+ 757 01e8 6C       		.sleb128 -20
+ 758 01e9 0D       		.uleb128 0xd
+ 759 01ea 4D000000 		.4byte	.LASF26
+ 760 01ee 01       		.byte	0x1
+ 761 01ef A2       		.byte	0xa2
+ 762 01f0 4E010000 		.4byte	0x14e
+ 763 01f4 02       		.uleb128 0x2
+ 764 01f5 91       		.byte	0x91
+ 765 01f6 68       		.sleb128 -24
+ 766 01f7 0D       		.uleb128 0xd
+ 767 01f8 43030000 		.4byte	.LASF34
+ 768 01fc 01       		.byte	0x1
+ 769 01fd A2       		.byte	0xa2
+ 770 01fe CB000000 		.4byte	0xcb
+ 771 0202 02       		.uleb128 0x2
+ 772 0203 91       		.byte	0x91
+ 773 0204 64       		.sleb128 -28
+ 774 0205 0D       		.uleb128 0xd
+ 775 0206 21000000 		.4byte	.LASF35
+ 776 020a 01       		.byte	0x1
+ 777 020b A3       		.byte	0xa3
+ 778 020c B2000000 		.4byte	0xb2
+ 779 0210 02       		.uleb128 0x2
+ 780 0211 91       		.byte	0x91
+ 781 0212 74       		.sleb128 -12
+ 782 0213 0D       		.uleb128 0xd
+ 783 0214 DF020000 		.4byte	.LASF36
+ 784 0218 01       		.byte	0x1
+ 785 0219 A4       		.byte	0xa4
+ 786 021a 4C000000 		.4byte	0x4c
+ 787 021e 02       		.uleb128 0x2
+ 788 021f 91       		.byte	0x91
+ 789 0220 72       		.sleb128 -14
+ 790 0221 0D       		.uleb128 0xd
+ 791 0222 57010000 		.4byte	.LASF37
+ 792 0226 01       		.byte	0x1
+ 793 0227 A4       		.byte	0xa4
+ 794 0228 4C000000 		.4byte	0x4c
+ 795 022c 02       		.uleb128 0x2
+ 796 022d 91       		.byte	0x91
+ 797 022e 70       		.sleb128 -16
+ 798 022f 00       		.byte	0
+ 799 0230 10       		.uleb128 0x10
+ 800 0231 2A010000 		.4byte	.LASF50
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 20
+
+
+ 801 0235 01       		.byte	0x1
+ 802 0236 FB       		.byte	0xfb
+ 803 0237 D0000000 		.4byte	0xd0
+ 804 023b 00000000 		.4byte	.LFB70
+ 805 023f 64000000 		.4byte	.LFE70-.LFB70
+ 806 0243 01       		.uleb128 0x1
+ 807 0244 9C       		.byte	0x9c
+ 808 0245 77020000 		.4byte	0x277
+ 809 0249 0D       		.uleb128 0xd
+ 810 024a 2F030000 		.4byte	.LASF38
+ 811 024e 01       		.byte	0x1
+ 812 024f FD       		.byte	0xfd
+ 813 0250 77020000 		.4byte	0x277
+ 814 0254 05       		.uleb128 0x5
+ 815 0255 03       		.byte	0x3
+ 816 0256 0C000000 		.4byte	sLastCheckVariables.6797
+ 817 025a 0D       		.uleb128 0xd
+ 818 025b 0B000000 		.4byte	.LASF39
+ 819 025f 01       		.byte	0x1
+ 820 0260 FE       		.byte	0xfe
+ 821 0261 D0000000 		.4byte	0xd0
+ 822 0265 02       		.uleb128 0x2
+ 823 0266 91       		.byte	0x91
+ 824 0267 74       		.sleb128 -12
+ 825 0268 0D       		.uleb128 0xd
+ 826 0269 18020000 		.4byte	.LASF40
+ 827 026d 01       		.byte	0x1
+ 828 026e FE       		.byte	0xfe
+ 829 026f D0000000 		.4byte	0xd0
+ 830 0273 02       		.uleb128 0x2
+ 831 0274 91       		.byte	0x91
+ 832 0275 70       		.sleb128 -16
+ 833 0276 00       		.byte	0
+ 834 0277 11       		.uleb128 0x11
+ 835 0278 4C000000 		.4byte	0x4c
+ 836 027c 87020000 		.4byte	0x287
+ 837 0280 12       		.uleb128 0x12
+ 838 0281 8C000000 		.4byte	0x8c
+ 839 0285 03       		.byte	0x3
+ 840 0286 00       		.byte	0
+ 841 0287 0D       		.uleb128 0xd
+ 842 0288 11000000 		.4byte	.LASF41
+ 843 028c 01       		.byte	0x1
+ 844 028d 54       		.byte	0x54
+ 845 028e 98020000 		.4byte	0x298
+ 846 0292 05       		.uleb128 0x5
+ 847 0293 03       		.byte	0x3
+ 848 0294 00000000 		.4byte	sCheckVariables
+ 849 0298 06       		.uleb128 0x6
+ 850 0299 77020000 		.4byte	0x277
+ 851 029d 0D       		.uleb128 0xd
+ 852 029e 17010000 		.4byte	.LASF42
+ 853 02a2 01       		.byte	0x1
+ 854 02a3 55       		.byte	0x55
+ 855 02a4 AE020000 		.4byte	0x2ae
+ 856 02a8 05       		.uleb128 0x5
+ 857 02a9 03       		.byte	0x3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 21
+
+
+ 858 02aa 08000000 		.4byte	sNextCheckVariable
+ 859 02ae 06       		.uleb128 0x6
+ 860 02af 4C000000 		.4byte	0x4c
+ 861 02b3 13       		.uleb128 0x13
+ 862 02b4 B9010000 		.4byte	.LASF51
+ 863 02b8 08       		.byte	0x8
+ 864 02b9 9606     		.2byte	0x696
+ 865 02bb BF020000 		.4byte	0x2bf
+ 866 02bf 06       		.uleb128 0x6
+ 867 02c0 A7000000 		.4byte	0xa7
+ 868 02c4 00       		.byte	0
+ 869              		.section	.debug_abbrev,"",%progbits
+ 870              	.Ldebug_abbrev0:
+ 871 0000 01       		.uleb128 0x1
+ 872 0001 11       		.uleb128 0x11
+ 873 0002 01       		.byte	0x1
+ 874 0003 25       		.uleb128 0x25
+ 875 0004 0E       		.uleb128 0xe
+ 876 0005 13       		.uleb128 0x13
+ 877 0006 0B       		.uleb128 0xb
+ 878 0007 03       		.uleb128 0x3
+ 879 0008 0E       		.uleb128 0xe
+ 880 0009 1B       		.uleb128 0x1b
+ 881 000a 0E       		.uleb128 0xe
+ 882 000b 55       		.uleb128 0x55
+ 883 000c 17       		.uleb128 0x17
+ 884 000d 11       		.uleb128 0x11
+ 885 000e 01       		.uleb128 0x1
+ 886 000f 10       		.uleb128 0x10
+ 887 0010 17       		.uleb128 0x17
+ 888 0011 00       		.byte	0
+ 889 0012 00       		.byte	0
+ 890 0013 02       		.uleb128 0x2
+ 891 0014 24       		.uleb128 0x24
+ 892 0015 00       		.byte	0
+ 893 0016 0B       		.uleb128 0xb
+ 894 0017 0B       		.uleb128 0xb
+ 895 0018 3E       		.uleb128 0x3e
+ 896 0019 0B       		.uleb128 0xb
+ 897 001a 03       		.uleb128 0x3
+ 898 001b 0E       		.uleb128 0xe
+ 899 001c 00       		.byte	0
+ 900 001d 00       		.byte	0
+ 901 001e 03       		.uleb128 0x3
+ 902 001f 24       		.uleb128 0x24
+ 903 0020 00       		.byte	0
+ 904 0021 0B       		.uleb128 0xb
+ 905 0022 0B       		.uleb128 0xb
+ 906 0023 3E       		.uleb128 0x3e
+ 907 0024 0B       		.uleb128 0xb
+ 908 0025 03       		.uleb128 0x3
+ 909 0026 08       		.uleb128 0x8
+ 910 0027 00       		.byte	0
+ 911 0028 00       		.byte	0
+ 912 0029 04       		.uleb128 0x4
+ 913 002a 16       		.uleb128 0x16
+ 914 002b 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 22
+
+
+ 915 002c 03       		.uleb128 0x3
+ 916 002d 0E       		.uleb128 0xe
+ 917 002e 3A       		.uleb128 0x3a
+ 918 002f 0B       		.uleb128 0xb
+ 919 0030 3B       		.uleb128 0x3b
+ 920 0031 0B       		.uleb128 0xb
+ 921 0032 49       		.uleb128 0x49
+ 922 0033 13       		.uleb128 0x13
+ 923 0034 00       		.byte	0
+ 924 0035 00       		.byte	0
+ 925 0036 05       		.uleb128 0x5
+ 926 0037 0F       		.uleb128 0xf
+ 927 0038 00       		.byte	0
+ 928 0039 0B       		.uleb128 0xb
+ 929 003a 0B       		.uleb128 0xb
+ 930 003b 00       		.byte	0
+ 931 003c 00       		.byte	0
+ 932 003d 06       		.uleb128 0x6
+ 933 003e 35       		.uleb128 0x35
+ 934 003f 00       		.byte	0
+ 935 0040 49       		.uleb128 0x49
+ 936 0041 13       		.uleb128 0x13
+ 937 0042 00       		.byte	0
+ 938 0043 00       		.byte	0
+ 939 0044 07       		.uleb128 0x7
+ 940 0045 0F       		.uleb128 0xf
+ 941 0046 00       		.byte	0
+ 942 0047 0B       		.uleb128 0xb
+ 943 0048 0B       		.uleb128 0xb
+ 944 0049 49       		.uleb128 0x49
+ 945 004a 13       		.uleb128 0x13
+ 946 004b 00       		.byte	0
+ 947 004c 00       		.byte	0
+ 948 004d 08       		.uleb128 0x8
+ 949 004e 13       		.uleb128 0x13
+ 950 004f 00       		.byte	0
+ 951 0050 03       		.uleb128 0x3
+ 952 0051 0E       		.uleb128 0xe
+ 953 0052 3C       		.uleb128 0x3c
+ 954 0053 19       		.uleb128 0x19
+ 955 0054 00       		.byte	0
+ 956 0055 00       		.byte	0
+ 957 0056 09       		.uleb128 0x9
+ 958 0057 13       		.uleb128 0x13
+ 959 0058 01       		.byte	0x1
+ 960 0059 03       		.uleb128 0x3
+ 961 005a 0E       		.uleb128 0xe
+ 962 005b 0B       		.uleb128 0xb
+ 963 005c 0B       		.uleb128 0xb
+ 964 005d 3A       		.uleb128 0x3a
+ 965 005e 0B       		.uleb128 0xb
+ 966 005f 3B       		.uleb128 0x3b
+ 967 0060 0B       		.uleb128 0xb
+ 968 0061 01       		.uleb128 0x1
+ 969 0062 13       		.uleb128 0x13
+ 970 0063 00       		.byte	0
+ 971 0064 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 23
+
+
+ 972 0065 0A       		.uleb128 0xa
+ 973 0066 0D       		.uleb128 0xd
+ 974 0067 00       		.byte	0
+ 975 0068 03       		.uleb128 0x3
+ 976 0069 0E       		.uleb128 0xe
+ 977 006a 3A       		.uleb128 0x3a
+ 978 006b 0B       		.uleb128 0xb
+ 979 006c 3B       		.uleb128 0x3b
+ 980 006d 0B       		.uleb128 0xb
+ 981 006e 49       		.uleb128 0x49
+ 982 006f 13       		.uleb128 0x13
+ 983 0070 38       		.uleb128 0x38
+ 984 0071 0B       		.uleb128 0xb
+ 985 0072 00       		.byte	0
+ 986 0073 00       		.byte	0
+ 987 0074 0B       		.uleb128 0xb
+ 988 0075 2E       		.uleb128 0x2e
+ 989 0076 01       		.byte	0x1
+ 990 0077 3F       		.uleb128 0x3f
+ 991 0078 19       		.uleb128 0x19
+ 992 0079 03       		.uleb128 0x3
+ 993 007a 0E       		.uleb128 0xe
+ 994 007b 3A       		.uleb128 0x3a
+ 995 007c 0B       		.uleb128 0xb
+ 996 007d 3B       		.uleb128 0x3b
+ 997 007e 0B       		.uleb128 0xb
+ 998 007f 27       		.uleb128 0x27
+ 999 0080 19       		.uleb128 0x19
+ 1000 0081 11       		.uleb128 0x11
+ 1001 0082 01       		.uleb128 0x1
+ 1002 0083 12       		.uleb128 0x12
+ 1003 0084 06       		.uleb128 0x6
+ 1004 0085 40       		.uleb128 0x40
+ 1005 0086 18       		.uleb128 0x18
+ 1006 0087 9642     		.uleb128 0x2116
+ 1007 0089 19       		.uleb128 0x19
+ 1008 008a 01       		.uleb128 0x1
+ 1009 008b 13       		.uleb128 0x13
+ 1010 008c 00       		.byte	0
+ 1011 008d 00       		.byte	0
+ 1012 008e 0C       		.uleb128 0xc
+ 1013 008f 05       		.uleb128 0x5
+ 1014 0090 00       		.byte	0
+ 1015 0091 03       		.uleb128 0x3
+ 1016 0092 0E       		.uleb128 0xe
+ 1017 0093 3A       		.uleb128 0x3a
+ 1018 0094 0B       		.uleb128 0xb
+ 1019 0095 3B       		.uleb128 0x3b
+ 1020 0096 0B       		.uleb128 0xb
+ 1021 0097 49       		.uleb128 0x49
+ 1022 0098 13       		.uleb128 0x13
+ 1023 0099 02       		.uleb128 0x2
+ 1024 009a 18       		.uleb128 0x18
+ 1025 009b 00       		.byte	0
+ 1026 009c 00       		.byte	0
+ 1027 009d 0D       		.uleb128 0xd
+ 1028 009e 34       		.uleb128 0x34
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 24
+
+
+ 1029 009f 00       		.byte	0
+ 1030 00a0 03       		.uleb128 0x3
+ 1031 00a1 0E       		.uleb128 0xe
+ 1032 00a2 3A       		.uleb128 0x3a
+ 1033 00a3 0B       		.uleb128 0xb
+ 1034 00a4 3B       		.uleb128 0x3b
+ 1035 00a5 0B       		.uleb128 0xb
+ 1036 00a6 49       		.uleb128 0x49
+ 1037 00a7 13       		.uleb128 0x13
+ 1038 00a8 02       		.uleb128 0x2
+ 1039 00a9 18       		.uleb128 0x18
+ 1040 00aa 00       		.byte	0
+ 1041 00ab 00       		.byte	0
+ 1042 00ac 0E       		.uleb128 0xe
+ 1043 00ad 26       		.uleb128 0x26
+ 1044 00ae 00       		.byte	0
+ 1045 00af 49       		.uleb128 0x49
+ 1046 00b0 13       		.uleb128 0x13
+ 1047 00b1 00       		.byte	0
+ 1048 00b2 00       		.byte	0
+ 1049 00b3 0F       		.uleb128 0xf
+ 1050 00b4 2E       		.uleb128 0x2e
+ 1051 00b5 01       		.byte	0x1
+ 1052 00b6 03       		.uleb128 0x3
+ 1053 00b7 0E       		.uleb128 0xe
+ 1054 00b8 3A       		.uleb128 0x3a
+ 1055 00b9 0B       		.uleb128 0xb
+ 1056 00ba 3B       		.uleb128 0x3b
+ 1057 00bb 0B       		.uleb128 0xb
+ 1058 00bc 27       		.uleb128 0x27
+ 1059 00bd 19       		.uleb128 0x19
+ 1060 00be 11       		.uleb128 0x11
+ 1061 00bf 01       		.uleb128 0x1
+ 1062 00c0 12       		.uleb128 0x12
+ 1063 00c1 06       		.uleb128 0x6
+ 1064 00c2 40       		.uleb128 0x40
+ 1065 00c3 18       		.uleb128 0x18
+ 1066 00c4 9642     		.uleb128 0x2116
+ 1067 00c6 19       		.uleb128 0x19
+ 1068 00c7 01       		.uleb128 0x1
+ 1069 00c8 13       		.uleb128 0x13
+ 1070 00c9 00       		.byte	0
+ 1071 00ca 00       		.byte	0
+ 1072 00cb 10       		.uleb128 0x10
+ 1073 00cc 2E       		.uleb128 0x2e
+ 1074 00cd 01       		.byte	0x1
+ 1075 00ce 3F       		.uleb128 0x3f
+ 1076 00cf 19       		.uleb128 0x19
+ 1077 00d0 03       		.uleb128 0x3
+ 1078 00d1 0E       		.uleb128 0xe
+ 1079 00d2 3A       		.uleb128 0x3a
+ 1080 00d3 0B       		.uleb128 0xb
+ 1081 00d4 3B       		.uleb128 0x3b
+ 1082 00d5 0B       		.uleb128 0xb
+ 1083 00d6 27       		.uleb128 0x27
+ 1084 00d7 19       		.uleb128 0x19
+ 1085 00d8 49       		.uleb128 0x49
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 25
+
+
+ 1086 00d9 13       		.uleb128 0x13
+ 1087 00da 11       		.uleb128 0x11
+ 1088 00db 01       		.uleb128 0x1
+ 1089 00dc 12       		.uleb128 0x12
+ 1090 00dd 06       		.uleb128 0x6
+ 1091 00de 40       		.uleb128 0x40
+ 1092 00df 18       		.uleb128 0x18
+ 1093 00e0 9742     		.uleb128 0x2117
+ 1094 00e2 19       		.uleb128 0x19
+ 1095 00e3 01       		.uleb128 0x1
+ 1096 00e4 13       		.uleb128 0x13
+ 1097 00e5 00       		.byte	0
+ 1098 00e6 00       		.byte	0
+ 1099 00e7 11       		.uleb128 0x11
+ 1100 00e8 01       		.uleb128 0x1
+ 1101 00e9 01       		.byte	0x1
+ 1102 00ea 49       		.uleb128 0x49
+ 1103 00eb 13       		.uleb128 0x13
+ 1104 00ec 01       		.uleb128 0x1
+ 1105 00ed 13       		.uleb128 0x13
+ 1106 00ee 00       		.byte	0
+ 1107 00ef 00       		.byte	0
+ 1108 00f0 12       		.uleb128 0x12
+ 1109 00f1 21       		.uleb128 0x21
+ 1110 00f2 00       		.byte	0
+ 1111 00f3 49       		.uleb128 0x49
+ 1112 00f4 13       		.uleb128 0x13
+ 1113 00f5 2F       		.uleb128 0x2f
+ 1114 00f6 0B       		.uleb128 0xb
+ 1115 00f7 00       		.byte	0
+ 1116 00f8 00       		.byte	0
+ 1117 00f9 13       		.uleb128 0x13
+ 1118 00fa 34       		.uleb128 0x34
+ 1119 00fb 00       		.byte	0
+ 1120 00fc 03       		.uleb128 0x3
+ 1121 00fd 0E       		.uleb128 0xe
+ 1122 00fe 3A       		.uleb128 0x3a
+ 1123 00ff 0B       		.uleb128 0xb
+ 1124 0100 3B       		.uleb128 0x3b
+ 1125 0101 05       		.uleb128 0x5
+ 1126 0102 49       		.uleb128 0x49
+ 1127 0103 13       		.uleb128 0x13
+ 1128 0104 3F       		.uleb128 0x3f
+ 1129 0105 19       		.uleb128 0x19
+ 1130 0106 3C       		.uleb128 0x3c
+ 1131 0107 19       		.uleb128 0x19
+ 1132 0108 00       		.byte	0
+ 1133 0109 00       		.byte	0
+ 1134 010a 00       		.byte	0
+ 1135              		.section	.debug_aranges,"",%progbits
+ 1136 0000 2C000000 		.4byte	0x2c
+ 1137 0004 0200     		.2byte	0x2
+ 1138 0006 00000000 		.4byte	.Ldebug_info0
+ 1139 000a 04       		.byte	0x4
+ 1140 000b 00       		.byte	0
+ 1141 000c 0000     		.2byte	0
+ 1142 000e 0000     		.2byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 26
+
+
+ 1143 0010 00000000 		.4byte	.LFB68
+ 1144 0014 38010000 		.4byte	.LFE68-.LFB68
+ 1145 0018 00000000 		.4byte	.LFB69
+ 1146 001c 18010000 		.4byte	.LFE69-.LFB69
+ 1147 0020 00000000 		.4byte	.LFB70
+ 1148 0024 64000000 		.4byte	.LFE70-.LFB70
+ 1149 0028 00000000 		.4byte	0
+ 1150 002c 00000000 		.4byte	0
+ 1151              		.section	.debug_ranges,"",%progbits
+ 1152              	.Ldebug_ranges0:
+ 1153 0000 00000000 		.4byte	.LFB68
+ 1154 0004 38010000 		.4byte	.LFE68
+ 1155 0008 00000000 		.4byte	.LFB69
+ 1156 000c 18010000 		.4byte	.LFE69
+ 1157 0010 00000000 		.4byte	.LFB70
+ 1158 0014 64000000 		.4byte	.LFE70
+ 1159 0018 00000000 		.4byte	0
+ 1160 001c 00000000 		.4byte	0
+ 1161              		.section	.debug_line,"",%progbits
+ 1162              	.Ldebug_line0:
+ 1163 0000 51020000 		.section	.debug_str,"MS",%progbits,1
+ 1163      0200BF01 
+ 1163      00000201 
+ 1163      FB0E0D00 
+ 1163      01010101 
+ 1164              	.LASF25:
+ 1165 0000 7853656D 		.ascii	"xSemaphore\000"
+ 1165      6170686F 
+ 1165      726500
+ 1166              	.LASF39:
+ 1167 000b 78546173 		.ascii	"xTask\000"
+ 1167      6B00
+ 1168              	.LASF41:
+ 1169 0011 73436865 		.ascii	"sCheckVariables\000"
+ 1169      636B5661 
+ 1169      72696162 
+ 1169      6C657300 
+ 1170              	.LASF35:
+ 1171 0021 756C436F 		.ascii	"ulCounter\000"
+ 1171      756E7465 
+ 1171      7200
+ 1172              	.LASF5:
+ 1173 002b 5F5F7569 		.ascii	"__uint8_t\000"
+ 1173      6E74385F 
+ 1173      7400
+ 1174              	.LASF21:
+ 1175 0035 5469636B 		.ascii	"TickType_t\000"
+ 1175      54797065 
+ 1175      5F7400
+ 1176              	.LASF33:
+ 1177 0040 70785061 		.ascii	"pxParameters\000"
+ 1177      72616D65 
+ 1177      74657273 
+ 1177      00
+ 1178              	.LASF26:
+ 1179 004d 70756C53 		.ascii	"pulSharedVariable\000"
+ 1179      68617265 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 27
+
+
+ 1179      64566172 
+ 1179      6961626C 
+ 1179      6500
+ 1180              	.LASF6:
+ 1181 005f 5F5F696E 		.ascii	"__int32_t\000"
+ 1181      7433325F 
+ 1181      7400
+ 1182              	.LASF43:
+ 1183 0069 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1183      4320342E 
+ 1183      392E3320 
+ 1183      32303135 
+ 1183      30333033 
+ 1184 009c 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1184      20726576 
+ 1184      6973696F 
+ 1184      6E203232 
+ 1184      31323230 
+ 1185 00cf 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 1185      66756E63 
+ 1185      74696F6E 
+ 1185      2D736563 
+ 1185      74696F6E 
+ 1186              	.LASF23:
+ 1187 00f7 51756575 		.ascii	"QueueHandle_t\000"
+ 1187      6548616E 
+ 1187      646C655F 
+ 1187      7400
+ 1188              	.LASF24:
+ 1189 0105 53656D61 		.ascii	"SemaphoreHandle_t\000"
+ 1189      70686F72 
+ 1189      6548616E 
+ 1189      646C655F 
+ 1189      7400
+ 1190              	.LASF42:
+ 1191 0117 734E6578 		.ascii	"sNextCheckVariable\000"
+ 1191      74436865 
+ 1191      636B5661 
+ 1191      72696162 
+ 1191      6C6500
+ 1192              	.LASF50:
+ 1193 012a 78417265 		.ascii	"xAreSemaphoreTasksStillRunning\000"
+ 1193      53656D61 
+ 1193      70686F72 
+ 1193      65546173 
+ 1193      6B735374 
+ 1194              	.LASF15:
+ 1195 0149 696E7433 		.ascii	"int32_t\000"
+ 1195      325F7400 
+ 1196              	.LASF17:
+ 1197 0151 666C6F61 		.ascii	"float\000"
+ 1197      7400
+ 1198              	.LASF37:
+ 1199 0157 73436865 		.ascii	"sCheckVariableToUse\000"
+ 1199      636B5661 
+ 1199      72696162 
+ 1199      6C65546F 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 28
+
+
+ 1199      55736500 
+ 1200              	.LASF2:
+ 1201 016b 756E7369 		.ascii	"unsigned char\000"
+ 1201      676E6564 
+ 1201      20636861 
+ 1201      7200
+ 1202              	.LASF9:
+ 1203 0179 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1203      20756E73 
+ 1203      69676E65 
+ 1203      6420696E 
+ 1203      7400
+ 1204              	.LASF4:
+ 1205 018b 73686F72 		.ascii	"short unsigned int\000"
+ 1205      7420756E 
+ 1205      7369676E 
+ 1205      65642069 
+ 1205      6E7400
+ 1206              	.LASF29:
+ 1207 019e 70784669 		.ascii	"pxFirstSemaphoreParameters\000"
+ 1207      72737453 
+ 1207      656D6170 
+ 1207      686F7265 
+ 1207      50617261 
+ 1208              	.LASF51:
+ 1209 01b9 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1209      52784275 
+ 1209      66666572 
+ 1209      00
+ 1210              	.LASF30:
+ 1211 01c6 70785365 		.ascii	"pxSecondSemaphoreParameters\000"
+ 1211      636F6E64 
+ 1211      53656D61 
+ 1211      70686F72 
+ 1211      65506172 
+ 1212              	.LASF18:
+ 1213 01e2 646F7562 		.ascii	"double\000"
+ 1213      6C6500
+ 1214              	.LASF49:
+ 1215 01e9 70727653 		.ascii	"prvSemaphoreTest\000"
+ 1215      656D6170 
+ 1215      686F7265 
+ 1215      54657374 
+ 1215      00
+ 1216              	.LASF8:
+ 1217 01fa 5F5F7569 		.ascii	"__uint32_t\000"
+ 1217      6E743332 
+ 1217      5F7400
+ 1218              	.LASF46:
+ 1219 0205 5461736B 		.ascii	"TaskControlBlock_t\000"
+ 1219      436F6E74 
+ 1219      726F6C42 
+ 1219      6C6F636B 
+ 1219      5F7400
+ 1220              	.LASF40:
+ 1221 0218 78526574 		.ascii	"xReturn\000"
+ 1221      75726E00 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 29
+
+
+ 1222              	.LASF31:
+ 1223 0220 75785072 		.ascii	"uxPriority\000"
+ 1223      696F7269 
+ 1223      747900
+ 1224              	.LASF0:
+ 1225 022b 756E7369 		.ascii	"unsigned int\000"
+ 1225      676E6564 
+ 1225      20696E74 
+ 1225      00
+ 1226              	.LASF11:
+ 1227 0238 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1227      206C6F6E 
+ 1227      6720756E 
+ 1227      7369676E 
+ 1227      65642069 
+ 1228              	.LASF14:
+ 1229 024f 75696E74 		.ascii	"uint8_t\000"
+ 1229      385F7400 
+ 1230              	.LASF45:
+ 1231 0257 453A5C47 		.ascii	"E:\\GitHub\\FreeRTOS\\freertos-code-2543-trunk\\fre"
+ 1231      69744875 
+ 1231      625C4672 
+ 1231      65655254 
+ 1231      4F535C66 
+ 1232 0286 6572746F 		.ascii	"ertos-code-2543-trunk\\FreeRTOS\\Demo\\CORTEX_CY8C5"
+ 1232      732D636F 
+ 1232      64652D32 
+ 1232      3534332D 
+ 1232      7472756E 
+ 1233 02b6 3538385F 		.ascii	"588_PSoC_Creator_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1233      50536F43 
+ 1233      5F437265 
+ 1233      61746F72 
+ 1233      5F474343 
+ 1234              	.LASF36:
+ 1235 02df 73457272 		.ascii	"sError\000"
+ 1235      6F7200
+ 1236              	.LASF28:
+ 1237 02e6 7853656D 		.ascii	"xSemaphoreParameters\000"
+ 1237      6170686F 
+ 1237      72655061 
+ 1237      72616D65 
+ 1237      74657273 
+ 1238              	.LASF27:
+ 1239 02fb 78426C6F 		.ascii	"xBlockTime\000"
+ 1239      636B5469 
+ 1239      6D6500
+ 1240              	.LASF12:
+ 1241 0306 73697A65 		.ascii	"sizetype\000"
+ 1241      74797065 
+ 1241      00
+ 1242              	.LASF10:
+ 1243 030f 6C6F6E67 		.ascii	"long long int\000"
+ 1243      206C6F6E 
+ 1243      6720696E 
+ 1243      7400
+ 1244              	.LASF13:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 30
+
+
+ 1245 031d 63686172 		.ascii	"char\000"
+ 1245      00
+ 1246              	.LASF32:
+ 1247 0322 70765061 		.ascii	"pvParameters\000"
+ 1247      72616D65 
+ 1247      74657273 
+ 1247      00
+ 1248              	.LASF38:
+ 1249 032f 734C6173 		.ascii	"sLastCheckVariables\000"
+ 1249      74436865 
+ 1249      636B5661 
+ 1249      72696162 
+ 1249      6C657300 
+ 1250              	.LASF34:
+ 1251 0343 756C4578 		.ascii	"ulExpectedValue\000"
+ 1251      70656374 
+ 1251      65645661 
+ 1251      6C756500 
+ 1252              	.LASF3:
+ 1253 0353 73686F72 		.ascii	"short int\000"
+ 1253      7420696E 
+ 1253      7400
+ 1254              	.LASF22:
+ 1255 035d 5461736B 		.ascii	"TaskHandle_t\000"
+ 1255      48616E64 
+ 1255      6C655F74 
+ 1255      00
+ 1256              	.LASF16:
+ 1257 036a 75696E74 		.ascii	"uint32_t\000"
+ 1257      33325F74 
+ 1257      00
+ 1258              	.LASF7:
+ 1259 0373 6C6F6E67 		.ascii	"long int\000"
+ 1259      20696E74 
+ 1259      00
+ 1260              	.LASF1:
+ 1261 037c 7369676E 		.ascii	"signed char\000"
+ 1261      65642063 
+ 1261      68617200 
+ 1262              	.LASF48:
+ 1263 0388 76537461 		.ascii	"vStartSemaphoreTasks\000"
+ 1263      72745365 
+ 1263      6D617068 
+ 1263      6F726554 
+ 1263      61736B73 
+ 1264              	.LASF44:
+ 1265 039d 2E2E5C2E 		.ascii	"..\\..\\Common\\Minimal\\semtest.c\000"
+ 1265      2E5C436F 
+ 1265      6D6D6F6E 
+ 1265      5C4D696E 
+ 1265      696D616C 
+ 1266              	.LASF20:
+ 1267 03bc 55426173 		.ascii	"UBaseType_t\000"
+ 1267      65547970 
+ 1267      655F7400 
+ 1268              	.LASF19:
+ 1269 03c8 42617365 		.ascii	"BaseType_t\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccvIEdxh.s 			page 31
+
+
+ 1269      54797065 
+ 1269      5F7400
+ 1270              	.LASF47:
+ 1271 03d3 53454D41 		.ascii	"SEMAPHORE_PARAMETERS\000"
+ 1271      50484F52 
+ 1271      455F5041 
+ 1271      52414D45 
+ 1271      54455253 
+ 1272              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

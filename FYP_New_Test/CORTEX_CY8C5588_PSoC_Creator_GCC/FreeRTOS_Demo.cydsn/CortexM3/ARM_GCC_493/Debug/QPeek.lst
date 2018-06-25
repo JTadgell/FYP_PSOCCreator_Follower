@@ -1,0 +1,2198 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"QPeek.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	xErrorDetected:
+  21 0000 00000000 		.space	4
+  22              		.align	2
+  23              	ulLoopCounter:
+  24 0004 00000000 		.space	4
+  25              		.comm	xMediumPriorityTask,4,4
+  26              		.comm	xHighPriorityTask,4,4
+  27              		.comm	xHighestPriorityTask,4,4
+  28              		.section	.rodata
+  29              		.align	2
+  30              	.LC0:
+  31 0000 51506565 		.ascii	"QPeek_Test_Queue\000"
+  31      6B5F5465 
+  31      73745F51 
+  31      75657565 
+  31      00
+  32 0011 000000   		.align	2
+  33              	.LC1:
+  34 0014 5065656B 		.ascii	"PeekL\000"
+  34      4C00
+  35 001a 0000     		.align	2
+  36              	.LC2:
+  37 001c 5065656B 		.ascii	"PeekM\000"
+  37      4D00
+  38 0022 0000     		.align	2
+  39              	.LC3:
+  40 0024 5065656B 		.ascii	"PeekH1\000"
+  40      483100
+  41 002b 00       		.align	2
+  42              	.LC4:
+  43 002c 5065656B 		.ascii	"PeekH2\000"
+  43      483200
+  44 0033 00       		.section	.text.vStartQueuePeekTasks,"ax",%progbits
+  45              		.align	2
+  46              		.global	vStartQueuePeekTasks
+  47              		.thumb
+  48              		.thumb_func
+  49              		.type	vStartQueuePeekTasks, %function
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 2
+
+
+  50              	vStartQueuePeekTasks:
+  51              	.LFB68:
+  52              		.file 1 "..\\..\\Common\\Minimal\\QPeek.c"
+   1:..\..\Common\Minimal/QPeek.c **** /*
+   2:..\..\Common\Minimal/QPeek.c ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\Common\Minimal/QPeek.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\Common\Minimal/QPeek.c ****  *
+   5:..\..\Common\Minimal/QPeek.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\Common\Minimal/QPeek.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\Common\Minimal/QPeek.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\Common\Minimal/QPeek.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\Common\Minimal/QPeek.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\Common\Minimal/QPeek.c ****  * subject to the following conditions:
+  11:..\..\Common\Minimal/QPeek.c ****  *
+  12:..\..\Common\Minimal/QPeek.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\Common\Minimal/QPeek.c ****  * copies or substantial portions of the Software.
+  14:..\..\Common\Minimal/QPeek.c ****  *
+  15:..\..\Common\Minimal/QPeek.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\Common\Minimal/QPeek.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\Common\Minimal/QPeek.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\Common\Minimal/QPeek.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\Common\Minimal/QPeek.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\Common\Minimal/QPeek.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\Common\Minimal/QPeek.c ****  *
+  22:..\..\Common\Minimal/QPeek.c ****  * http://www.FreeRTOS.org
+  23:..\..\Common\Minimal/QPeek.c ****  * http://aws.amazon.com/freertos
+  24:..\..\Common\Minimal/QPeek.c ****  *
+  25:..\..\Common\Minimal/QPeek.c ****  * 1 tab == 4 spaces!
+  26:..\..\Common\Minimal/QPeek.c ****  */
+  27:..\..\Common\Minimal/QPeek.c **** 
+  28:..\..\Common\Minimal/QPeek.c **** 
+  29:..\..\Common\Minimal/QPeek.c **** /*
+  30:..\..\Common\Minimal/QPeek.c ****  * Tests the behaviour when data is peeked from a queue when there are
+  31:..\..\Common\Minimal/QPeek.c ****  * multiple tasks blocked on the queue.
+  32:..\..\Common\Minimal/QPeek.c ****  */
+  33:..\..\Common\Minimal/QPeek.c **** 
+  34:..\..\Common\Minimal/QPeek.c **** 
+  35:..\..\Common\Minimal/QPeek.c **** #include <stdlib.h>
+  36:..\..\Common\Minimal/QPeek.c **** 
+  37:..\..\Common\Minimal/QPeek.c **** /* Scheduler include files. */
+  38:..\..\Common\Minimal/QPeek.c **** #include "FreeRTOS.h"
+  39:..\..\Common\Minimal/QPeek.c **** #include "task.h"
+  40:..\..\Common\Minimal/QPeek.c **** #include "queue.h"
+  41:..\..\Common\Minimal/QPeek.c **** #include "semphr.h"
+  42:..\..\Common\Minimal/QPeek.c **** 
+  43:..\..\Common\Minimal/QPeek.c **** /* Demo program include files. */
+  44:..\..\Common\Minimal/QPeek.c **** #include "QPeek.h"
+  45:..\..\Common\Minimal/QPeek.c **** 
+  46:..\..\Common\Minimal/QPeek.c **** #define qpeekQUEUE_LENGTH		( 5 )
+  47:..\..\Common\Minimal/QPeek.c **** #define qpeekNO_BLOCK			( 0 )
+  48:..\..\Common\Minimal/QPeek.c **** #define qpeekSHORT_DELAY		( 10 )
+  49:..\..\Common\Minimal/QPeek.c **** 
+  50:..\..\Common\Minimal/QPeek.c **** #define qpeekLOW_PRIORITY			( tskIDLE_PRIORITY + 0 )
+  51:..\..\Common\Minimal/QPeek.c **** #define qpeekMEDIUM_PRIORITY		( tskIDLE_PRIORITY + 1 )
+  52:..\..\Common\Minimal/QPeek.c **** #define qpeekHIGH_PRIORITY			( tskIDLE_PRIORITY + 2 )
+  53:..\..\Common\Minimal/QPeek.c **** #define qpeekHIGHEST_PRIORITY		( tskIDLE_PRIORITY + 3 )
+  54:..\..\Common\Minimal/QPeek.c **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 3
+
+
+  55:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+  56:..\..\Common\Minimal/QPeek.c **** 
+  57:..\..\Common\Minimal/QPeek.c **** /*
+  58:..\..\Common\Minimal/QPeek.c ****  * The following three tasks are used to demonstrate the peeking behaviour.
+  59:..\..\Common\Minimal/QPeek.c ****  * Each task is given a different priority to demonstrate the order in which
+  60:..\..\Common\Minimal/QPeek.c ****  * tasks are woken as data is peeked from a queue.
+  61:..\..\Common\Minimal/QPeek.c ****  */
+  62:..\..\Common\Minimal/QPeek.c **** static void prvLowPriorityPeekTask( void *pvParameters );
+  63:..\..\Common\Minimal/QPeek.c **** static void prvMediumPriorityPeekTask( void *pvParameters );
+  64:..\..\Common\Minimal/QPeek.c **** static void prvHighPriorityPeekTask( void *pvParameters );
+  65:..\..\Common\Minimal/QPeek.c **** static void prvHighestPriorityPeekTask( void *pvParameters );
+  66:..\..\Common\Minimal/QPeek.c **** 
+  67:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+  68:..\..\Common\Minimal/QPeek.c **** 
+  69:..\..\Common\Minimal/QPeek.c **** /* Flag that will be latched to pdTRUE should any unexpected behaviour be
+  70:..\..\Common\Minimal/QPeek.c **** detected in any of the tasks. */
+  71:..\..\Common\Minimal/QPeek.c **** static volatile BaseType_t xErrorDetected = pdFALSE;
+  72:..\..\Common\Minimal/QPeek.c **** 
+  73:..\..\Common\Minimal/QPeek.c **** /* Counter that is incremented on each cycle of a test.  This is used to
+  74:..\..\Common\Minimal/QPeek.c **** detect a stalled task - a test that is no longer running. */
+  75:..\..\Common\Minimal/QPeek.c **** static volatile uint32_t ulLoopCounter = 0;
+  76:..\..\Common\Minimal/QPeek.c **** 
+  77:..\..\Common\Minimal/QPeek.c **** /* Handles to the test tasks. */
+  78:..\..\Common\Minimal/QPeek.c **** TaskHandle_t xMediumPriorityTask, xHighPriorityTask, xHighestPriorityTask;
+  79:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+  80:..\..\Common\Minimal/QPeek.c **** 
+  81:..\..\Common\Minimal/QPeek.c **** void vStartQueuePeekTasks( void )
+  82:..\..\Common\Minimal/QPeek.c **** {
+  53              		.loc 1 82 0
+  54              		.cfi_startproc
+  55              		@ args = 0, pretend = 0, frame = 8
+  56              		@ frame_needed = 1, uses_anonymous_args = 0
+  57 0000 80B5     		push	{r7, lr}
+  58              		.cfi_def_cfa_offset 8
+  59              		.cfi_offset 7, -8
+  60              		.cfi_offset 14, -4
+  61 0002 84B0     		sub	sp, sp, #16
+  62              		.cfi_def_cfa_offset 24
+  63 0004 02AF     		add	r7, sp, #8
+  64              		.cfi_def_cfa 7, 16
+  83:..\..\Common\Minimal/QPeek.c **** QueueHandle_t xQueue;
+  84:..\..\Common\Minimal/QPeek.c **** 
+  85:..\..\Common\Minimal/QPeek.c **** 	/* Create the queue that we are going to use for the test/demo. */
+  86:..\..\Common\Minimal/QPeek.c **** 	xQueue = xQueueCreate( qpeekQUEUE_LENGTH, sizeof( uint32_t ) );
+  65              		.loc 1 86 0
+  66 0006 0520     		movs	r0, #5
+  67 0008 0421     		movs	r1, #4
+  68 000a 0022     		movs	r2, #0
+  69 000c FFF7FEFF 		bl	xQueueGenericCreate
+  70 0010 7860     		str	r0, [r7, #4]
+  87:..\..\Common\Minimal/QPeek.c **** 
+  88:..\..\Common\Minimal/QPeek.c **** 	if( xQueue != NULL )
+  71              		.loc 1 88 0
+  72 0012 7B68     		ldr	r3, [r7, #4]
+  73 0014 002B     		cmp	r3, #0
+  74 0016 2BD0     		beq	.L1
+  89:..\..\Common\Minimal/QPeek.c **** 	{
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 4
+
+
+  90:..\..\Common\Minimal/QPeek.c **** 		/* vQueueAddToRegistry() adds the queue to the queue registry, if one is
+  91:..\..\Common\Minimal/QPeek.c **** 		in use.  The queue registry is provided as a means for kernel aware
+  92:..\..\Common\Minimal/QPeek.c **** 		debuggers to locate queues and has no purpose if a kernel aware debugger
+  93:..\..\Common\Minimal/QPeek.c **** 		is not being used.  The call to vQueueAddToRegistry() will be removed
+  94:..\..\Common\Minimal/QPeek.c **** 		by the pre-processor if configQUEUE_REGISTRY_SIZE is not defined or is
+  95:..\..\Common\Minimal/QPeek.c **** 		defined to be less than 1. */
+  96:..\..\Common\Minimal/QPeek.c **** 		vQueueAddToRegistry( xQueue, "QPeek_Test_Queue" );
+  75              		.loc 1 96 0
+  76 0018 7868     		ldr	r0, [r7, #4]
+  77 001a 1749     		ldr	r1, .L3
+  78 001c FFF7FEFF 		bl	vQueueAddToRegistry
+  97:..\..\Common\Minimal/QPeek.c **** 
+  98:..\..\Common\Minimal/QPeek.c **** 		/* Create the demo tasks and pass it the queue just created.  We are
+  99:..\..\Common\Minimal/QPeek.c **** 		passing the queue handle by value so it does not matter that it is declared
+ 100:..\..\Common\Minimal/QPeek.c **** 		on the stack here. */
+ 101:..\..\Common\Minimal/QPeek.c **** 		xTaskCreate( prvLowPriorityPeekTask, "PeekL", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpeekL
+  79              		.loc 1 101 0
+  80 0020 0023     		movs	r3, #0
+  81 0022 0093     		str	r3, [sp]
+  82 0024 0023     		movs	r3, #0
+  83 0026 0193     		str	r3, [sp, #4]
+  84 0028 1448     		ldr	r0, .L3+4
+  85 002a 1549     		ldr	r1, .L3+8
+  86 002c 6422     		movs	r2, #100
+  87 002e 7B68     		ldr	r3, [r7, #4]
+  88 0030 FFF7FEFF 		bl	xTaskCreate
+ 102:..\..\Common\Minimal/QPeek.c **** 		xTaskCreate( prvMediumPriorityPeekTask, "PeekM", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpe
+  89              		.loc 1 102 0
+  90 0034 0123     		movs	r3, #1
+  91 0036 0093     		str	r3, [sp]
+  92 0038 124B     		ldr	r3, .L3+12
+  93 003a 0193     		str	r3, [sp, #4]
+  94 003c 1248     		ldr	r0, .L3+16
+  95 003e 1349     		ldr	r1, .L3+20
+  96 0040 6422     		movs	r2, #100
+  97 0042 7B68     		ldr	r3, [r7, #4]
+  98 0044 FFF7FEFF 		bl	xTaskCreate
+ 103:..\..\Common\Minimal/QPeek.c **** 		xTaskCreate( prvHighPriorityPeekTask, "PeekH1", configMINIMAL_STACK_SIZE, ( void * ) xQueue, qpee
+  99              		.loc 1 103 0
+ 100 0048 0223     		movs	r3, #2
+ 101 004a 0093     		str	r3, [sp]
+ 102 004c 104B     		ldr	r3, .L3+24
+ 103 004e 0193     		str	r3, [sp, #4]
+ 104 0050 1048     		ldr	r0, .L3+28
+ 105 0052 1149     		ldr	r1, .L3+32
+ 106 0054 6422     		movs	r2, #100
+ 107 0056 7B68     		ldr	r3, [r7, #4]
+ 108 0058 FFF7FEFF 		bl	xTaskCreate
+ 104:..\..\Common\Minimal/QPeek.c **** 		xTaskCreate( prvHighestPriorityPeekTask, "PeekH2", configMINIMAL_STACK_SIZE, ( void * ) xQueue, q
+ 109              		.loc 1 104 0
+ 110 005c 0323     		movs	r3, #3
+ 111 005e 0093     		str	r3, [sp]
+ 112 0060 0E4B     		ldr	r3, .L3+36
+ 113 0062 0193     		str	r3, [sp, #4]
+ 114 0064 0E48     		ldr	r0, .L3+40
+ 115 0066 0F49     		ldr	r1, .L3+44
+ 116 0068 6422     		movs	r2, #100
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 5
+
+
+ 117 006a 7B68     		ldr	r3, [r7, #4]
+ 118 006c FFF7FEFF 		bl	xTaskCreate
+ 119              	.L1:
+ 105:..\..\Common\Minimal/QPeek.c **** 	}
+ 106:..\..\Common\Minimal/QPeek.c **** }
+ 120              		.loc 1 106 0
+ 121 0070 0837     		adds	r7, r7, #8
+ 122              		.cfi_def_cfa_offset 8
+ 123 0072 BD46     		mov	sp, r7
+ 124              		.cfi_def_cfa_register 13
+ 125              		@ sp needed
+ 126 0074 80BD     		pop	{r7, pc}
+ 127              	.L4:
+ 128 0076 00BF     		.align	2
+ 129              	.L3:
+ 130 0078 00000000 		.word	.LC0
+ 131 007c 00000000 		.word	prvLowPriorityPeekTask
+ 132 0080 14000000 		.word	.LC1
+ 133 0084 00000000 		.word	xMediumPriorityTask
+ 134 0088 00000000 		.word	prvMediumPriorityPeekTask
+ 135 008c 1C000000 		.word	.LC2
+ 136 0090 00000000 		.word	xHighPriorityTask
+ 137 0094 00000000 		.word	prvHighPriorityPeekTask
+ 138 0098 24000000 		.word	.LC3
+ 139 009c 00000000 		.word	xHighestPriorityTask
+ 140 00a0 00000000 		.word	prvHighestPriorityPeekTask
+ 141 00a4 2C000000 		.word	.LC4
+ 142              		.cfi_endproc
+ 143              	.LFE68:
+ 144              		.size	vStartQueuePeekTasks, .-vStartQueuePeekTasks
+ 145              		.section	.text.prvHighestPriorityPeekTask,"ax",%progbits
+ 146              		.align	2
+ 147              		.thumb
+ 148              		.thumb_func
+ 149              		.type	prvHighestPriorityPeekTask, %function
+ 150              	prvHighestPriorityPeekTask:
+ 151              	.LFB69:
+ 107:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+ 108:..\..\Common\Minimal/QPeek.c **** 
+ 109:..\..\Common\Minimal/QPeek.c **** static void prvHighestPriorityPeekTask( void *pvParameters )
+ 110:..\..\Common\Minimal/QPeek.c **** {
+ 152              		.loc 1 110 0
+ 153              		.cfi_startproc
+ 154              		@ args = 0, pretend = 0, frame = 16
+ 155              		@ frame_needed = 1, uses_anonymous_args = 0
+ 156 0000 80B5     		push	{r7, lr}
+ 157              		.cfi_def_cfa_offset 8
+ 158              		.cfi_offset 7, -8
+ 159              		.cfi_offset 14, -4
+ 160 0002 84B0     		sub	sp, sp, #16
+ 161              		.cfi_def_cfa_offset 24
+ 162 0004 00AF     		add	r7, sp, #0
+ 163              		.cfi_def_cfa_register 7
+ 164 0006 7860     		str	r0, [r7, #4]
+ 111:..\..\Common\Minimal/QPeek.c **** QueueHandle_t xQueue = ( QueueHandle_t ) pvParameters;
+ 165              		.loc 1 111 0
+ 166 0008 7B68     		ldr	r3, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 6
+
+
+ 167 000a FB60     		str	r3, [r7, #12]
+ 168              	.L16:
+ 112:..\..\Common\Minimal/QPeek.c **** uint32_t ulValue;
+ 113:..\..\Common\Minimal/QPeek.c **** 
+ 114:..\..\Common\Minimal/QPeek.c **** 	#ifdef USE_STDIO
+ 115:..\..\Common\Minimal/QPeek.c **** 	{
+ 116:..\..\Common\Minimal/QPeek.c **** 		void vPrintDisplayMessage( const char * const * ppcMessageToSend );
+ 117:..\..\Common\Minimal/QPeek.c **** 
+ 118:..\..\Common\Minimal/QPeek.c **** 		const char * const pcTaskStartMsg = "Queue peek test started.\r\n";
+ 119:..\..\Common\Minimal/QPeek.c **** 
+ 120:..\..\Common\Minimal/QPeek.c **** 		/* Queue a message for printing to say the task has started. */
+ 121:..\..\Common\Minimal/QPeek.c **** 		vPrintDisplayMessage( &pcTaskStartMsg );
+ 122:..\..\Common\Minimal/QPeek.c **** 	}
+ 123:..\..\Common\Minimal/QPeek.c **** 	#endif
+ 124:..\..\Common\Minimal/QPeek.c **** 
+ 125:..\..\Common\Minimal/QPeek.c **** 	for( ;; )
+ 126:..\..\Common\Minimal/QPeek.c **** 	{
+ 127:..\..\Common\Minimal/QPeek.c **** 		/* Try peeking from the queue.  The queue should be empty so we will
+ 128:..\..\Common\Minimal/QPeek.c **** 		block, allowing the high priority task to execute. */
+ 129:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 169              		.loc 1 129 0
+ 170 000c 07F10803 		add	r3, r7, #8
+ 171 0010 F868     		ldr	r0, [r7, #12]
+ 172 0012 1946     		mov	r1, r3
+ 173 0014 4FF0FF32 		mov	r2, #-1
+ 174 0018 FFF7FEFF 		bl	xQueuePeek
+ 175 001c 0346     		mov	r3, r0
+ 176 001e 012B     		cmp	r3, #1
+ 177 0020 02D0     		beq	.L6
+ 130:..\..\Common\Minimal/QPeek.c **** 		{
+ 131:..\..\Common\Minimal/QPeek.c **** 			/* We expected to have received something by the time we unblock. */
+ 132:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 178              		.loc 1 132 0
+ 179 0022 314B     		ldr	r3, .L17
+ 180 0024 0122     		movs	r2, #1
+ 181 0026 1A60     		str	r2, [r3]
+ 182              	.L6:
+ 133:..\..\Common\Minimal/QPeek.c **** 		}
+ 134:..\..\Common\Minimal/QPeek.c **** 
+ 135:..\..\Common\Minimal/QPeek.c **** 		/* When we reach here the high and medium priority tasks should still
+ 136:..\..\Common\Minimal/QPeek.c **** 		be blocked on the queue.  We unblocked because the low priority task
+ 137:..\..\Common\Minimal/QPeek.c **** 		wrote a value to the queue, which we should have peeked.  Peeking the
+ 138:..\..\Common\Minimal/QPeek.c **** 		data (rather than receiving it) will leave the data on the queue, so
+ 139:..\..\Common\Minimal/QPeek.c **** 		the high priority task should then have also been unblocked, but not
+ 140:..\..\Common\Minimal/QPeek.c **** 		yet executed. */
+ 141:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x11223344 )
+ 183              		.loc 1 141 0
+ 184 0028 BB68     		ldr	r3, [r7, #8]
+ 185 002a 304A     		ldr	r2, .L17+4
+ 186 002c 9342     		cmp	r3, r2
+ 187 002e 02D0     		beq	.L7
+ 142:..\..\Common\Minimal/QPeek.c **** 		{
+ 143:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value. */
+ 144:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 188              		.loc 1 144 0
+ 189 0030 2D4B     		ldr	r3, .L17
+ 190 0032 0122     		movs	r2, #1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 7
+
+
+ 191 0034 1A60     		str	r2, [r3]
+ 192              	.L7:
+ 145:..\..\Common\Minimal/QPeek.c **** 		}
+ 146:..\..\Common\Minimal/QPeek.c **** 
+ 147:..\..\Common\Minimal/QPeek.c **** 		if( uxQueueMessagesWaiting( xQueue ) != 1 )
+ 193              		.loc 1 147 0
+ 194 0036 F868     		ldr	r0, [r7, #12]
+ 195 0038 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 196 003c 0346     		mov	r3, r0
+ 197 003e 012B     		cmp	r3, #1
+ 198 0040 02D0     		beq	.L8
+ 148:..\..\Common\Minimal/QPeek.c **** 		{
+ 149:..\..\Common\Minimal/QPeek.c **** 			/* The message should have been left on the queue. */
+ 150:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 199              		.loc 1 150 0
+ 200 0042 294B     		ldr	r3, .L17
+ 201 0044 0122     		movs	r2, #1
+ 202 0046 1A60     		str	r2, [r3]
+ 203              	.L8:
+ 151:..\..\Common\Minimal/QPeek.c **** 		}
+ 152:..\..\Common\Minimal/QPeek.c **** 
+ 153:..\..\Common\Minimal/QPeek.c **** 		/* Now we are going to actually receive the data, so when the high
+ 154:..\..\Common\Minimal/QPeek.c **** 		priority task runs it will find the queue empty and return to the
+ 155:..\..\Common\Minimal/QPeek.c **** 		blocked state. */
+ 156:..\..\Common\Minimal/QPeek.c **** 		ulValue = 0;
+ 204              		.loc 1 156 0
+ 205 0048 0023     		movs	r3, #0
+ 206 004a BB60     		str	r3, [r7, #8]
+ 157:..\..\Common\Minimal/QPeek.c **** 		if( xQueueReceive( xQueue, &ulValue, qpeekNO_BLOCK ) != pdPASS )
+ 207              		.loc 1 157 0
+ 208 004c 07F10803 		add	r3, r7, #8
+ 209 0050 F868     		ldr	r0, [r7, #12]
+ 210 0052 1946     		mov	r1, r3
+ 211 0054 0022     		movs	r2, #0
+ 212 0056 FFF7FEFF 		bl	xQueueReceive
+ 213 005a 0346     		mov	r3, r0
+ 214 005c 012B     		cmp	r3, #1
+ 215 005e 02D0     		beq	.L9
+ 158:..\..\Common\Minimal/QPeek.c **** 		{
+ 159:..\..\Common\Minimal/QPeek.c **** 			/* We expected to receive the value. */
+ 160:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 216              		.loc 1 160 0
+ 217 0060 214B     		ldr	r3, .L17
+ 218 0062 0122     		movs	r2, #1
+ 219 0064 1A60     		str	r2, [r3]
+ 220              	.L9:
+ 161:..\..\Common\Minimal/QPeek.c **** 		}
+ 162:..\..\Common\Minimal/QPeek.c **** 
+ 163:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x11223344 )
+ 221              		.loc 1 163 0
+ 222 0066 BB68     		ldr	r3, [r7, #8]
+ 223 0068 204A     		ldr	r2, .L17+4
+ 224 006a 9342     		cmp	r3, r2
+ 225 006c 02D0     		beq	.L10
+ 164:..\..\Common\Minimal/QPeek.c **** 		{
+ 165:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value - which should have been
+ 166:..\..\Common\Minimal/QPeek.c **** 			the same value as was peeked. */
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 8
+
+
+ 167:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 226              		.loc 1 167 0
+ 227 006e 1E4B     		ldr	r3, .L17
+ 228 0070 0122     		movs	r2, #1
+ 229 0072 1A60     		str	r2, [r3]
+ 230              	.L10:
+ 168:..\..\Common\Minimal/QPeek.c **** 		}
+ 169:..\..\Common\Minimal/QPeek.c **** 
+ 170:..\..\Common\Minimal/QPeek.c **** 		/* Now we will block again as the queue is once more empty.  The low
+ 171:..\..\Common\Minimal/QPeek.c **** 		priority task can then execute again. */
+ 172:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 231              		.loc 1 172 0
+ 232 0074 07F10803 		add	r3, r7, #8
+ 233 0078 F868     		ldr	r0, [r7, #12]
+ 234 007a 1946     		mov	r1, r3
+ 235 007c 4FF0FF32 		mov	r2, #-1
+ 236 0080 FFF7FEFF 		bl	xQueuePeek
+ 237 0084 0346     		mov	r3, r0
+ 238 0086 012B     		cmp	r3, #1
+ 239 0088 02D0     		beq	.L11
+ 173:..\..\Common\Minimal/QPeek.c **** 		{
+ 174:..\..\Common\Minimal/QPeek.c **** 			/* We expected to have received something by the time we unblock. */
+ 175:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 240              		.loc 1 175 0
+ 241 008a 174B     		ldr	r3, .L17
+ 242 008c 0122     		movs	r2, #1
+ 243 008e 1A60     		str	r2, [r3]
+ 244              	.L11:
+ 176:..\..\Common\Minimal/QPeek.c **** 		}
+ 177:..\..\Common\Minimal/QPeek.c **** 
+ 178:..\..\Common\Minimal/QPeek.c **** 		/* When we get here the low priority task should have again written to the
+ 179:..\..\Common\Minimal/QPeek.c **** 		queue. */
+ 180:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x01234567 )
+ 245              		.loc 1 180 0
+ 246 0090 BB68     		ldr	r3, [r7, #8]
+ 247 0092 174A     		ldr	r2, .L17+8
+ 248 0094 9342     		cmp	r3, r2
+ 249 0096 02D0     		beq	.L12
+ 181:..\..\Common\Minimal/QPeek.c **** 		{
+ 182:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value. */
+ 183:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 250              		.loc 1 183 0
+ 251 0098 134B     		ldr	r3, .L17
+ 252 009a 0122     		movs	r2, #1
+ 253 009c 1A60     		str	r2, [r3]
+ 254              	.L12:
+ 184:..\..\Common\Minimal/QPeek.c **** 		}
+ 185:..\..\Common\Minimal/QPeek.c **** 
+ 186:..\..\Common\Minimal/QPeek.c **** 		if( uxQueueMessagesWaiting( xQueue ) != 1 )
+ 255              		.loc 1 186 0
+ 256 009e F868     		ldr	r0, [r7, #12]
+ 257 00a0 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 258 00a4 0346     		mov	r3, r0
+ 259 00a6 012B     		cmp	r3, #1
+ 260 00a8 02D0     		beq	.L13
+ 187:..\..\Common\Minimal/QPeek.c **** 		{
+ 188:..\..\Common\Minimal/QPeek.c **** 			/* The message should have been left on the queue. */
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 9
+
+
+ 189:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 261              		.loc 1 189 0
+ 262 00aa 0F4B     		ldr	r3, .L17
+ 263 00ac 0122     		movs	r2, #1
+ 264 00ae 1A60     		str	r2, [r3]
+ 265              	.L13:
+ 190:..\..\Common\Minimal/QPeek.c **** 		}
+ 191:..\..\Common\Minimal/QPeek.c **** 
+ 192:..\..\Common\Minimal/QPeek.c **** 		/* We only peeked the data, so suspending ourselves now should enable
+ 193:..\..\Common\Minimal/QPeek.c **** 		the high priority task to also peek the data.  The high priority task
+ 194:..\..\Common\Minimal/QPeek.c **** 		will have been unblocked when we peeked the data as we left the data
+ 195:..\..\Common\Minimal/QPeek.c **** 		in the queue. */
+ 196:..\..\Common\Minimal/QPeek.c **** 		vTaskSuspend( NULL );
+ 266              		.loc 1 196 0
+ 267 00b0 0020     		movs	r0, #0
+ 268 00b2 FFF7FEFF 		bl	vTaskSuspend
+ 197:..\..\Common\Minimal/QPeek.c **** 
+ 198:..\..\Common\Minimal/QPeek.c **** 
+ 199:..\..\Common\Minimal/QPeek.c **** 
+ 200:..\..\Common\Minimal/QPeek.c **** 		/* This time we are going to do the same as the above test, but the
+ 201:..\..\Common\Minimal/QPeek.c **** 		high priority task is going to receive the data, rather than peek it.
+ 202:..\..\Common\Minimal/QPeek.c **** 		This means that the medium priority task should never peek the value. */
+ 203:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 269              		.loc 1 203 0
+ 270 00b6 07F10803 		add	r3, r7, #8
+ 271 00ba F868     		ldr	r0, [r7, #12]
+ 272 00bc 1946     		mov	r1, r3
+ 273 00be 4FF0FF32 		mov	r2, #-1
+ 274 00c2 FFF7FEFF 		bl	xQueuePeek
+ 275 00c6 0346     		mov	r3, r0
+ 276 00c8 012B     		cmp	r3, #1
+ 277 00ca 02D0     		beq	.L14
+ 204:..\..\Common\Minimal/QPeek.c **** 		{
+ 205:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 278              		.loc 1 205 0
+ 279 00cc 064B     		ldr	r3, .L17
+ 280 00ce 0122     		movs	r2, #1
+ 281 00d0 1A60     		str	r2, [r3]
+ 282              	.L14:
+ 206:..\..\Common\Minimal/QPeek.c **** 		}
+ 207:..\..\Common\Minimal/QPeek.c **** 
+ 208:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0xaabbaabb )
+ 283              		.loc 1 208 0
+ 284 00d2 BB68     		ldr	r3, [r7, #8]
+ 285 00d4 074A     		ldr	r2, .L17+12
+ 286 00d6 9342     		cmp	r3, r2
+ 287 00d8 02D0     		beq	.L15
+ 209:..\..\Common\Minimal/QPeek.c **** 		{
+ 210:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 288              		.loc 1 210 0
+ 289 00da 034B     		ldr	r3, .L17
+ 290 00dc 0122     		movs	r2, #1
+ 291 00de 1A60     		str	r2, [r3]
+ 292              	.L15:
+ 211:..\..\Common\Minimal/QPeek.c **** 		}
+ 212:..\..\Common\Minimal/QPeek.c **** 
+ 213:..\..\Common\Minimal/QPeek.c **** 		vTaskSuspend( NULL );
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 10
+
+
+ 293              		.loc 1 213 0
+ 294 00e0 0020     		movs	r0, #0
+ 295 00e2 FFF7FEFF 		bl	vTaskSuspend
+ 214:..\..\Common\Minimal/QPeek.c **** 	}
+ 296              		.loc 1 214 0
+ 297 00e6 91E7     		b	.L16
+ 298              	.L18:
+ 299              		.align	2
+ 300              	.L17:
+ 301 00e8 00000000 		.word	xErrorDetected
+ 302 00ec 44332211 		.word	287454020
+ 303 00f0 67452301 		.word	19088743
+ 304 00f4 BBAABBAA 		.word	-1430541637
+ 305              		.cfi_endproc
+ 306              	.LFE69:
+ 307              		.size	prvHighestPriorityPeekTask, .-prvHighestPriorityPeekTask
+ 308              		.section	.text.prvHighPriorityPeekTask,"ax",%progbits
+ 309              		.align	2
+ 310              		.thumb
+ 311              		.thumb_func
+ 312              		.type	prvHighPriorityPeekTask, %function
+ 313              	prvHighPriorityPeekTask:
+ 314              	.LFB70:
+ 215:..\..\Common\Minimal/QPeek.c **** }
+ 216:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+ 217:..\..\Common\Minimal/QPeek.c **** 
+ 218:..\..\Common\Minimal/QPeek.c **** static void prvHighPriorityPeekTask( void *pvParameters )
+ 219:..\..\Common\Minimal/QPeek.c **** {
+ 315              		.loc 1 219 0
+ 316              		.cfi_startproc
+ 317              		@ args = 0, pretend = 0, frame = 16
+ 318              		@ frame_needed = 1, uses_anonymous_args = 0
+ 319 0000 80B5     		push	{r7, lr}
+ 320              		.cfi_def_cfa_offset 8
+ 321              		.cfi_offset 7, -8
+ 322              		.cfi_offset 14, -4
+ 323 0002 84B0     		sub	sp, sp, #16
+ 324              		.cfi_def_cfa_offset 24
+ 325 0004 00AF     		add	r7, sp, #0
+ 326              		.cfi_def_cfa_register 7
+ 327 0006 7860     		str	r0, [r7, #4]
+ 220:..\..\Common\Minimal/QPeek.c **** QueueHandle_t xQueue = ( QueueHandle_t ) pvParameters;
+ 328              		.loc 1 220 0
+ 329 0008 7B68     		ldr	r3, [r7, #4]
+ 330 000a FB60     		str	r3, [r7, #12]
+ 331              	.L25:
+ 221:..\..\Common\Minimal/QPeek.c **** uint32_t ulValue;
+ 222:..\..\Common\Minimal/QPeek.c **** 
+ 223:..\..\Common\Minimal/QPeek.c **** 	for( ;; )
+ 224:..\..\Common\Minimal/QPeek.c **** 	{
+ 225:..\..\Common\Minimal/QPeek.c **** 		/* Try peeking from the queue.  The queue should be empty so we will
+ 226:..\..\Common\Minimal/QPeek.c **** 		block, allowing the medium priority task to execute.  Both the high
+ 227:..\..\Common\Minimal/QPeek.c **** 		and highest priority tasks will then be blocked on the queue. */
+ 228:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 332              		.loc 1 228 0
+ 333 000c 07F10803 		add	r3, r7, #8
+ 334 0010 F868     		ldr	r0, [r7, #12]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 11
+
+
+ 335 0012 1946     		mov	r1, r3
+ 336 0014 4FF0FF32 		mov	r2, #-1
+ 337 0018 FFF7FEFF 		bl	xQueuePeek
+ 338 001c 0346     		mov	r3, r0
+ 339 001e 012B     		cmp	r3, #1
+ 340 0020 02D0     		beq	.L20
+ 229:..\..\Common\Minimal/QPeek.c **** 		{
+ 230:..\..\Common\Minimal/QPeek.c **** 			/* We expected to have received something by the time we unblock. */
+ 231:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 341              		.loc 1 231 0
+ 342 0022 174B     		ldr	r3, .L26
+ 343 0024 0122     		movs	r2, #1
+ 344 0026 1A60     		str	r2, [r3]
+ 345              	.L20:
+ 232:..\..\Common\Minimal/QPeek.c **** 		}
+ 233:..\..\Common\Minimal/QPeek.c **** 
+ 234:..\..\Common\Minimal/QPeek.c **** 		/* When we get here the highest priority task should have peeked the data
+ 235:..\..\Common\Minimal/QPeek.c **** 		(unblocking this task) then suspended (allowing this task to also peek
+ 236:..\..\Common\Minimal/QPeek.c **** 		the data). */
+ 237:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x01234567 )
+ 346              		.loc 1 237 0
+ 347 0028 BB68     		ldr	r3, [r7, #8]
+ 348 002a 164A     		ldr	r2, .L26+4
+ 349 002c 9342     		cmp	r3, r2
+ 350 002e 02D0     		beq	.L21
+ 238:..\..\Common\Minimal/QPeek.c **** 		{
+ 239:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value. */
+ 240:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 351              		.loc 1 240 0
+ 352 0030 134B     		ldr	r3, .L26
+ 353 0032 0122     		movs	r2, #1
+ 354 0034 1A60     		str	r2, [r3]
+ 355              	.L21:
+ 241:..\..\Common\Minimal/QPeek.c **** 		}
+ 242:..\..\Common\Minimal/QPeek.c **** 
+ 243:..\..\Common\Minimal/QPeek.c **** 		if( uxQueueMessagesWaiting( xQueue ) != 1 )
+ 356              		.loc 1 243 0
+ 357 0036 F868     		ldr	r0, [r7, #12]
+ 358 0038 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 359 003c 0346     		mov	r3, r0
+ 360 003e 012B     		cmp	r3, #1
+ 361 0040 02D0     		beq	.L22
+ 244:..\..\Common\Minimal/QPeek.c **** 		{
+ 245:..\..\Common\Minimal/QPeek.c **** 			/* The message should have been left on the queue. */
+ 246:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 362              		.loc 1 246 0
+ 363 0042 0F4B     		ldr	r3, .L26
+ 364 0044 0122     		movs	r2, #1
+ 365 0046 1A60     		str	r2, [r3]
+ 366              	.L22:
+ 247:..\..\Common\Minimal/QPeek.c **** 		}
+ 248:..\..\Common\Minimal/QPeek.c **** 
+ 249:..\..\Common\Minimal/QPeek.c **** 		/* We only peeked the data, so suspending ourselves now should enable
+ 250:..\..\Common\Minimal/QPeek.c **** 		the medium priority task to also peek the data.  The medium priority task
+ 251:..\..\Common\Minimal/QPeek.c **** 		will have been unblocked when we peeked the data as we left the data
+ 252:..\..\Common\Minimal/QPeek.c **** 		in the queue. */
+ 253:..\..\Common\Minimal/QPeek.c **** 		vTaskSuspend( NULL );
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 12
+
+
+ 367              		.loc 1 253 0
+ 368 0048 0020     		movs	r0, #0
+ 369 004a FFF7FEFF 		bl	vTaskSuspend
+ 254:..\..\Common\Minimal/QPeek.c **** 
+ 255:..\..\Common\Minimal/QPeek.c **** 
+ 256:..\..\Common\Minimal/QPeek.c **** 		/* This time we are going actually receive the value, so the medium
+ 257:..\..\Common\Minimal/QPeek.c **** 		priority task will never peek the data - we removed it from the queue. */
+ 258:..\..\Common\Minimal/QPeek.c **** 		if( xQueueReceive( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 370              		.loc 1 258 0
+ 371 004e 07F10803 		add	r3, r7, #8
+ 372 0052 F868     		ldr	r0, [r7, #12]
+ 373 0054 1946     		mov	r1, r3
+ 374 0056 4FF0FF32 		mov	r2, #-1
+ 375 005a FFF7FEFF 		bl	xQueueReceive
+ 376 005e 0346     		mov	r3, r0
+ 377 0060 012B     		cmp	r3, #1
+ 378 0062 02D0     		beq	.L23
+ 259:..\..\Common\Minimal/QPeek.c **** 		{
+ 260:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 379              		.loc 1 260 0
+ 380 0064 064B     		ldr	r3, .L26
+ 381 0066 0122     		movs	r2, #1
+ 382 0068 1A60     		str	r2, [r3]
+ 383              	.L23:
+ 261:..\..\Common\Minimal/QPeek.c **** 		}
+ 262:..\..\Common\Minimal/QPeek.c **** 
+ 263:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0xaabbaabb )
+ 384              		.loc 1 263 0
+ 385 006a BB68     		ldr	r3, [r7, #8]
+ 386 006c 064A     		ldr	r2, .L26+8
+ 387 006e 9342     		cmp	r3, r2
+ 388 0070 02D0     		beq	.L24
+ 264:..\..\Common\Minimal/QPeek.c **** 		{
+ 265:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 389              		.loc 1 265 0
+ 390 0072 034B     		ldr	r3, .L26
+ 391 0074 0122     		movs	r2, #1
+ 392 0076 1A60     		str	r2, [r3]
+ 393              	.L24:
+ 266:..\..\Common\Minimal/QPeek.c **** 		}
+ 267:..\..\Common\Minimal/QPeek.c **** 
+ 268:..\..\Common\Minimal/QPeek.c **** 		vTaskSuspend( NULL );
+ 394              		.loc 1 268 0
+ 395 0078 0020     		movs	r0, #0
+ 396 007a FFF7FEFF 		bl	vTaskSuspend
+ 269:..\..\Common\Minimal/QPeek.c **** 	}
+ 397              		.loc 1 269 0
+ 398 007e C5E7     		b	.L25
+ 399              	.L27:
+ 400              		.align	2
+ 401              	.L26:
+ 402 0080 00000000 		.word	xErrorDetected
+ 403 0084 67452301 		.word	19088743
+ 404 0088 BBAABBAA 		.word	-1430541637
+ 405              		.cfi_endproc
+ 406              	.LFE70:
+ 407              		.size	prvHighPriorityPeekTask, .-prvHighPriorityPeekTask
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 13
+
+
+ 408              		.section	.text.prvMediumPriorityPeekTask,"ax",%progbits
+ 409              		.align	2
+ 410              		.thumb
+ 411              		.thumb_func
+ 412              		.type	prvMediumPriorityPeekTask, %function
+ 413              	prvMediumPriorityPeekTask:
+ 414              	.LFB71:
+ 270:..\..\Common\Minimal/QPeek.c **** }
+ 271:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+ 272:..\..\Common\Minimal/QPeek.c **** 
+ 273:..\..\Common\Minimal/QPeek.c **** static void prvMediumPriorityPeekTask( void *pvParameters )
+ 274:..\..\Common\Minimal/QPeek.c **** {
+ 415              		.loc 1 274 0
+ 416              		.cfi_startproc
+ 417              		@ args = 0, pretend = 0, frame = 16
+ 418              		@ frame_needed = 1, uses_anonymous_args = 0
+ 419 0000 80B5     		push	{r7, lr}
+ 420              		.cfi_def_cfa_offset 8
+ 421              		.cfi_offset 7, -8
+ 422              		.cfi_offset 14, -4
+ 423 0002 84B0     		sub	sp, sp, #16
+ 424              		.cfi_def_cfa_offset 24
+ 425 0004 00AF     		add	r7, sp, #0
+ 426              		.cfi_def_cfa_register 7
+ 427 0006 7860     		str	r0, [r7, #4]
+ 275:..\..\Common\Minimal/QPeek.c **** QueueHandle_t xQueue = ( QueueHandle_t ) pvParameters;
+ 428              		.loc 1 275 0
+ 429 0008 7B68     		ldr	r3, [r7, #4]
+ 430 000a FB60     		str	r3, [r7, #12]
+ 431              	.L32:
+ 276:..\..\Common\Minimal/QPeek.c **** uint32_t ulValue;
+ 277:..\..\Common\Minimal/QPeek.c **** 
+ 278:..\..\Common\Minimal/QPeek.c **** 	for( ;; )
+ 279:..\..\Common\Minimal/QPeek.c **** 	{
+ 280:..\..\Common\Minimal/QPeek.c **** 		/* Try peeking from the queue.  The queue should be empty so we will
+ 281:..\..\Common\Minimal/QPeek.c **** 		block, allowing the low priority task to execute.  The highest, high
+ 282:..\..\Common\Minimal/QPeek.c **** 		and medium priority tasks will then all be blocked on the queue. */
+ 283:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, portMAX_DELAY ) != pdPASS )
+ 432              		.loc 1 283 0
+ 433 000c 07F10803 		add	r3, r7, #8
+ 434 0010 F868     		ldr	r0, [r7, #12]
+ 435 0012 1946     		mov	r1, r3
+ 436 0014 4FF0FF32 		mov	r2, #-1
+ 437 0018 FFF7FEFF 		bl	xQueuePeek
+ 438 001c 0346     		mov	r3, r0
+ 439 001e 012B     		cmp	r3, #1
+ 440 0020 02D0     		beq	.L29
+ 284:..\..\Common\Minimal/QPeek.c **** 		{
+ 285:..\..\Common\Minimal/QPeek.c **** 			/* We expected to have received something by the time we unblock. */
+ 286:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 441              		.loc 1 286 0
+ 442 0022 0E4B     		ldr	r3, .L33
+ 443 0024 0122     		movs	r2, #1
+ 444 0026 1A60     		str	r2, [r3]
+ 445              	.L29:
+ 287:..\..\Common\Minimal/QPeek.c **** 		}
+ 288:..\..\Common\Minimal/QPeek.c **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 14
+
+
+ 289:..\..\Common\Minimal/QPeek.c **** 		/* When we get here the high priority task should have peeked the data
+ 290:..\..\Common\Minimal/QPeek.c **** 		(unblocking this task) then suspended (allowing this task to also peek
+ 291:..\..\Common\Minimal/QPeek.c **** 		the data). */
+ 292:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x01234567 )
+ 446              		.loc 1 292 0
+ 447 0028 BB68     		ldr	r3, [r7, #8]
+ 448 002a 0D4A     		ldr	r2, .L33+4
+ 449 002c 9342     		cmp	r3, r2
+ 450 002e 02D0     		beq	.L30
+ 293:..\..\Common\Minimal/QPeek.c **** 		{
+ 294:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value. */
+ 295:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 451              		.loc 1 295 0
+ 452 0030 0A4B     		ldr	r3, .L33
+ 453 0032 0122     		movs	r2, #1
+ 454 0034 1A60     		str	r2, [r3]
+ 455              	.L30:
+ 296:..\..\Common\Minimal/QPeek.c **** 		}
+ 297:..\..\Common\Minimal/QPeek.c **** 
+ 298:..\..\Common\Minimal/QPeek.c **** 		if( uxQueueMessagesWaiting( xQueue ) != 1 )
+ 456              		.loc 1 298 0
+ 457 0036 F868     		ldr	r0, [r7, #12]
+ 458 0038 FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 459 003c 0346     		mov	r3, r0
+ 460 003e 012B     		cmp	r3, #1
+ 461 0040 02D0     		beq	.L31
+ 299:..\..\Common\Minimal/QPeek.c **** 		{
+ 300:..\..\Common\Minimal/QPeek.c **** 			/* The message should have been left on the queue. */
+ 301:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 462              		.loc 1 301 0
+ 463 0042 064B     		ldr	r3, .L33
+ 464 0044 0122     		movs	r2, #1
+ 465 0046 1A60     		str	r2, [r3]
+ 466              	.L31:
+ 302:..\..\Common\Minimal/QPeek.c **** 		}
+ 303:..\..\Common\Minimal/QPeek.c **** 
+ 304:..\..\Common\Minimal/QPeek.c **** 		/* Just so we know the test is still running. */
+ 305:..\..\Common\Minimal/QPeek.c **** 		ulLoopCounter++;
+ 467              		.loc 1 305 0
+ 468 0048 064B     		ldr	r3, .L33+8
+ 469 004a 1B68     		ldr	r3, [r3]
+ 470 004c 0133     		adds	r3, r3, #1
+ 471 004e 054A     		ldr	r2, .L33+8
+ 472 0050 1360     		str	r3, [r2]
+ 306:..\..\Common\Minimal/QPeek.c **** 
+ 307:..\..\Common\Minimal/QPeek.c **** 		/* Now we can suspend ourselves so the low priority task can execute
+ 308:..\..\Common\Minimal/QPeek.c **** 		again. */
+ 309:..\..\Common\Minimal/QPeek.c **** 		vTaskSuspend( NULL );
+ 473              		.loc 1 309 0
+ 474 0052 0020     		movs	r0, #0
+ 475 0054 FFF7FEFF 		bl	vTaskSuspend
+ 310:..\..\Common\Minimal/QPeek.c **** 	}
+ 476              		.loc 1 310 0
+ 477 0058 D8E7     		b	.L32
+ 478              	.L34:
+ 479 005a 00BF     		.align	2
+ 480              	.L33:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 15
+
+
+ 481 005c 00000000 		.word	xErrorDetected
+ 482 0060 67452301 		.word	19088743
+ 483 0064 04000000 		.word	ulLoopCounter
+ 484              		.cfi_endproc
+ 485              	.LFE71:
+ 486              		.size	prvMediumPriorityPeekTask, .-prvMediumPriorityPeekTask
+ 487              		.section	.text.prvLowPriorityPeekTask,"ax",%progbits
+ 488              		.align	2
+ 489              		.thumb
+ 490              		.thumb_func
+ 491              		.type	prvLowPriorityPeekTask, %function
+ 492              	prvLowPriorityPeekTask:
+ 493              	.LFB72:
+ 311:..\..\Common\Minimal/QPeek.c **** }
+ 312:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+ 313:..\..\Common\Minimal/QPeek.c **** 
+ 314:..\..\Common\Minimal/QPeek.c **** static void prvLowPriorityPeekTask( void *pvParameters )
+ 315:..\..\Common\Minimal/QPeek.c **** {
+ 494              		.loc 1 315 0
+ 495              		.cfi_startproc
+ 496              		@ args = 0, pretend = 0, frame = 16
+ 497              		@ frame_needed = 1, uses_anonymous_args = 0
+ 498 0000 80B5     		push	{r7, lr}
+ 499              		.cfi_def_cfa_offset 8
+ 500              		.cfi_offset 7, -8
+ 501              		.cfi_offset 14, -4
+ 502 0002 84B0     		sub	sp, sp, #16
+ 503              		.cfi_def_cfa_offset 24
+ 504 0004 00AF     		add	r7, sp, #0
+ 505              		.cfi_def_cfa_register 7
+ 506 0006 7860     		str	r0, [r7, #4]
+ 316:..\..\Common\Minimal/QPeek.c **** QueueHandle_t xQueue = ( QueueHandle_t ) pvParameters;
+ 507              		.loc 1 316 0
+ 508 0008 7B68     		ldr	r3, [r7, #4]
+ 509 000a FB60     		str	r3, [r7, #12]
+ 510              	.L42:
+ 317:..\..\Common\Minimal/QPeek.c **** uint32_t ulValue;
+ 318:..\..\Common\Minimal/QPeek.c **** 
+ 319:..\..\Common\Minimal/QPeek.c **** 	for( ;; )
+ 320:..\..\Common\Minimal/QPeek.c **** 	{
+ 321:..\..\Common\Minimal/QPeek.c **** 		/* Write some data to the queue.  This should unblock the highest
+ 322:..\..\Common\Minimal/QPeek.c **** 		priority task that is waiting to peek data from the queue. */
+ 323:..\..\Common\Minimal/QPeek.c **** 		ulValue = 0x11223344;
+ 511              		.loc 1 323 0
+ 512 000c 3A4B     		ldr	r3, .L43
+ 513 000e BB60     		str	r3, [r7, #8]
+ 324:..\..\Common\Minimal/QPeek.c **** 		if( xQueueSendToBack( xQueue, &ulValue, qpeekNO_BLOCK ) != pdPASS )
+ 514              		.loc 1 324 0
+ 515 0010 07F10803 		add	r3, r7, #8
+ 516 0014 F868     		ldr	r0, [r7, #12]
+ 517 0016 1946     		mov	r1, r3
+ 518 0018 0022     		movs	r2, #0
+ 519 001a 0023     		movs	r3, #0
+ 520 001c FFF7FEFF 		bl	xQueueGenericSend
+ 521 0020 0346     		mov	r3, r0
+ 522 0022 012B     		cmp	r3, #1
+ 523 0024 02D0     		beq	.L36
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 16
+
+
+ 325:..\..\Common\Minimal/QPeek.c **** 		{
+ 326:..\..\Common\Minimal/QPeek.c **** 			/* We were expecting the queue to be empty so we should not of
+ 327:..\..\Common\Minimal/QPeek.c **** 			had a problem writing to the queue. */
+ 328:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 524              		.loc 1 328 0
+ 525 0026 354B     		ldr	r3, .L43+4
+ 526 0028 0122     		movs	r2, #1
+ 527 002a 1A60     		str	r2, [r3]
+ 528              	.L36:
+ 329:..\..\Common\Minimal/QPeek.c **** 		}
+ 330:..\..\Common\Minimal/QPeek.c **** 
+ 331:..\..\Common\Minimal/QPeek.c **** 		#if configUSE_PREEMPTION == 0
+ 332:..\..\Common\Minimal/QPeek.c **** 			taskYIELD();
+ 333:..\..\Common\Minimal/QPeek.c **** 		#endif
+ 334:..\..\Common\Minimal/QPeek.c **** 
+ 335:..\..\Common\Minimal/QPeek.c **** 		/* By the time we get here the data should have been removed from
+ 336:..\..\Common\Minimal/QPeek.c **** 		the queue. */
+ 337:..\..\Common\Minimal/QPeek.c **** 		if( uxQueueMessagesWaiting( xQueue ) != 0 )
+ 529              		.loc 1 337 0
+ 530 002c F868     		ldr	r0, [r7, #12]
+ 531 002e FFF7FEFF 		bl	uxQueueMessagesWaiting
+ 532 0032 0346     		mov	r3, r0
+ 533 0034 002B     		cmp	r3, #0
+ 534 0036 02D0     		beq	.L37
+ 338:..\..\Common\Minimal/QPeek.c **** 		{
+ 339:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 535              		.loc 1 339 0
+ 536 0038 304B     		ldr	r3, .L43+4
+ 537 003a 0122     		movs	r2, #1
+ 538 003c 1A60     		str	r2, [r3]
+ 539              	.L37:
+ 340:..\..\Common\Minimal/QPeek.c **** 		}
+ 341:..\..\Common\Minimal/QPeek.c **** 
+ 342:..\..\Common\Minimal/QPeek.c **** 		/* Write another value to the queue, again waking the highest priority
+ 343:..\..\Common\Minimal/QPeek.c **** 		task that is blocked on the queue. */
+ 344:..\..\Common\Minimal/QPeek.c **** 		ulValue = 0x01234567;
+ 540              		.loc 1 344 0
+ 541 003e 304B     		ldr	r3, .L43+8
+ 542 0040 BB60     		str	r3, [r7, #8]
+ 345:..\..\Common\Minimal/QPeek.c **** 		if( xQueueSendToBack( xQueue, &ulValue, qpeekNO_BLOCK ) != pdPASS )
+ 543              		.loc 1 345 0
+ 544 0042 07F10803 		add	r3, r7, #8
+ 545 0046 F868     		ldr	r0, [r7, #12]
+ 546 0048 1946     		mov	r1, r3
+ 547 004a 0022     		movs	r2, #0
+ 548 004c 0023     		movs	r3, #0
+ 549 004e FFF7FEFF 		bl	xQueueGenericSend
+ 550 0052 0346     		mov	r3, r0
+ 551 0054 012B     		cmp	r3, #1
+ 552 0056 02D0     		beq	.L38
+ 346:..\..\Common\Minimal/QPeek.c **** 		{
+ 347:..\..\Common\Minimal/QPeek.c **** 			/* We were expecting the queue to be empty so we should not of
+ 348:..\..\Common\Minimal/QPeek.c **** 			had a problem writing to the queue. */
+ 349:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 553              		.loc 1 349 0
+ 554 0058 284B     		ldr	r3, .L43+4
+ 555 005a 0122     		movs	r2, #1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 17
+
+
+ 556 005c 1A60     		str	r2, [r3]
+ 557              	.L38:
+ 350:..\..\Common\Minimal/QPeek.c **** 		}
+ 351:..\..\Common\Minimal/QPeek.c **** 
+ 352:..\..\Common\Minimal/QPeek.c **** 		#if configUSE_PREEMPTION == 0
+ 353:..\..\Common\Minimal/QPeek.c **** 			taskYIELD();
+ 354:..\..\Common\Minimal/QPeek.c **** 		#endif
+ 355:..\..\Common\Minimal/QPeek.c **** 
+ 356:..\..\Common\Minimal/QPeek.c **** 		/* All the other tasks should now have successfully peeked the data.
+ 357:..\..\Common\Minimal/QPeek.c **** 		The data is still in the queue so we should be able to receive it. */
+ 358:..\..\Common\Minimal/QPeek.c **** 		ulValue = 0;
+ 558              		.loc 1 358 0
+ 559 005e 0023     		movs	r3, #0
+ 560 0060 BB60     		str	r3, [r7, #8]
+ 359:..\..\Common\Minimal/QPeek.c **** 		if( xQueueReceive( xQueue, &ulValue, qpeekNO_BLOCK ) != pdPASS )
+ 561              		.loc 1 359 0
+ 562 0062 07F10803 		add	r3, r7, #8
+ 563 0066 F868     		ldr	r0, [r7, #12]
+ 564 0068 1946     		mov	r1, r3
+ 565 006a 0022     		movs	r2, #0
+ 566 006c FFF7FEFF 		bl	xQueueReceive
+ 567 0070 0346     		mov	r3, r0
+ 568 0072 012B     		cmp	r3, #1
+ 569 0074 02D0     		beq	.L39
+ 360:..\..\Common\Minimal/QPeek.c **** 		{
+ 361:..\..\Common\Minimal/QPeek.c **** 			/* We expected to receive the data. */
+ 362:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 570              		.loc 1 362 0
+ 571 0076 214B     		ldr	r3, .L43+4
+ 572 0078 0122     		movs	r2, #1
+ 573 007a 1A60     		str	r2, [r3]
+ 574              	.L39:
+ 363:..\..\Common\Minimal/QPeek.c **** 		}
+ 364:..\..\Common\Minimal/QPeek.c **** 
+ 365:..\..\Common\Minimal/QPeek.c **** 		if( ulValue != 0x01234567 )
+ 366:..\..\Common\Minimal/QPeek.c **** 		{
+ 367:..\..\Common\Minimal/QPeek.c **** 			/* We did not receive the expected value. */
+ 368:..\..\Common\Minimal/QPeek.c **** 		}
+ 369:..\..\Common\Minimal/QPeek.c **** 
+ 370:..\..\Common\Minimal/QPeek.c **** 		/* Lets just delay a while as this is an intensive test as we don't
+ 371:..\..\Common\Minimal/QPeek.c **** 		want to starve other tests of processing time. */
+ 372:..\..\Common\Minimal/QPeek.c **** 		vTaskDelay( qpeekSHORT_DELAY );
+ 575              		.loc 1 372 0
+ 576 007c 0A20     		movs	r0, #10
+ 577 007e FFF7FEFF 		bl	vTaskDelay
+ 373:..\..\Common\Minimal/QPeek.c **** 
+ 374:..\..\Common\Minimal/QPeek.c **** 		/* Unsuspend the other tasks so we can repeat the test - this time
+ 375:..\..\Common\Minimal/QPeek.c **** 		however not all the other tasks will peek the data as the high
+ 376:..\..\Common\Minimal/QPeek.c **** 		priority task is actually going to remove it from the queue.  Send
+ 377:..\..\Common\Minimal/QPeek.c **** 		to front is used just to be different.  As the queue is empty it
+ 378:..\..\Common\Minimal/QPeek.c **** 		makes no difference to the result. */
+ 379:..\..\Common\Minimal/QPeek.c **** 		vTaskResume( xMediumPriorityTask );
+ 578              		.loc 1 379 0
+ 579 0082 204B     		ldr	r3, .L43+12
+ 580 0084 1B68     		ldr	r3, [r3]
+ 581 0086 1846     		mov	r0, r3
+ 582 0088 FFF7FEFF 		bl	vTaskResume
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 18
+
+
+ 380:..\..\Common\Minimal/QPeek.c **** 		vTaskResume( xHighPriorityTask );
+ 583              		.loc 1 380 0
+ 584 008c 1E4B     		ldr	r3, .L43+16
+ 585 008e 1B68     		ldr	r3, [r3]
+ 586 0090 1846     		mov	r0, r3
+ 587 0092 FFF7FEFF 		bl	vTaskResume
+ 381:..\..\Common\Minimal/QPeek.c **** 		vTaskResume( xHighestPriorityTask );
+ 588              		.loc 1 381 0
+ 589 0096 1D4B     		ldr	r3, .L43+20
+ 590 0098 1B68     		ldr	r3, [r3]
+ 591 009a 1846     		mov	r0, r3
+ 592 009c FFF7FEFF 		bl	vTaskResume
+ 382:..\..\Common\Minimal/QPeek.c **** 
+ 383:..\..\Common\Minimal/QPeek.c **** 		#if( configUSE_PREEMPTION == 0 )
+ 384:..\..\Common\Minimal/QPeek.c **** 			taskYIELD();
+ 385:..\..\Common\Minimal/QPeek.c **** 		#endif
+ 386:..\..\Common\Minimal/QPeek.c **** 
+ 387:..\..\Common\Minimal/QPeek.c **** 		ulValue = 0xaabbaabb;
+ 593              		.loc 1 387 0
+ 594 00a0 1B4B     		ldr	r3, .L43+24
+ 595 00a2 BB60     		str	r3, [r7, #8]
+ 388:..\..\Common\Minimal/QPeek.c **** 		if( xQueueSendToFront( xQueue, &ulValue, qpeekNO_BLOCK ) != pdPASS )
+ 596              		.loc 1 388 0
+ 597 00a4 07F10803 		add	r3, r7, #8
+ 598 00a8 F868     		ldr	r0, [r7, #12]
+ 599 00aa 1946     		mov	r1, r3
+ 600 00ac 0022     		movs	r2, #0
+ 601 00ae 0123     		movs	r3, #1
+ 602 00b0 FFF7FEFF 		bl	xQueueGenericSend
+ 603 00b4 0346     		mov	r3, r0
+ 604 00b6 012B     		cmp	r3, #1
+ 605 00b8 02D0     		beq	.L40
+ 389:..\..\Common\Minimal/QPeek.c **** 		{
+ 390:..\..\Common\Minimal/QPeek.c **** 			/* We were expecting the queue to be empty so we should not of
+ 391:..\..\Common\Minimal/QPeek.c **** 			had a problem writing to the queue. */
+ 392:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 606              		.loc 1 392 0
+ 607 00ba 104B     		ldr	r3, .L43+4
+ 608 00bc 0122     		movs	r2, #1
+ 609 00be 1A60     		str	r2, [r3]
+ 610              	.L40:
+ 393:..\..\Common\Minimal/QPeek.c **** 		}
+ 394:..\..\Common\Minimal/QPeek.c **** 
+ 395:..\..\Common\Minimal/QPeek.c **** 		#if configUSE_PREEMPTION == 0
+ 396:..\..\Common\Minimal/QPeek.c **** 			taskYIELD();
+ 397:..\..\Common\Minimal/QPeek.c **** 		#endif
+ 398:..\..\Common\Minimal/QPeek.c **** 
+ 399:..\..\Common\Minimal/QPeek.c **** 		/* This time we should find that the queue is empty.  The high priority
+ 400:..\..\Common\Minimal/QPeek.c **** 		task actually removed the data rather than just peeking it. */
+ 401:..\..\Common\Minimal/QPeek.c **** 		if( xQueuePeek( xQueue, &ulValue, qpeekNO_BLOCK ) != errQUEUE_EMPTY )
+ 611              		.loc 1 401 0
+ 612 00c0 07F10803 		add	r3, r7, #8
+ 613 00c4 F868     		ldr	r0, [r7, #12]
+ 614 00c6 1946     		mov	r1, r3
+ 615 00c8 0022     		movs	r2, #0
+ 616 00ca FFF7FEFF 		bl	xQueuePeek
+ 617 00ce 0346     		mov	r3, r0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 19
+
+
+ 618 00d0 002B     		cmp	r3, #0
+ 619 00d2 02D0     		beq	.L41
+ 402:..\..\Common\Minimal/QPeek.c **** 		{
+ 403:..\..\Common\Minimal/QPeek.c **** 			/* We expected to receive the data. */
+ 404:..\..\Common\Minimal/QPeek.c **** 			xErrorDetected = pdTRUE;
+ 620              		.loc 1 404 0
+ 621 00d4 094B     		ldr	r3, .L43+4
+ 622 00d6 0122     		movs	r2, #1
+ 623 00d8 1A60     		str	r2, [r3]
+ 624              	.L41:
+ 405:..\..\Common\Minimal/QPeek.c **** 		}
+ 406:..\..\Common\Minimal/QPeek.c **** 
+ 407:..\..\Common\Minimal/QPeek.c **** 		/* Unsuspend the highest and high priority tasks so we can go back
+ 408:..\..\Common\Minimal/QPeek.c **** 		and repeat the whole thing.  The medium priority task should not be
+ 409:..\..\Common\Minimal/QPeek.c **** 		suspended as it was not able to peek the data in this last case. */
+ 410:..\..\Common\Minimal/QPeek.c **** 		vTaskResume( xHighPriorityTask );
+ 625              		.loc 1 410 0
+ 626 00da 0B4B     		ldr	r3, .L43+16
+ 627 00dc 1B68     		ldr	r3, [r3]
+ 628 00de 1846     		mov	r0, r3
+ 629 00e0 FFF7FEFF 		bl	vTaskResume
+ 411:..\..\Common\Minimal/QPeek.c **** 		vTaskResume( xHighestPriorityTask );
+ 630              		.loc 1 411 0
+ 631 00e4 094B     		ldr	r3, .L43+20
+ 632 00e6 1B68     		ldr	r3, [r3]
+ 633 00e8 1846     		mov	r0, r3
+ 634 00ea FFF7FEFF 		bl	vTaskResume
+ 412:..\..\Common\Minimal/QPeek.c **** 
+ 413:..\..\Common\Minimal/QPeek.c **** 		/* Lets just delay a while as this is an intensive test as we don't
+ 414:..\..\Common\Minimal/QPeek.c **** 		want to starve other tests of processing time. */
+ 415:..\..\Common\Minimal/QPeek.c **** 		vTaskDelay( qpeekSHORT_DELAY );
+ 635              		.loc 1 415 0
+ 636 00ee 0A20     		movs	r0, #10
+ 637 00f0 FFF7FEFF 		bl	vTaskDelay
+ 416:..\..\Common\Minimal/QPeek.c **** 	}
+ 638              		.loc 1 416 0
+ 639 00f4 8AE7     		b	.L42
+ 640              	.L44:
+ 641 00f6 00BF     		.align	2
+ 642              	.L43:
+ 643 00f8 44332211 		.word	287454020
+ 644 00fc 00000000 		.word	xErrorDetected
+ 645 0100 67452301 		.word	19088743
+ 646 0104 00000000 		.word	xMediumPriorityTask
+ 647 0108 00000000 		.word	xHighPriorityTask
+ 648 010c 00000000 		.word	xHighestPriorityTask
+ 649 0110 BBAABBAA 		.word	-1430541637
+ 650              		.cfi_endproc
+ 651              	.LFE72:
+ 652              		.size	prvLowPriorityPeekTask, .-prvLowPriorityPeekTask
+ 653              		.section	.text.xAreQueuePeekTasksStillRunning,"ax",%progbits
+ 654              		.align	2
+ 655              		.global	xAreQueuePeekTasksStillRunning
+ 656              		.thumb
+ 657              		.thumb_func
+ 658              		.type	xAreQueuePeekTasksStillRunning, %function
+ 659              	xAreQueuePeekTasksStillRunning:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 20
+
+
+ 660              	.LFB73:
+ 417:..\..\Common\Minimal/QPeek.c **** }
+ 418:..\..\Common\Minimal/QPeek.c **** /*-----------------------------------------------------------*/
+ 419:..\..\Common\Minimal/QPeek.c **** 
+ 420:..\..\Common\Minimal/QPeek.c **** /* This is called to check that all the created tasks are still running. */
+ 421:..\..\Common\Minimal/QPeek.c **** BaseType_t xAreQueuePeekTasksStillRunning( void )
+ 422:..\..\Common\Minimal/QPeek.c **** {
+ 661              		.loc 1 422 0
+ 662              		.cfi_startproc
+ 663              		@ args = 0, pretend = 0, frame = 0
+ 664              		@ frame_needed = 1, uses_anonymous_args = 0
+ 665              		@ link register save eliminated.
+ 666 0000 80B4     		push	{r7}
+ 667              		.cfi_def_cfa_offset 4
+ 668              		.cfi_offset 7, -4
+ 669 0002 00AF     		add	r7, sp, #0
+ 670              		.cfi_def_cfa_register 7
+ 423:..\..\Common\Minimal/QPeek.c **** static uint32_t ulLastLoopCounter = 0;
+ 424:..\..\Common\Minimal/QPeek.c **** 
+ 425:..\..\Common\Minimal/QPeek.c **** 	/* If the demo task is still running then we expect the loopcounter to
+ 426:..\..\Common\Minimal/QPeek.c **** 	have incremented since this function was last called. */
+ 427:..\..\Common\Minimal/QPeek.c **** 	if( ulLastLoopCounter == ulLoopCounter )
+ 671              		.loc 1 427 0
+ 672 0004 0C4B     		ldr	r3, .L48
+ 673 0006 1A68     		ldr	r2, [r3]
+ 674 0008 0C4B     		ldr	r3, .L48+4
+ 675 000a 1B68     		ldr	r3, [r3]
+ 676 000c 9A42     		cmp	r2, r3
+ 677 000e 02D1     		bne	.L46
+ 428:..\..\Common\Minimal/QPeek.c **** 	{
+ 429:..\..\Common\Minimal/QPeek.c **** 		xErrorDetected = pdTRUE;
+ 678              		.loc 1 429 0
+ 679 0010 0B4B     		ldr	r3, .L48+8
+ 680 0012 0122     		movs	r2, #1
+ 681 0014 1A60     		str	r2, [r3]
+ 682              	.L46:
+ 430:..\..\Common\Minimal/QPeek.c **** 	}
+ 431:..\..\Common\Minimal/QPeek.c **** 
+ 432:..\..\Common\Minimal/QPeek.c **** 	ulLastLoopCounter = ulLoopCounter;
+ 683              		.loc 1 432 0
+ 684 0016 094B     		ldr	r3, .L48+4
+ 685 0018 1B68     		ldr	r3, [r3]
+ 686 001a 074A     		ldr	r2, .L48
+ 687 001c 1360     		str	r3, [r2]
+ 433:..\..\Common\Minimal/QPeek.c **** 
+ 434:..\..\Common\Minimal/QPeek.c **** 	/* Errors detected in the task itself will have latched xErrorDetected
+ 435:..\..\Common\Minimal/QPeek.c **** 	to true. */
+ 436:..\..\Common\Minimal/QPeek.c **** 
+ 437:..\..\Common\Minimal/QPeek.c **** 	return ( BaseType_t ) !xErrorDetected;
+ 688              		.loc 1 437 0
+ 689 001e 084B     		ldr	r3, .L48+8
+ 690 0020 1B68     		ldr	r3, [r3]
+ 691 0022 002B     		cmp	r3, #0
+ 692 0024 0CBF     		ite	eq
+ 693 0026 0123     		moveq	r3, #1
+ 694 0028 0023     		movne	r3, #0
+ 695 002a DBB2     		uxtb	r3, r3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 21
+
+
+ 438:..\..\Common\Minimal/QPeek.c **** }
+ 696              		.loc 1 438 0
+ 697 002c 1846     		mov	r0, r3
+ 698 002e BD46     		mov	sp, r7
+ 699              		.cfi_def_cfa_register 13
+ 700              		@ sp needed
+ 701 0030 5DF8047B 		ldr	r7, [sp], #4
+ 702              		.cfi_restore 7
+ 703              		.cfi_def_cfa_offset 0
+ 704 0034 7047     		bx	lr
+ 705              	.L49:
+ 706 0036 00BF     		.align	2
+ 707              	.L48:
+ 708 0038 08000000 		.word	ulLastLoopCounter.6810
+ 709 003c 04000000 		.word	ulLoopCounter
+ 710 0040 00000000 		.word	xErrorDetected
+ 711              		.cfi_endproc
+ 712              	.LFE73:
+ 713              		.size	xAreQueuePeekTasksStillRunning, .-xAreQueuePeekTasksStillRunning
+ 714              		.bss
+ 715              		.align	2
+ 716              	ulLastLoopCounter.6810:
+ 717 0008 00000000 		.space	4
+ 718              		.text
+ 719              	.Letext0:
+ 720              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 721              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 722              		.file 4 "../../../Source/portable/GCC/ARM_CM3/portmacro.h"
+ 723              		.file 5 "../../../Source/include/task.h"
+ 724              		.file 6 "../../../Source/include/queue.h"
+ 725              		.file 7 "Generated_Source\\PSoC5/core_cm3.h"
+ 726              		.section	.debug_info,"",%progbits
+ 727              	.Ldebug_info0:
+ 728 0000 D3020000 		.4byte	0x2d3
+ 729 0004 0400     		.2byte	0x4
+ 730 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 731 000a 04       		.byte	0x4
+ 732 000b 01       		.uleb128 0x1
+ 733 000c 49000000 		.4byte	.LASF38
+ 734 0010 01       		.byte	0x1
+ 735 0011 7D020000 		.4byte	.LASF39
+ 736 0015 E4010000 		.4byte	.LASF40
+ 737 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 738 001d 00000000 		.4byte	0
+ 739 0021 00000000 		.4byte	.Ldebug_line0
+ 740 0025 02       		.uleb128 0x2
+ 741 0026 04       		.byte	0x4
+ 742 0027 07       		.byte	0x7
+ 743 0028 A1010000 		.4byte	.LASF0
+ 744 002c 03       		.uleb128 0x3
+ 745 002d 04       		.byte	0x4
+ 746 002e 05       		.byte	0x5
+ 747 002f 696E7400 		.ascii	"int\000"
+ 748 0033 02       		.uleb128 0x2
+ 749 0034 01       		.byte	0x1
+ 750 0035 06       		.byte	0x6
+ 751 0036 06010000 		.4byte	.LASF1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 22
+
+
+ 752 003a 04       		.uleb128 0x4
+ 753 003b 15000000 		.4byte	.LASF5
+ 754 003f 02       		.byte	0x2
+ 755 0040 1D       		.byte	0x1d
+ 756 0041 45000000 		.4byte	0x45
+ 757 0045 02       		.uleb128 0x2
+ 758 0046 01       		.byte	0x1
+ 759 0047 08       		.byte	0x8
+ 760 0048 12010000 		.4byte	.LASF2
+ 761 004c 02       		.uleb128 0x2
+ 762 004d 02       		.byte	0x2
+ 763 004e 05       		.byte	0x5
+ 764 004f C2020000 		.4byte	.LASF3
+ 765 0053 02       		.uleb128 0x2
+ 766 0054 02       		.byte	0x2
+ 767 0055 07       		.byte	0x7
+ 768 0056 44010000 		.4byte	.LASF4
+ 769 005a 04       		.uleb128 0x4
+ 770 005b 38000000 		.4byte	.LASF6
+ 771 005f 02       		.byte	0x2
+ 772 0060 3F       		.byte	0x3f
+ 773 0061 65000000 		.4byte	0x65
+ 774 0065 02       		.uleb128 0x2
+ 775 0066 04       		.byte	0x4
+ 776 0067 05       		.byte	0x5
+ 777 0068 F6020000 		.4byte	.LASF7
+ 778 006c 04       		.uleb128 0x4
+ 779 006d 83010000 		.4byte	.LASF8
+ 780 0071 02       		.byte	0x2
+ 781 0072 41       		.byte	0x41
+ 782 0073 77000000 		.4byte	0x77
+ 783 0077 02       		.uleb128 0x2
+ 784 0078 04       		.byte	0x4
+ 785 0079 07       		.byte	0x7
+ 786 007a 32010000 		.4byte	.LASF9
+ 787 007e 02       		.uleb128 0x2
+ 788 007f 08       		.byte	0x8
+ 789 0080 05       		.byte	0x5
+ 790 0081 9A020000 		.4byte	.LASF10
+ 791 0085 02       		.uleb128 0x2
+ 792 0086 08       		.byte	0x8
+ 793 0087 07       		.byte	0x7
+ 794 0088 AE010000 		.4byte	.LASF11
+ 795 008c 02       		.uleb128 0x2
+ 796 008d 04       		.byte	0x4
+ 797 008e 07       		.byte	0x7
+ 798 008f 74020000 		.4byte	.LASF12
+ 799 0093 05       		.uleb128 0x5
+ 800 0094 04       		.byte	0x4
+ 801 0095 02       		.uleb128 0x2
+ 802 0096 01       		.byte	0x1
+ 803 0097 08       		.byte	0x8
+ 804 0098 A8020000 		.4byte	.LASF13
+ 805 009c 04       		.uleb128 0x4
+ 806 009d C5010000 		.4byte	.LASF14
+ 807 00a1 03       		.byte	0x3
+ 808 00a2 15       		.byte	0x15
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 23
+
+
+ 809 00a3 3A000000 		.4byte	0x3a
+ 810 00a7 04       		.uleb128 0x4
+ 811 00a8 6C020000 		.4byte	.LASF15
+ 812 00ac 03       		.byte	0x3
+ 813 00ad 2C       		.byte	0x2c
+ 814 00ae 5A000000 		.4byte	0x5a
+ 815 00b2 04       		.uleb128 0x4
+ 816 00b3 ED020000 		.4byte	.LASF16
+ 817 00b7 03       		.byte	0x3
+ 818 00b8 2D       		.byte	0x2d
+ 819 00b9 6C000000 		.4byte	0x6c
+ 820 00bd 02       		.uleb128 0x2
+ 821 00be 04       		.byte	0x4
+ 822 00bf 04       		.byte	0x4
+ 823 00c0 00010000 		.4byte	.LASF17
+ 824 00c4 02       		.uleb128 0x2
+ 825 00c5 08       		.byte	0x8
+ 826 00c6 04       		.byte	0x4
+ 827 00c7 7C010000 		.4byte	.LASF18
+ 828 00cb 06       		.uleb128 0x6
+ 829 00cc B2000000 		.4byte	0xb2
+ 830 00d0 04       		.uleb128 0x4
+ 831 00d1 49030000 		.4byte	.LASF19
+ 832 00d5 04       		.byte	0x4
+ 833 00d6 38       		.byte	0x38
+ 834 00d7 65000000 		.4byte	0x65
+ 835 00db 04       		.uleb128 0x4
+ 836 00dc 3D030000 		.4byte	.LASF20
+ 837 00e0 04       		.byte	0x4
+ 838 00e1 39       		.byte	0x39
+ 839 00e2 77000000 		.4byte	0x77
+ 840 00e6 04       		.uleb128 0x4
+ 841 00e7 2D000000 		.4byte	.LASF21
+ 842 00eb 04       		.byte	0x4
+ 843 00ec 3F       		.byte	0x3f
+ 844 00ed B2000000 		.4byte	0xb2
+ 845 00f1 04       		.uleb128 0x4
+ 846 00f2 E0020000 		.4byte	.LASF22
+ 847 00f6 05       		.byte	0x5
+ 848 00f7 3E       		.byte	0x3e
+ 849 00f8 FC000000 		.4byte	0xfc
+ 850 00fc 07       		.uleb128 0x7
+ 851 00fd 04       		.byte	0x4
+ 852 00fe 02010000 		.4byte	0x102
+ 853 0102 08       		.uleb128 0x8
+ 854 0103 8E010000 		.4byte	.LASF41
+ 855 0107 04       		.uleb128 0x4
+ 856 0108 D7000000 		.4byte	.LASF23
+ 857 010c 06       		.byte	0x6
+ 858 010d 2E       		.byte	0x2e
+ 859 010e 93000000 		.4byte	0x93
+ 860 0112 09       		.uleb128 0x9
+ 861 0113 28030000 		.4byte	.LASF42
+ 862 0117 01       		.byte	0x1
+ 863 0118 51       		.byte	0x51
+ 864 0119 00000000 		.4byte	.LFB68
+ 865 011d A8000000 		.4byte	.LFE68-.LFB68
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 24
+
+
+ 866 0121 01       		.uleb128 0x1
+ 867 0122 9C       		.byte	0x9c
+ 868 0123 36010000 		.4byte	0x136
+ 869 0127 0A       		.uleb128 0xa
+ 870 0128 42000000 		.4byte	.LASF24
+ 871 012c 01       		.byte	0x1
+ 872 012d 53       		.byte	0x53
+ 873 012e 07010000 		.4byte	0x107
+ 874 0132 02       		.uleb128 0x2
+ 875 0133 91       		.byte	0x91
+ 876 0134 74       		.sleb128 -12
+ 877 0135 00       		.byte	0
+ 878 0136 0B       		.uleb128 0xb
+ 879 0137 E5000000 		.4byte	.LASF26
+ 880 013b 01       		.byte	0x1
+ 881 013c 6D       		.byte	0x6d
+ 882 013d 00000000 		.4byte	.LFB69
+ 883 0141 F8000000 		.4byte	.LFE69-.LFB69
+ 884 0145 01       		.uleb128 0x1
+ 885 0146 9C       		.byte	0x9c
+ 886 0147 76010000 		.4byte	0x176
+ 887 014b 0C       		.uleb128 0xc
+ 888 014c AD020000 		.4byte	.LASF28
+ 889 0150 01       		.byte	0x1
+ 890 0151 6D       		.byte	0x6d
+ 891 0152 93000000 		.4byte	0x93
+ 892 0156 02       		.uleb128 0x2
+ 893 0157 91       		.byte	0x91
+ 894 0158 6C       		.sleb128 -20
+ 895 0159 0A       		.uleb128 0xa
+ 896 015a 42000000 		.4byte	.LASF24
+ 897 015e 01       		.byte	0x1
+ 898 015f 6F       		.byte	0x6f
+ 899 0160 07010000 		.4byte	0x107
+ 900 0164 02       		.uleb128 0x2
+ 901 0165 91       		.byte	0x91
+ 902 0166 74       		.sleb128 -12
+ 903 0167 0A       		.uleb128 0xa
+ 904 0168 BA020000 		.4byte	.LASF25
+ 905 016c 01       		.byte	0x1
+ 906 016d 70       		.byte	0x70
+ 907 016e B2000000 		.4byte	0xb2
+ 908 0172 02       		.uleb128 0x2
+ 909 0173 91       		.byte	0x91
+ 910 0174 70       		.sleb128 -16
+ 911 0175 00       		.byte	0
+ 912 0176 0B       		.uleb128 0xb
+ 913 0177 64010000 		.4byte	.LASF27
+ 914 017b 01       		.byte	0x1
+ 915 017c DA       		.byte	0xda
+ 916 017d 00000000 		.4byte	.LFB70
+ 917 0181 8C000000 		.4byte	.LFE70-.LFB70
+ 918 0185 01       		.uleb128 0x1
+ 919 0186 9C       		.byte	0x9c
+ 920 0187 B6010000 		.4byte	0x1b6
+ 921 018b 0C       		.uleb128 0xc
+ 922 018c AD020000 		.4byte	.LASF28
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 25
+
+
+ 923 0190 01       		.byte	0x1
+ 924 0191 DA       		.byte	0xda
+ 925 0192 93000000 		.4byte	0x93
+ 926 0196 02       		.uleb128 0x2
+ 927 0197 91       		.byte	0x91
+ 928 0198 6C       		.sleb128 -20
+ 929 0199 0A       		.uleb128 0xa
+ 930 019a 42000000 		.4byte	.LASF24
+ 931 019e 01       		.byte	0x1
+ 932 019f DC       		.byte	0xdc
+ 933 01a0 07010000 		.4byte	0x107
+ 934 01a4 02       		.uleb128 0x2
+ 935 01a5 91       		.byte	0x91
+ 936 01a6 74       		.sleb128 -12
+ 937 01a7 0A       		.uleb128 0xa
+ 938 01a8 BA020000 		.4byte	.LASF25
+ 939 01ac 01       		.byte	0x1
+ 940 01ad DD       		.byte	0xdd
+ 941 01ae B2000000 		.4byte	0xb2
+ 942 01b2 02       		.uleb128 0x2
+ 943 01b3 91       		.byte	0x91
+ 944 01b4 70       		.sleb128 -16
+ 945 01b5 00       		.byte	0
+ 946 01b6 0D       		.uleb128 0xd
+ 947 01b7 0E030000 		.4byte	.LASF29
+ 948 01bb 01       		.byte	0x1
+ 949 01bc 1101     		.2byte	0x111
+ 950 01be 00000000 		.4byte	.LFB71
+ 951 01c2 68000000 		.4byte	.LFE71-.LFB71
+ 952 01c6 01       		.uleb128 0x1
+ 953 01c7 9C       		.byte	0x9c
+ 954 01c8 FA010000 		.4byte	0x1fa
+ 955 01cc 0E       		.uleb128 0xe
+ 956 01cd AD020000 		.4byte	.LASF28
+ 957 01d1 01       		.byte	0x1
+ 958 01d2 1101     		.2byte	0x111
+ 959 01d4 93000000 		.4byte	0x93
+ 960 01d8 02       		.uleb128 0x2
+ 961 01d9 91       		.byte	0x91
+ 962 01da 6C       		.sleb128 -20
+ 963 01db 0F       		.uleb128 0xf
+ 964 01dc 42000000 		.4byte	.LASF24
+ 965 01e0 01       		.byte	0x1
+ 966 01e1 1301     		.2byte	0x113
+ 967 01e3 07010000 		.4byte	0x107
+ 968 01e7 02       		.uleb128 0x2
+ 969 01e8 91       		.byte	0x91
+ 970 01e9 74       		.sleb128 -12
+ 971 01ea 0F       		.uleb128 0xf
+ 972 01eb BA020000 		.4byte	.LASF25
+ 973 01ef 01       		.byte	0x1
+ 974 01f0 1401     		.2byte	0x114
+ 975 01f2 B2000000 		.4byte	0xb2
+ 976 01f6 02       		.uleb128 0x2
+ 977 01f7 91       		.byte	0x91
+ 978 01f8 70       		.sleb128 -16
+ 979 01f9 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 26
+
+
+ 980 01fa 0D       		.uleb128 0xd
+ 981 01fb CD010000 		.4byte	.LASF30
+ 982 01ff 01       		.byte	0x1
+ 983 0200 3A01     		.2byte	0x13a
+ 984 0202 00000000 		.4byte	.LFB72
+ 985 0206 14010000 		.4byte	.LFE72-.LFB72
+ 986 020a 01       		.uleb128 0x1
+ 987 020b 9C       		.byte	0x9c
+ 988 020c 3E020000 		.4byte	0x23e
+ 989 0210 0E       		.uleb128 0xe
+ 990 0211 AD020000 		.4byte	.LASF28
+ 991 0215 01       		.byte	0x1
+ 992 0216 3A01     		.2byte	0x13a
+ 993 0218 93000000 		.4byte	0x93
+ 994 021c 02       		.uleb128 0x2
+ 995 021d 91       		.byte	0x91
+ 996 021e 6C       		.sleb128 -20
+ 997 021f 0F       		.uleb128 0xf
+ 998 0220 42000000 		.4byte	.LASF24
+ 999 0224 01       		.byte	0x1
+ 1000 0225 3C01     		.2byte	0x13c
+ 1001 0227 07010000 		.4byte	0x107
+ 1002 022b 02       		.uleb128 0x2
+ 1003 022c 91       		.byte	0x91
+ 1004 022d 74       		.sleb128 -12
+ 1005 022e 0F       		.uleb128 0xf
+ 1006 022f BA020000 		.4byte	.LASF25
+ 1007 0233 01       		.byte	0x1
+ 1008 0234 3D01     		.2byte	0x13d
+ 1009 0236 B2000000 		.4byte	0xb2
+ 1010 023a 02       		.uleb128 0x2
+ 1011 023b 91       		.byte	0x91
+ 1012 023c 70       		.sleb128 -16
+ 1013 023d 00       		.byte	0
+ 1014 023e 10       		.uleb128 0x10
+ 1015 023f 66030000 		.4byte	.LASF43
+ 1016 0243 01       		.byte	0x1
+ 1017 0244 A501     		.2byte	0x1a5
+ 1018 0246 D0000000 		.4byte	0xd0
+ 1019 024a 00000000 		.4byte	.LFB73
+ 1020 024e 44000000 		.4byte	.LFE73-.LFB73
+ 1021 0252 01       		.uleb128 0x1
+ 1022 0253 9C       		.byte	0x9c
+ 1023 0254 6B020000 		.4byte	0x26b
+ 1024 0258 0F       		.uleb128 0xf
+ 1025 0259 54030000 		.4byte	.LASF31
+ 1026 025d 01       		.byte	0x1
+ 1027 025e A701     		.2byte	0x1a7
+ 1028 0260 B2000000 		.4byte	0xb2
+ 1029 0264 05       		.uleb128 0x5
+ 1030 0265 03       		.byte	0x3
+ 1031 0266 08000000 		.4byte	ulLastLoopCounter.6810
+ 1032 026a 00       		.byte	0
+ 1033 026b 0A       		.uleb128 0xa
+ 1034 026c FF020000 		.4byte	.LASF32
+ 1035 0270 01       		.byte	0x1
+ 1036 0271 47       		.byte	0x47
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 27
+
+
+ 1037 0272 7C020000 		.4byte	0x27c
+ 1038 0276 05       		.uleb128 0x5
+ 1039 0277 03       		.byte	0x3
+ 1040 0278 00000000 		.4byte	xErrorDetected
+ 1041 027c 06       		.uleb128 0x6
+ 1042 027d D0000000 		.4byte	0xd0
+ 1043 0281 0A       		.uleb128 0xa
+ 1044 0282 1F000000 		.4byte	.LASF33
+ 1045 0286 01       		.byte	0x1
+ 1046 0287 4B       		.byte	0x4b
+ 1047 0288 CB000000 		.4byte	0xcb
+ 1048 028c 05       		.uleb128 0x5
+ 1049 028d 03       		.byte	0x3
+ 1050 028e 04000000 		.4byte	ulLoopCounter
+ 1051 0292 11       		.uleb128 0x11
+ 1052 0293 57010000 		.4byte	.LASF34
+ 1053 0297 07       		.byte	0x7
+ 1054 0298 9606     		.2byte	0x696
+ 1055 029a 9E020000 		.4byte	0x29e
+ 1056 029e 06       		.uleb128 0x6
+ 1057 029f A7000000 		.4byte	0xa7
+ 1058 02a3 12       		.uleb128 0x12
+ 1059 02a4 CC020000 		.4byte	.LASF35
+ 1060 02a8 01       		.byte	0x1
+ 1061 02a9 4E       		.byte	0x4e
+ 1062 02aa F1000000 		.4byte	0xf1
+ 1063 02ae 05       		.uleb128 0x5
+ 1064 02af 03       		.byte	0x3
+ 1065 02b0 00000000 		.4byte	xMediumPriorityTask
+ 1066 02b4 12       		.uleb128 0x12
+ 1067 02b5 20010000 		.4byte	.LASF36
+ 1068 02b9 01       		.byte	0x1
+ 1069 02ba 4E       		.byte	0x4e
+ 1070 02bb F1000000 		.4byte	0xf1
+ 1071 02bf 05       		.uleb128 0x5
+ 1072 02c0 03       		.byte	0x3
+ 1073 02c1 00000000 		.4byte	xHighPriorityTask
+ 1074 02c5 12       		.uleb128 0x12
+ 1075 02c6 00000000 		.4byte	.LASF37
+ 1076 02ca 01       		.byte	0x1
+ 1077 02cb 4E       		.byte	0x4e
+ 1078 02cc F1000000 		.4byte	0xf1
+ 1079 02d0 05       		.uleb128 0x5
+ 1080 02d1 03       		.byte	0x3
+ 1081 02d2 00000000 		.4byte	xHighestPriorityTask
+ 1082 02d6 00       		.byte	0
+ 1083              		.section	.debug_abbrev,"",%progbits
+ 1084              	.Ldebug_abbrev0:
+ 1085 0000 01       		.uleb128 0x1
+ 1086 0001 11       		.uleb128 0x11
+ 1087 0002 01       		.byte	0x1
+ 1088 0003 25       		.uleb128 0x25
+ 1089 0004 0E       		.uleb128 0xe
+ 1090 0005 13       		.uleb128 0x13
+ 1091 0006 0B       		.uleb128 0xb
+ 1092 0007 03       		.uleb128 0x3
+ 1093 0008 0E       		.uleb128 0xe
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 28
+
+
+ 1094 0009 1B       		.uleb128 0x1b
+ 1095 000a 0E       		.uleb128 0xe
+ 1096 000b 55       		.uleb128 0x55
+ 1097 000c 17       		.uleb128 0x17
+ 1098 000d 11       		.uleb128 0x11
+ 1099 000e 01       		.uleb128 0x1
+ 1100 000f 10       		.uleb128 0x10
+ 1101 0010 17       		.uleb128 0x17
+ 1102 0011 00       		.byte	0
+ 1103 0012 00       		.byte	0
+ 1104 0013 02       		.uleb128 0x2
+ 1105 0014 24       		.uleb128 0x24
+ 1106 0015 00       		.byte	0
+ 1107 0016 0B       		.uleb128 0xb
+ 1108 0017 0B       		.uleb128 0xb
+ 1109 0018 3E       		.uleb128 0x3e
+ 1110 0019 0B       		.uleb128 0xb
+ 1111 001a 03       		.uleb128 0x3
+ 1112 001b 0E       		.uleb128 0xe
+ 1113 001c 00       		.byte	0
+ 1114 001d 00       		.byte	0
+ 1115 001e 03       		.uleb128 0x3
+ 1116 001f 24       		.uleb128 0x24
+ 1117 0020 00       		.byte	0
+ 1118 0021 0B       		.uleb128 0xb
+ 1119 0022 0B       		.uleb128 0xb
+ 1120 0023 3E       		.uleb128 0x3e
+ 1121 0024 0B       		.uleb128 0xb
+ 1122 0025 03       		.uleb128 0x3
+ 1123 0026 08       		.uleb128 0x8
+ 1124 0027 00       		.byte	0
+ 1125 0028 00       		.byte	0
+ 1126 0029 04       		.uleb128 0x4
+ 1127 002a 16       		.uleb128 0x16
+ 1128 002b 00       		.byte	0
+ 1129 002c 03       		.uleb128 0x3
+ 1130 002d 0E       		.uleb128 0xe
+ 1131 002e 3A       		.uleb128 0x3a
+ 1132 002f 0B       		.uleb128 0xb
+ 1133 0030 3B       		.uleb128 0x3b
+ 1134 0031 0B       		.uleb128 0xb
+ 1135 0032 49       		.uleb128 0x49
+ 1136 0033 13       		.uleb128 0x13
+ 1137 0034 00       		.byte	0
+ 1138 0035 00       		.byte	0
+ 1139 0036 05       		.uleb128 0x5
+ 1140 0037 0F       		.uleb128 0xf
+ 1141 0038 00       		.byte	0
+ 1142 0039 0B       		.uleb128 0xb
+ 1143 003a 0B       		.uleb128 0xb
+ 1144 003b 00       		.byte	0
+ 1145 003c 00       		.byte	0
+ 1146 003d 06       		.uleb128 0x6
+ 1147 003e 35       		.uleb128 0x35
+ 1148 003f 00       		.byte	0
+ 1149 0040 49       		.uleb128 0x49
+ 1150 0041 13       		.uleb128 0x13
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 29
+
+
+ 1151 0042 00       		.byte	0
+ 1152 0043 00       		.byte	0
+ 1153 0044 07       		.uleb128 0x7
+ 1154 0045 0F       		.uleb128 0xf
+ 1155 0046 00       		.byte	0
+ 1156 0047 0B       		.uleb128 0xb
+ 1157 0048 0B       		.uleb128 0xb
+ 1158 0049 49       		.uleb128 0x49
+ 1159 004a 13       		.uleb128 0x13
+ 1160 004b 00       		.byte	0
+ 1161 004c 00       		.byte	0
+ 1162 004d 08       		.uleb128 0x8
+ 1163 004e 13       		.uleb128 0x13
+ 1164 004f 00       		.byte	0
+ 1165 0050 03       		.uleb128 0x3
+ 1166 0051 0E       		.uleb128 0xe
+ 1167 0052 3C       		.uleb128 0x3c
+ 1168 0053 19       		.uleb128 0x19
+ 1169 0054 00       		.byte	0
+ 1170 0055 00       		.byte	0
+ 1171 0056 09       		.uleb128 0x9
+ 1172 0057 2E       		.uleb128 0x2e
+ 1173 0058 01       		.byte	0x1
+ 1174 0059 3F       		.uleb128 0x3f
+ 1175 005a 19       		.uleb128 0x19
+ 1176 005b 03       		.uleb128 0x3
+ 1177 005c 0E       		.uleb128 0xe
+ 1178 005d 3A       		.uleb128 0x3a
+ 1179 005e 0B       		.uleb128 0xb
+ 1180 005f 3B       		.uleb128 0x3b
+ 1181 0060 0B       		.uleb128 0xb
+ 1182 0061 27       		.uleb128 0x27
+ 1183 0062 19       		.uleb128 0x19
+ 1184 0063 11       		.uleb128 0x11
+ 1185 0064 01       		.uleb128 0x1
+ 1186 0065 12       		.uleb128 0x12
+ 1187 0066 06       		.uleb128 0x6
+ 1188 0067 40       		.uleb128 0x40
+ 1189 0068 18       		.uleb128 0x18
+ 1190 0069 9642     		.uleb128 0x2116
+ 1191 006b 19       		.uleb128 0x19
+ 1192 006c 01       		.uleb128 0x1
+ 1193 006d 13       		.uleb128 0x13
+ 1194 006e 00       		.byte	0
+ 1195 006f 00       		.byte	0
+ 1196 0070 0A       		.uleb128 0xa
+ 1197 0071 34       		.uleb128 0x34
+ 1198 0072 00       		.byte	0
+ 1199 0073 03       		.uleb128 0x3
+ 1200 0074 0E       		.uleb128 0xe
+ 1201 0075 3A       		.uleb128 0x3a
+ 1202 0076 0B       		.uleb128 0xb
+ 1203 0077 3B       		.uleb128 0x3b
+ 1204 0078 0B       		.uleb128 0xb
+ 1205 0079 49       		.uleb128 0x49
+ 1206 007a 13       		.uleb128 0x13
+ 1207 007b 02       		.uleb128 0x2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 30
+
+
+ 1208 007c 18       		.uleb128 0x18
+ 1209 007d 00       		.byte	0
+ 1210 007e 00       		.byte	0
+ 1211 007f 0B       		.uleb128 0xb
+ 1212 0080 2E       		.uleb128 0x2e
+ 1213 0081 01       		.byte	0x1
+ 1214 0082 03       		.uleb128 0x3
+ 1215 0083 0E       		.uleb128 0xe
+ 1216 0084 3A       		.uleb128 0x3a
+ 1217 0085 0B       		.uleb128 0xb
+ 1218 0086 3B       		.uleb128 0x3b
+ 1219 0087 0B       		.uleb128 0xb
+ 1220 0088 27       		.uleb128 0x27
+ 1221 0089 19       		.uleb128 0x19
+ 1222 008a 11       		.uleb128 0x11
+ 1223 008b 01       		.uleb128 0x1
+ 1224 008c 12       		.uleb128 0x12
+ 1225 008d 06       		.uleb128 0x6
+ 1226 008e 40       		.uleb128 0x40
+ 1227 008f 18       		.uleb128 0x18
+ 1228 0090 9642     		.uleb128 0x2116
+ 1229 0092 19       		.uleb128 0x19
+ 1230 0093 01       		.uleb128 0x1
+ 1231 0094 13       		.uleb128 0x13
+ 1232 0095 00       		.byte	0
+ 1233 0096 00       		.byte	0
+ 1234 0097 0C       		.uleb128 0xc
+ 1235 0098 05       		.uleb128 0x5
+ 1236 0099 00       		.byte	0
+ 1237 009a 03       		.uleb128 0x3
+ 1238 009b 0E       		.uleb128 0xe
+ 1239 009c 3A       		.uleb128 0x3a
+ 1240 009d 0B       		.uleb128 0xb
+ 1241 009e 3B       		.uleb128 0x3b
+ 1242 009f 0B       		.uleb128 0xb
+ 1243 00a0 49       		.uleb128 0x49
+ 1244 00a1 13       		.uleb128 0x13
+ 1245 00a2 02       		.uleb128 0x2
+ 1246 00a3 18       		.uleb128 0x18
+ 1247 00a4 00       		.byte	0
+ 1248 00a5 00       		.byte	0
+ 1249 00a6 0D       		.uleb128 0xd
+ 1250 00a7 2E       		.uleb128 0x2e
+ 1251 00a8 01       		.byte	0x1
+ 1252 00a9 03       		.uleb128 0x3
+ 1253 00aa 0E       		.uleb128 0xe
+ 1254 00ab 3A       		.uleb128 0x3a
+ 1255 00ac 0B       		.uleb128 0xb
+ 1256 00ad 3B       		.uleb128 0x3b
+ 1257 00ae 05       		.uleb128 0x5
+ 1258 00af 27       		.uleb128 0x27
+ 1259 00b0 19       		.uleb128 0x19
+ 1260 00b1 11       		.uleb128 0x11
+ 1261 00b2 01       		.uleb128 0x1
+ 1262 00b3 12       		.uleb128 0x12
+ 1263 00b4 06       		.uleb128 0x6
+ 1264 00b5 40       		.uleb128 0x40
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 31
+
+
+ 1265 00b6 18       		.uleb128 0x18
+ 1266 00b7 9642     		.uleb128 0x2116
+ 1267 00b9 19       		.uleb128 0x19
+ 1268 00ba 01       		.uleb128 0x1
+ 1269 00bb 13       		.uleb128 0x13
+ 1270 00bc 00       		.byte	0
+ 1271 00bd 00       		.byte	0
+ 1272 00be 0E       		.uleb128 0xe
+ 1273 00bf 05       		.uleb128 0x5
+ 1274 00c0 00       		.byte	0
+ 1275 00c1 03       		.uleb128 0x3
+ 1276 00c2 0E       		.uleb128 0xe
+ 1277 00c3 3A       		.uleb128 0x3a
+ 1278 00c4 0B       		.uleb128 0xb
+ 1279 00c5 3B       		.uleb128 0x3b
+ 1280 00c6 05       		.uleb128 0x5
+ 1281 00c7 49       		.uleb128 0x49
+ 1282 00c8 13       		.uleb128 0x13
+ 1283 00c9 02       		.uleb128 0x2
+ 1284 00ca 18       		.uleb128 0x18
+ 1285 00cb 00       		.byte	0
+ 1286 00cc 00       		.byte	0
+ 1287 00cd 0F       		.uleb128 0xf
+ 1288 00ce 34       		.uleb128 0x34
+ 1289 00cf 00       		.byte	0
+ 1290 00d0 03       		.uleb128 0x3
+ 1291 00d1 0E       		.uleb128 0xe
+ 1292 00d2 3A       		.uleb128 0x3a
+ 1293 00d3 0B       		.uleb128 0xb
+ 1294 00d4 3B       		.uleb128 0x3b
+ 1295 00d5 05       		.uleb128 0x5
+ 1296 00d6 49       		.uleb128 0x49
+ 1297 00d7 13       		.uleb128 0x13
+ 1298 00d8 02       		.uleb128 0x2
+ 1299 00d9 18       		.uleb128 0x18
+ 1300 00da 00       		.byte	0
+ 1301 00db 00       		.byte	0
+ 1302 00dc 10       		.uleb128 0x10
+ 1303 00dd 2E       		.uleb128 0x2e
+ 1304 00de 01       		.byte	0x1
+ 1305 00df 3F       		.uleb128 0x3f
+ 1306 00e0 19       		.uleb128 0x19
+ 1307 00e1 03       		.uleb128 0x3
+ 1308 00e2 0E       		.uleb128 0xe
+ 1309 00e3 3A       		.uleb128 0x3a
+ 1310 00e4 0B       		.uleb128 0xb
+ 1311 00e5 3B       		.uleb128 0x3b
+ 1312 00e6 05       		.uleb128 0x5
+ 1313 00e7 27       		.uleb128 0x27
+ 1314 00e8 19       		.uleb128 0x19
+ 1315 00e9 49       		.uleb128 0x49
+ 1316 00ea 13       		.uleb128 0x13
+ 1317 00eb 11       		.uleb128 0x11
+ 1318 00ec 01       		.uleb128 0x1
+ 1319 00ed 12       		.uleb128 0x12
+ 1320 00ee 06       		.uleb128 0x6
+ 1321 00ef 40       		.uleb128 0x40
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 32
+
+
+ 1322 00f0 18       		.uleb128 0x18
+ 1323 00f1 9742     		.uleb128 0x2117
+ 1324 00f3 19       		.uleb128 0x19
+ 1325 00f4 01       		.uleb128 0x1
+ 1326 00f5 13       		.uleb128 0x13
+ 1327 00f6 00       		.byte	0
+ 1328 00f7 00       		.byte	0
+ 1329 00f8 11       		.uleb128 0x11
+ 1330 00f9 34       		.uleb128 0x34
+ 1331 00fa 00       		.byte	0
+ 1332 00fb 03       		.uleb128 0x3
+ 1333 00fc 0E       		.uleb128 0xe
+ 1334 00fd 3A       		.uleb128 0x3a
+ 1335 00fe 0B       		.uleb128 0xb
+ 1336 00ff 3B       		.uleb128 0x3b
+ 1337 0100 05       		.uleb128 0x5
+ 1338 0101 49       		.uleb128 0x49
+ 1339 0102 13       		.uleb128 0x13
+ 1340 0103 3F       		.uleb128 0x3f
+ 1341 0104 19       		.uleb128 0x19
+ 1342 0105 3C       		.uleb128 0x3c
+ 1343 0106 19       		.uleb128 0x19
+ 1344 0107 00       		.byte	0
+ 1345 0108 00       		.byte	0
+ 1346 0109 12       		.uleb128 0x12
+ 1347 010a 34       		.uleb128 0x34
+ 1348 010b 00       		.byte	0
+ 1349 010c 03       		.uleb128 0x3
+ 1350 010d 0E       		.uleb128 0xe
+ 1351 010e 3A       		.uleb128 0x3a
+ 1352 010f 0B       		.uleb128 0xb
+ 1353 0110 3B       		.uleb128 0x3b
+ 1354 0111 0B       		.uleb128 0xb
+ 1355 0112 49       		.uleb128 0x49
+ 1356 0113 13       		.uleb128 0x13
+ 1357 0114 3F       		.uleb128 0x3f
+ 1358 0115 19       		.uleb128 0x19
+ 1359 0116 02       		.uleb128 0x2
+ 1360 0117 18       		.uleb128 0x18
+ 1361 0118 00       		.byte	0
+ 1362 0119 00       		.byte	0
+ 1363 011a 00       		.byte	0
+ 1364              		.section	.debug_aranges,"",%progbits
+ 1365 0000 44000000 		.4byte	0x44
+ 1366 0004 0200     		.2byte	0x2
+ 1367 0006 00000000 		.4byte	.Ldebug_info0
+ 1368 000a 04       		.byte	0x4
+ 1369 000b 00       		.byte	0
+ 1370 000c 0000     		.2byte	0
+ 1371 000e 0000     		.2byte	0
+ 1372 0010 00000000 		.4byte	.LFB68
+ 1373 0014 A8000000 		.4byte	.LFE68-.LFB68
+ 1374 0018 00000000 		.4byte	.LFB69
+ 1375 001c F8000000 		.4byte	.LFE69-.LFB69
+ 1376 0020 00000000 		.4byte	.LFB70
+ 1377 0024 8C000000 		.4byte	.LFE70-.LFB70
+ 1378 0028 00000000 		.4byte	.LFB71
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 33
+
+
+ 1379 002c 68000000 		.4byte	.LFE71-.LFB71
+ 1380 0030 00000000 		.4byte	.LFB72
+ 1381 0034 14010000 		.4byte	.LFE72-.LFB72
+ 1382 0038 00000000 		.4byte	.LFB73
+ 1383 003c 44000000 		.4byte	.LFE73-.LFB73
+ 1384 0040 00000000 		.4byte	0
+ 1385 0044 00000000 		.4byte	0
+ 1386              		.section	.debug_ranges,"",%progbits
+ 1387              	.Ldebug_ranges0:
+ 1388 0000 00000000 		.4byte	.LFB68
+ 1389 0004 A8000000 		.4byte	.LFE68
+ 1390 0008 00000000 		.4byte	.LFB69
+ 1391 000c F8000000 		.4byte	.LFE69
+ 1392 0010 00000000 		.4byte	.LFB70
+ 1393 0014 8C000000 		.4byte	.LFE70
+ 1394 0018 00000000 		.4byte	.LFB71
+ 1395 001c 68000000 		.4byte	.LFE71
+ 1396 0020 00000000 		.4byte	.LFB72
+ 1397 0024 14010000 		.4byte	.LFE72
+ 1398 0028 00000000 		.4byte	.LFB73
+ 1399 002c 44000000 		.4byte	.LFE73
+ 1400 0030 00000000 		.4byte	0
+ 1401 0034 00000000 		.4byte	0
+ 1402              		.section	.debug_line,"",%progbits
+ 1403              	.Ldebug_line0:
+ 1404 0000 7A020000 		.section	.debug_str,"MS",%progbits,1
+ 1404      0200B101 
+ 1404      00000201 
+ 1404      FB0E0D00 
+ 1404      01010101 
+ 1405              	.LASF37:
+ 1406 0000 78486967 		.ascii	"xHighestPriorityTask\000"
+ 1406      68657374 
+ 1406      5072696F 
+ 1406      72697479 
+ 1406      5461736B 
+ 1407              	.LASF5:
+ 1408 0015 5F5F7569 		.ascii	"__uint8_t\000"
+ 1408      6E74385F 
+ 1408      7400
+ 1409              	.LASF33:
+ 1410 001f 756C4C6F 		.ascii	"ulLoopCounter\000"
+ 1410      6F70436F 
+ 1410      756E7465 
+ 1410      7200
+ 1411              	.LASF21:
+ 1412 002d 5469636B 		.ascii	"TickType_t\000"
+ 1412      54797065 
+ 1412      5F7400
+ 1413              	.LASF6:
+ 1414 0038 5F5F696E 		.ascii	"__int32_t\000"
+ 1414      7433325F 
+ 1414      7400
+ 1415              	.LASF24:
+ 1416 0042 78517565 		.ascii	"xQueue\000"
+ 1416      756500
+ 1417              	.LASF38:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 34
+
+
+ 1418 0049 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1418      4320342E 
+ 1418      392E3320 
+ 1418      32303135 
+ 1418      30333033 
+ 1419 007c 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1419      20726576 
+ 1419      6973696F 
+ 1419      6E203232 
+ 1419      31323230 
+ 1420 00af 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 1420      66756E63 
+ 1420      74696F6E 
+ 1420      2D736563 
+ 1420      74696F6E 
+ 1421              	.LASF23:
+ 1422 00d7 51756575 		.ascii	"QueueHandle_t\000"
+ 1422      6548616E 
+ 1422      646C655F 
+ 1422      7400
+ 1423              	.LASF26:
+ 1424 00e5 70727648 		.ascii	"prvHighestPriorityPeekTask\000"
+ 1424      69676865 
+ 1424      73745072 
+ 1424      696F7269 
+ 1424      74795065 
+ 1425              	.LASF17:
+ 1426 0100 666C6F61 		.ascii	"float\000"
+ 1426      7400
+ 1427              	.LASF1:
+ 1428 0106 7369676E 		.ascii	"signed char\000"
+ 1428      65642063 
+ 1428      68617200 
+ 1429              	.LASF2:
+ 1430 0112 756E7369 		.ascii	"unsigned char\000"
+ 1430      676E6564 
+ 1430      20636861 
+ 1430      7200
+ 1431              	.LASF36:
+ 1432 0120 78486967 		.ascii	"xHighPriorityTask\000"
+ 1432      68507269 
+ 1432      6F726974 
+ 1432      79546173 
+ 1432      6B00
+ 1433              	.LASF9:
+ 1434 0132 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1434      20756E73 
+ 1434      69676E65 
+ 1434      6420696E 
+ 1434      7400
+ 1435              	.LASF4:
+ 1436 0144 73686F72 		.ascii	"short unsigned int\000"
+ 1436      7420756E 
+ 1436      7369676E 
+ 1436      65642069 
+ 1436      6E7400
+ 1437              	.LASF34:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 35
+
+
+ 1438 0157 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1438      52784275 
+ 1438      66666572 
+ 1438      00
+ 1439              	.LASF27:
+ 1440 0164 70727648 		.ascii	"prvHighPriorityPeekTask\000"
+ 1440      69676850 
+ 1440      72696F72 
+ 1440      69747950 
+ 1440      65656B54 
+ 1441              	.LASF18:
+ 1442 017c 646F7562 		.ascii	"double\000"
+ 1442      6C6500
+ 1443              	.LASF8:
+ 1444 0183 5F5F7569 		.ascii	"__uint32_t\000"
+ 1444      6E743332 
+ 1444      5F7400
+ 1445              	.LASF41:
+ 1446 018e 5461736B 		.ascii	"TaskControlBlock_t\000"
+ 1446      436F6E74 
+ 1446      726F6C42 
+ 1446      6C6F636B 
+ 1446      5F7400
+ 1447              	.LASF0:
+ 1448 01a1 756E7369 		.ascii	"unsigned int\000"
+ 1448      676E6564 
+ 1448      20696E74 
+ 1448      00
+ 1449              	.LASF11:
+ 1450 01ae 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1450      206C6F6E 
+ 1450      6720756E 
+ 1450      7369676E 
+ 1450      65642069 
+ 1451              	.LASF14:
+ 1452 01c5 75696E74 		.ascii	"uint8_t\000"
+ 1452      385F7400 
+ 1453              	.LASF30:
+ 1454 01cd 7072764C 		.ascii	"prvLowPriorityPeekTask\000"
+ 1454      6F775072 
+ 1454      696F7269 
+ 1454      74795065 
+ 1454      656B5461 
+ 1455              	.LASF40:
+ 1456 01e4 453A5C47 		.ascii	"E:\\GitHub\\FreeRTOS\\freertos-code-2543-trunk\\fre"
+ 1456      69744875 
+ 1456      625C4672 
+ 1456      65655254 
+ 1456      4F535C66 
+ 1457 0213 6572746F 		.ascii	"ertos-code-2543-trunk\\FreeRTOS\\Demo\\CORTEX_CY8C5"
+ 1457      732D636F 
+ 1457      64652D32 
+ 1457      3534332D 
+ 1457      7472756E 
+ 1458 0243 3538385F 		.ascii	"588_PSoC_Creator_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1458      50536F43 
+ 1458      5F437265 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 36
+
+
+ 1458      61746F72 
+ 1458      5F474343 
+ 1459              	.LASF15:
+ 1460 026c 696E7433 		.ascii	"int32_t\000"
+ 1460      325F7400 
+ 1461              	.LASF12:
+ 1462 0274 73697A65 		.ascii	"sizetype\000"
+ 1462      74797065 
+ 1462      00
+ 1463              	.LASF39:
+ 1464 027d 2E2E5C2E 		.ascii	"..\\..\\Common\\Minimal\\QPeek.c\000"
+ 1464      2E5C436F 
+ 1464      6D6D6F6E 
+ 1464      5C4D696E 
+ 1464      696D616C 
+ 1465              	.LASF10:
+ 1466 029a 6C6F6E67 		.ascii	"long long int\000"
+ 1466      206C6F6E 
+ 1466      6720696E 
+ 1466      7400
+ 1467              	.LASF13:
+ 1468 02a8 63686172 		.ascii	"char\000"
+ 1468      00
+ 1469              	.LASF28:
+ 1470 02ad 70765061 		.ascii	"pvParameters\000"
+ 1470      72616D65 
+ 1470      74657273 
+ 1470      00
+ 1471              	.LASF25:
+ 1472 02ba 756C5661 		.ascii	"ulValue\000"
+ 1472      6C756500 
+ 1473              	.LASF3:
+ 1474 02c2 73686F72 		.ascii	"short int\000"
+ 1474      7420696E 
+ 1474      7400
+ 1475              	.LASF35:
+ 1476 02cc 784D6564 		.ascii	"xMediumPriorityTask\000"
+ 1476      69756D50 
+ 1476      72696F72 
+ 1476      69747954 
+ 1476      61736B00 
+ 1477              	.LASF22:
+ 1478 02e0 5461736B 		.ascii	"TaskHandle_t\000"
+ 1478      48616E64 
+ 1478      6C655F74 
+ 1478      00
+ 1479              	.LASF16:
+ 1480 02ed 75696E74 		.ascii	"uint32_t\000"
+ 1480      33325F74 
+ 1480      00
+ 1481              	.LASF7:
+ 1482 02f6 6C6F6E67 		.ascii	"long int\000"
+ 1482      20696E74 
+ 1482      00
+ 1483              	.LASF32:
+ 1484 02ff 78457272 		.ascii	"xErrorDetected\000"
+ 1484      6F724465 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccNpZJrb.s 			page 37
+
+
+ 1484      74656374 
+ 1484      656400
+ 1485              	.LASF29:
+ 1486 030e 7072764D 		.ascii	"prvMediumPriorityPeekTask\000"
+ 1486      65646975 
+ 1486      6D507269 
+ 1486      6F726974 
+ 1486      79506565 
+ 1487              	.LASF42:
+ 1488 0328 76537461 		.ascii	"vStartQueuePeekTasks\000"
+ 1488      72745175 
+ 1488      65756550 
+ 1488      65656B54 
+ 1488      61736B73 
+ 1489              	.LASF20:
+ 1490 033d 55426173 		.ascii	"UBaseType_t\000"
+ 1490      65547970 
+ 1490      655F7400 
+ 1491              	.LASF19:
+ 1492 0349 42617365 		.ascii	"BaseType_t\000"
+ 1492      54797065 
+ 1492      5F7400
+ 1493              	.LASF31:
+ 1494 0354 756C4C61 		.ascii	"ulLastLoopCounter\000"
+ 1494      73744C6F 
+ 1494      6F70436F 
+ 1494      756E7465 
+ 1494      7200
+ 1495              	.LASF43:
+ 1496 0366 78417265 		.ascii	"xAreQueuePeekTasksStillRunning\000"
+ 1496      51756575 
+ 1496      65506565 
+ 1496      6B546173 
+ 1496      6B735374 
+ 1497              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

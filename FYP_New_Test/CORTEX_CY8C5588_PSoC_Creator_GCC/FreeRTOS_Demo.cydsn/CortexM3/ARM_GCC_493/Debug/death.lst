@@ -1,0 +1,1456 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"death.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	1
+  20              	usCreationCount:
+  21 0000 0000     		.space	2
+  22 0002 0000     		.align	2
+  23              	uxTasksRunningAtStart:
+  24 0004 00000000 		.space	4
+  25              		.section	.rodata
+  26              		.align	2
+  27              		.type	uxMaxNumberOfExtraTasksRunning, %object
+  28              		.size	uxMaxNumberOfExtraTasksRunning, 4
+  29              	uxMaxNumberOfExtraTasksRunning:
+  30 0000 03000000 		.word	3
+  31              		.comm	xCreatedTask,4,4
+  32              		.align	2
+  33              	.LC0:
+  34 0004 43524541 		.ascii	"CREATOR\000"
+  34      544F5200 
+  35              		.section	.text.vCreateSuicidalTasks,"ax",%progbits
+  36              		.align	2
+  37              		.global	vCreateSuicidalTasks
+  38              		.thumb
+  39              		.thumb_func
+  40              		.type	vCreateSuicidalTasks, %function
+  41              	vCreateSuicidalTasks:
+  42              	.LFB68:
+  43              		.file 1 "..\\..\\Common\\Minimal\\death.c"
+   1:..\..\Common\Minimal/death.c **** /*
+   2:..\..\Common\Minimal/death.c ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\Common\Minimal/death.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\Common\Minimal/death.c ****  *
+   5:..\..\Common\Minimal/death.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\Common\Minimal/death.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\Common\Minimal/death.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\Common\Minimal/death.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\Common\Minimal/death.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\Common\Minimal/death.c ****  * subject to the following conditions:
+  11:..\..\Common\Minimal/death.c ****  *
+  12:..\..\Common\Minimal/death.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\Common\Minimal/death.c ****  * copies or substantial portions of the Software.
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 2
+
+
+  14:..\..\Common\Minimal/death.c ****  *
+  15:..\..\Common\Minimal/death.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\Common\Minimal/death.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\Common\Minimal/death.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\Common\Minimal/death.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\Common\Minimal/death.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\Common\Minimal/death.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\Common\Minimal/death.c ****  *
+  22:..\..\Common\Minimal/death.c ****  * http://www.FreeRTOS.org
+  23:..\..\Common\Minimal/death.c ****  * http://aws.amazon.com/freertos
+  24:..\..\Common\Minimal/death.c ****  *
+  25:..\..\Common\Minimal/death.c ****  * 1 tab == 4 spaces!
+  26:..\..\Common\Minimal/death.c ****  */
+  27:..\..\Common\Minimal/death.c **** 
+  28:..\..\Common\Minimal/death.c **** /**
+  29:..\..\Common\Minimal/death.c ****  * Create a single persistent task which periodically dynamically creates another
+  30:..\..\Common\Minimal/death.c ****  * two tasks.  The original task is called the creator task, the two tasks it
+  31:..\..\Common\Minimal/death.c ****  * creates are called suicidal tasks.
+  32:..\..\Common\Minimal/death.c ****  *
+  33:..\..\Common\Minimal/death.c ****  * One of the created suicidal tasks kill one other suicidal task before killing
+  34:..\..\Common\Minimal/death.c ****  * itself - leaving just the original task remaining.
+  35:..\..\Common\Minimal/death.c ****  *
+  36:..\..\Common\Minimal/death.c ****  * The creator task must be spawned after all of the other demo application tasks
+  37:..\..\Common\Minimal/death.c ****  * as it keeps a check on the number of tasks under the scheduler control.  The
+  38:..\..\Common\Minimal/death.c ****  * number of tasks it expects to see running should never be greater than the
+  39:..\..\Common\Minimal/death.c ****  * number of tasks that were in existence when the creator task was spawned, plus
+  40:..\..\Common\Minimal/death.c ****  * one set of four suicidal tasks.  If this number is exceeded an error is flagged.
+  41:..\..\Common\Minimal/death.c ****  *
+  42:..\..\Common\Minimal/death.c ****  * \page DeathC death.c
+  43:..\..\Common\Minimal/death.c ****  * \ingroup DemoFiles
+  44:..\..\Common\Minimal/death.c ****  * <HR>
+  45:..\..\Common\Minimal/death.c ****  */
+  46:..\..\Common\Minimal/death.c **** 
+  47:..\..\Common\Minimal/death.c **** 
+  48:..\..\Common\Minimal/death.c **** #include <stdlib.h>
+  49:..\..\Common\Minimal/death.c **** 
+  50:..\..\Common\Minimal/death.c **** /* Scheduler include files. */
+  51:..\..\Common\Minimal/death.c **** #include "FreeRTOS.h"
+  52:..\..\Common\Minimal/death.c **** #include "task.h"
+  53:..\..\Common\Minimal/death.c **** 
+  54:..\..\Common\Minimal/death.c **** /* Demo program include files. */
+  55:..\..\Common\Minimal/death.c **** #include "death.h"
+  56:..\..\Common\Minimal/death.c **** 
+  57:..\..\Common\Minimal/death.c **** #define deathSTACK_SIZE		( configMINIMAL_STACK_SIZE + 60 )
+  58:..\..\Common\Minimal/death.c **** 
+  59:..\..\Common\Minimal/death.c **** /* The task originally created which is responsible for periodically dynamically
+  60:..\..\Common\Minimal/death.c **** creating another four tasks. */
+  61:..\..\Common\Minimal/death.c **** static portTASK_FUNCTION_PROTO( vCreateTasks, pvParameters );
+  62:..\..\Common\Minimal/death.c **** 
+  63:..\..\Common\Minimal/death.c **** /* The task function of the dynamically created tasks. */
+  64:..\..\Common\Minimal/death.c **** static portTASK_FUNCTION_PROTO( vSuicidalTask, pvParameters );
+  65:..\..\Common\Minimal/death.c **** 
+  66:..\..\Common\Minimal/death.c **** /* A variable which is incremented every time the dynamic tasks are created.  This
+  67:..\..\Common\Minimal/death.c **** is used to check that the task is still running. */
+  68:..\..\Common\Minimal/death.c **** static volatile uint16_t usCreationCount = 0;
+  69:..\..\Common\Minimal/death.c **** 
+  70:..\..\Common\Minimal/death.c **** /* Used to store the number of tasks that were originally running so the creator
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 3
+
+
+  71:..\..\Common\Minimal/death.c **** task can tell if any of the suicidal tasks have failed to die.
+  72:..\..\Common\Minimal/death.c **** */
+  73:..\..\Common\Minimal/death.c **** static volatile UBaseType_t uxTasksRunningAtStart = 0;
+  74:..\..\Common\Minimal/death.c **** 
+  75:..\..\Common\Minimal/death.c **** /* When a task deletes itself, it stack and TCB are cleaned up by the Idle task.
+  76:..\..\Common\Minimal/death.c **** Under heavy load the idle task might not get much processing time, so it would
+  77:..\..\Common\Minimal/death.c **** be legitimate for several tasks to remain undeleted for a short period.  There
+  78:..\..\Common\Minimal/death.c **** may also be a few other unexpected tasks if, for example, the tasks that test
+  79:..\..\Common\Minimal/death.c **** static allocation are also being used. */
+  80:..\..\Common\Minimal/death.c **** static const UBaseType_t uxMaxNumberOfExtraTasksRunning = 3;
+  81:..\..\Common\Minimal/death.c **** 
+  82:..\..\Common\Minimal/death.c **** /* Used to store a handle to the task that should be killed by a suicidal task,
+  83:..\..\Common\Minimal/death.c **** before it kills itself. */
+  84:..\..\Common\Minimal/death.c **** TaskHandle_t xCreatedTask;
+  85:..\..\Common\Minimal/death.c **** 
+  86:..\..\Common\Minimal/death.c **** /*-----------------------------------------------------------*/
+  87:..\..\Common\Minimal/death.c **** 
+  88:..\..\Common\Minimal/death.c **** void vCreateSuicidalTasks( UBaseType_t uxPriority )
+  89:..\..\Common\Minimal/death.c **** {
+  44              		.loc 1 89 0
+  45              		.cfi_startproc
+  46              		@ args = 0, pretend = 0, frame = 8
+  47              		@ frame_needed = 1, uses_anonymous_args = 0
+  48 0000 80B5     		push	{r7, lr}
+  49              		.cfi_def_cfa_offset 8
+  50              		.cfi_offset 7, -8
+  51              		.cfi_offset 14, -4
+  52 0002 84B0     		sub	sp, sp, #16
+  53              		.cfi_def_cfa_offset 24
+  54 0004 02AF     		add	r7, sp, #8
+  55              		.cfi_def_cfa 7, 16
+  56 0006 7860     		str	r0, [r7, #4]
+  90:..\..\Common\Minimal/death.c **** 	xTaskCreate( vCreateTasks, "CREATOR", deathSTACK_SIZE, ( void * ) NULL, uxPriority, NULL );
+  57              		.loc 1 90 0
+  58 0008 7B68     		ldr	r3, [r7, #4]
+  59 000a 0093     		str	r3, [sp]
+  60 000c 0023     		movs	r3, #0
+  61 000e 0193     		str	r3, [sp, #4]
+  62 0010 0448     		ldr	r0, .L2
+  63 0012 0549     		ldr	r1, .L2+4
+  64 0014 A022     		movs	r2, #160
+  65 0016 0023     		movs	r3, #0
+  66 0018 FFF7FEFF 		bl	xTaskCreate
+  91:..\..\Common\Minimal/death.c **** }
+  67              		.loc 1 91 0
+  68 001c 0837     		adds	r7, r7, #8
+  69              		.cfi_def_cfa_offset 8
+  70 001e BD46     		mov	sp, r7
+  71              		.cfi_def_cfa_register 13
+  72              		@ sp needed
+  73 0020 80BD     		pop	{r7, pc}
+  74              	.L3:
+  75 0022 00BF     		.align	2
+  76              	.L2:
+  77 0024 00000000 		.word	vCreateTasks
+  78 0028 04000000 		.word	.LC0
+  79              		.cfi_endproc
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 4
+
+
+  80              	.LFE68:
+  81              		.size	vCreateSuicidalTasks, .-vCreateSuicidalTasks
+  82              		.section	.text.vSuicidalTask,"ax",%progbits
+  83              		.align	2
+  84              		.thumb
+  85              		.thumb_func
+  86              		.type	vSuicidalTask, %function
+  87              	vSuicidalTask:
+  88              	.LFB69:
+  92:..\..\Common\Minimal/death.c **** /*-----------------------------------------------------------*/
+  93:..\..\Common\Minimal/death.c **** 
+  94:..\..\Common\Minimal/death.c **** static portTASK_FUNCTION( vSuicidalTask, pvParameters )
+  95:..\..\Common\Minimal/death.c **** {
+  89              		.loc 1 95 0
+  90              		.cfi_startproc
+  91              		@ args = 0, pretend = 0, frame = 24
+  92              		@ frame_needed = 1, uses_anonymous_args = 0
+  93 0000 80B5     		push	{r7, lr}
+  94              		.cfi_def_cfa_offset 8
+  95              		.cfi_offset 7, -8
+  96              		.cfi_offset 14, -4
+  97 0002 86B0     		sub	sp, sp, #24
+  98              		.cfi_def_cfa_offset 32
+  99 0004 00AF     		add	r7, sp, #0
+ 100              		.cfi_def_cfa_register 7
+ 101 0006 7860     		str	r0, [r7, #4]
+  96:..\..\Common\Minimal/death.c **** volatile long l1, l2;
+  97:..\..\Common\Minimal/death.c **** TaskHandle_t xTaskToKill;
+  98:..\..\Common\Minimal/death.c **** const TickType_t xDelay = pdMS_TO_TICKS( ( TickType_t ) 200 );
+ 102              		.loc 1 98 0
+ 103 0008 C823     		movs	r3, #200
+ 104 000a 3B61     		str	r3, [r7, #16]
+  99:..\..\Common\Minimal/death.c **** 
+ 100:..\..\Common\Minimal/death.c **** 	/* Test deletion of a task's secure context, if any. */
+ 101:..\..\Common\Minimal/death.c **** 	portTASK_CALLS_SECURE_FUNCTIONS();
+ 102:..\..\Common\Minimal/death.c **** 
+ 103:..\..\Common\Minimal/death.c **** 	if( pvParameters != NULL )
+ 105              		.loc 1 103 0
+ 106 000c 7B68     		ldr	r3, [r7, #4]
+ 107 000e 002B     		cmp	r3, #0
+ 108 0010 03D0     		beq	.L5
+ 104:..\..\Common\Minimal/death.c **** 	{
+ 105:..\..\Common\Minimal/death.c **** 		/* This task is periodically created four times.  Two created tasks are
+ 106:..\..\Common\Minimal/death.c **** 		passed a handle to the other task so it can kill it before killing itself.
+ 107:..\..\Common\Minimal/death.c **** 		The other task is passed in null. */
+ 108:..\..\Common\Minimal/death.c **** 		xTaskToKill = *( TaskHandle_t* )pvParameters;
+ 109              		.loc 1 108 0
+ 110 0012 7B68     		ldr	r3, [r7, #4]
+ 111 0014 1B68     		ldr	r3, [r3]
+ 112 0016 7B61     		str	r3, [r7, #20]
+ 113 0018 01E0     		b	.L6
+ 114              	.L5:
+ 109:..\..\Common\Minimal/death.c **** 	}
+ 110:..\..\Common\Minimal/death.c **** 	else
+ 111:..\..\Common\Minimal/death.c **** 	{
+ 112:..\..\Common\Minimal/death.c **** 		xTaskToKill = NULL;
+ 115              		.loc 1 112 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 5
+
+
+ 116 001a 0023     		movs	r3, #0
+ 117 001c 7B61     		str	r3, [r7, #20]
+ 118              	.L6:
+ 113:..\..\Common\Minimal/death.c **** 	}
+ 114:..\..\Common\Minimal/death.c **** 
+ 115:..\..\Common\Minimal/death.c **** 	for( ;; )
+ 116:..\..\Common\Minimal/death.c **** 	{
+ 117:..\..\Common\Minimal/death.c **** 		/* Do something random just to use some stack and registers. */
+ 118:..\..\Common\Minimal/death.c **** 		l1 = 2;
+ 119              		.loc 1 118 0
+ 120 001e 0223     		movs	r3, #2
+ 121 0020 FB60     		str	r3, [r7, #12]
+ 119:..\..\Common\Minimal/death.c **** 		l2 = 89;
+ 122              		.loc 1 119 0
+ 123 0022 5923     		movs	r3, #89
+ 124 0024 BB60     		str	r3, [r7, #8]
+ 120:..\..\Common\Minimal/death.c **** 		l2 *= l1;
+ 125              		.loc 1 120 0
+ 126 0026 FB68     		ldr	r3, [r7, #12]
+ 127 0028 BA68     		ldr	r2, [r7, #8]
+ 128 002a 02FB03F3 		mul	r3, r2, r3
+ 129 002e BB60     		str	r3, [r7, #8]
+ 121:..\..\Common\Minimal/death.c **** 		vTaskDelay( xDelay );
+ 130              		.loc 1 121 0
+ 131 0030 3869     		ldr	r0, [r7, #16]
+ 132 0032 FFF7FEFF 		bl	vTaskDelay
+ 122:..\..\Common\Minimal/death.c **** 
+ 123:..\..\Common\Minimal/death.c **** 		if( xTaskToKill != NULL )
+ 133              		.loc 1 123 0
+ 134 0036 7B69     		ldr	r3, [r7, #20]
+ 135 0038 002B     		cmp	r3, #0
+ 136 003a 08D0     		beq	.L7
+ 124:..\..\Common\Minimal/death.c **** 		{
+ 125:..\..\Common\Minimal/death.c **** 			/* Make sure the other task has a go before we delete it. */
+ 126:..\..\Common\Minimal/death.c **** 			vTaskDelay( ( TickType_t ) 0 );
+ 137              		.loc 1 126 0
+ 138 003c 0020     		movs	r0, #0
+ 139 003e FFF7FEFF 		bl	vTaskDelay
+ 127:..\..\Common\Minimal/death.c **** 
+ 128:..\..\Common\Minimal/death.c **** 			/* Kill the other task that was created by vCreateTasks(). */
+ 129:..\..\Common\Minimal/death.c **** 			vTaskDelete( xTaskToKill );
+ 140              		.loc 1 129 0
+ 141 0042 7869     		ldr	r0, [r7, #20]
+ 142 0044 FFF7FEFF 		bl	vTaskDelete
+ 130:..\..\Common\Minimal/death.c **** 
+ 131:..\..\Common\Minimal/death.c **** 			/* Kill ourselves. */
+ 132:..\..\Common\Minimal/death.c **** 			vTaskDelete( NULL );
+ 143              		.loc 1 132 0
+ 144 0048 0020     		movs	r0, #0
+ 145 004a FFF7FEFF 		bl	vTaskDelete
+ 146              	.L7:
+ 133:..\..\Common\Minimal/death.c **** 		}
+ 134:..\..\Common\Minimal/death.c **** 	}
+ 147              		.loc 1 134 0
+ 148 004e E6E7     		b	.L6
+ 149              		.cfi_endproc
+ 150              	.LFE69:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 6
+
+
+ 151              		.size	vSuicidalTask, .-vSuicidalTask
+ 152              		.section	.rodata
+ 153              		.align	2
+ 154              	.LC1:
+ 155 000c 53554943 		.ascii	"SUICID1\000"
+ 155      49443100 
+ 156              		.align	2
+ 157              	.LC2:
+ 158 0014 53554943 		.ascii	"SUICID2\000"
+ 158      49443200 
+ 159              		.section	.text.vCreateTasks,"ax",%progbits
+ 160              		.align	2
+ 161              		.thumb
+ 162              		.thumb_func
+ 163              		.type	vCreateTasks, %function
+ 164              	vCreateTasks:
+ 165              	.LFB70:
+ 135:..\..\Common\Minimal/death.c **** }/*lint !e818 !e550 Function prototype must be as per standard for task functions. */
+ 136:..\..\Common\Minimal/death.c **** /*-----------------------------------------------------------*/
+ 137:..\..\Common\Minimal/death.c **** 
+ 138:..\..\Common\Minimal/death.c **** static portTASK_FUNCTION( vCreateTasks, pvParameters )
+ 139:..\..\Common\Minimal/death.c **** {
+ 166              		.loc 1 139 0
+ 167              		.cfi_startproc
+ 168              		@ args = 0, pretend = 0, frame = 16
+ 169              		@ frame_needed = 1, uses_anonymous_args = 0
+ 170 0000 80B5     		push	{r7, lr}
+ 171              		.cfi_def_cfa_offset 8
+ 172              		.cfi_offset 7, -8
+ 173              		.cfi_offset 14, -4
+ 174 0002 86B0     		sub	sp, sp, #24
+ 175              		.cfi_def_cfa_offset 32
+ 176 0004 02AF     		add	r7, sp, #8
+ 177              		.cfi_def_cfa 7, 24
+ 178 0006 7860     		str	r0, [r7, #4]
+ 140:..\..\Common\Minimal/death.c **** const TickType_t xDelay = pdMS_TO_TICKS( ( TickType_t ) 1000 );
+ 179              		.loc 1 140 0
+ 180 0008 4FF47A73 		mov	r3, #1000
+ 181 000c FB60     		str	r3, [r7, #12]
+ 141:..\..\Common\Minimal/death.c **** UBaseType_t uxPriority;
+ 142:..\..\Common\Minimal/death.c **** 
+ 143:..\..\Common\Minimal/death.c **** 	/* Remove compiler warning about unused parameter. */
+ 144:..\..\Common\Minimal/death.c **** 	( void ) pvParameters;
+ 145:..\..\Common\Minimal/death.c **** 
+ 146:..\..\Common\Minimal/death.c **** 	/* Delay at the start to ensure tasks created by other demos have been
+ 147:..\..\Common\Minimal/death.c **** 	created before storing the current number of tasks. */
+ 148:..\..\Common\Minimal/death.c **** 	vTaskDelay( xDelay );
+ 182              		.loc 1 148 0
+ 183 000e F868     		ldr	r0, [r7, #12]
+ 184 0010 FFF7FEFF 		bl	vTaskDelay
+ 149:..\..\Common\Minimal/death.c **** 	uxTasksRunningAtStart = ( UBaseType_t ) uxTaskGetNumberOfTasks();
+ 185              		.loc 1 149 0
+ 186 0014 FFF7FEFF 		bl	uxTaskGetNumberOfTasks
+ 187 0018 0246     		mov	r2, r0
+ 188 001a 144B     		ldr	r3, .L10
+ 189 001c 1A60     		str	r2, [r3]
+ 150:..\..\Common\Minimal/death.c **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 7
+
+
+ 151:..\..\Common\Minimal/death.c **** 	uxPriority = uxTaskPriorityGet( NULL );
+ 190              		.loc 1 151 0
+ 191 001e 0020     		movs	r0, #0
+ 192 0020 FFF7FEFF 		bl	uxTaskPriorityGet
+ 193 0024 B860     		str	r0, [r7, #8]
+ 194              	.L9:
+ 152:..\..\Common\Minimal/death.c **** 
+ 153:..\..\Common\Minimal/death.c **** 	for( ;; )
+ 154:..\..\Common\Minimal/death.c **** 	{
+ 155:..\..\Common\Minimal/death.c **** 		/* Just loop round, delaying then creating the four suicidal tasks. */
+ 156:..\..\Common\Minimal/death.c **** 		vTaskDelay( xDelay );
+ 195              		.loc 1 156 0 discriminator 1
+ 196 0026 F868     		ldr	r0, [r7, #12]
+ 197 0028 FFF7FEFF 		bl	vTaskDelay
+ 157:..\..\Common\Minimal/death.c **** 
+ 158:..\..\Common\Minimal/death.c **** 		xCreatedTask = NULL;
+ 198              		.loc 1 158 0 discriminator 1
+ 199 002c 104B     		ldr	r3, .L10+4
+ 200 002e 0022     		movs	r2, #0
+ 201 0030 1A60     		str	r2, [r3]
+ 159:..\..\Common\Minimal/death.c **** 
+ 160:..\..\Common\Minimal/death.c **** 		xTaskCreate( vSuicidalTask, "SUICID1", configMINIMAL_STACK_SIZE, NULL, uxPriority, &xCreatedTask 
+ 202              		.loc 1 160 0 discriminator 1
+ 203 0032 BB68     		ldr	r3, [r7, #8]
+ 204 0034 0093     		str	r3, [sp]
+ 205 0036 0E4B     		ldr	r3, .L10+4
+ 206 0038 0193     		str	r3, [sp, #4]
+ 207 003a 0E48     		ldr	r0, .L10+8
+ 208 003c 0E49     		ldr	r1, .L10+12
+ 209 003e 6422     		movs	r2, #100
+ 210 0040 0023     		movs	r3, #0
+ 211 0042 FFF7FEFF 		bl	xTaskCreate
+ 161:..\..\Common\Minimal/death.c **** 		xTaskCreate( vSuicidalTask, "SUICID2", configMINIMAL_STACK_SIZE, &xCreatedTask, uxPriority, NULL 
+ 212              		.loc 1 161 0 discriminator 1
+ 213 0046 BB68     		ldr	r3, [r7, #8]
+ 214 0048 0093     		str	r3, [sp]
+ 215 004a 0023     		movs	r3, #0
+ 216 004c 0193     		str	r3, [sp, #4]
+ 217 004e 0948     		ldr	r0, .L10+8
+ 218 0050 0A49     		ldr	r1, .L10+16
+ 219 0052 6422     		movs	r2, #100
+ 220 0054 064B     		ldr	r3, .L10+4
+ 221 0056 FFF7FEFF 		bl	xTaskCreate
+ 162:..\..\Common\Minimal/death.c **** 
+ 163:..\..\Common\Minimal/death.c **** 		++usCreationCount;
+ 222              		.loc 1 163 0 discriminator 1
+ 223 005a 094B     		ldr	r3, .L10+20
+ 224 005c 1B88     		ldrh	r3, [r3]	@ movhi
+ 225 005e 9BB2     		uxth	r3, r3
+ 226 0060 0133     		adds	r3, r3, #1
+ 227 0062 9AB2     		uxth	r2, r3
+ 228 0064 064B     		ldr	r3, .L10+20
+ 229 0066 1A80     		strh	r2, [r3]	@ movhi
+ 164:..\..\Common\Minimal/death.c **** 	}
+ 230              		.loc 1 164 0 discriminator 1
+ 231 0068 DDE7     		b	.L9
+ 232              	.L11:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 8
+
+
+ 233 006a 00BF     		.align	2
+ 234              	.L10:
+ 235 006c 04000000 		.word	uxTasksRunningAtStart
+ 236 0070 00000000 		.word	xCreatedTask
+ 237 0074 00000000 		.word	vSuicidalTask
+ 238 0078 0C000000 		.word	.LC1
+ 239 007c 14000000 		.word	.LC2
+ 240 0080 00000000 		.word	usCreationCount
+ 241              		.cfi_endproc
+ 242              	.LFE70:
+ 243              		.size	vCreateTasks, .-vCreateTasks
+ 244              		.section	.text.xIsCreateTaskStillRunning,"ax",%progbits
+ 245              		.align	2
+ 246              		.global	xIsCreateTaskStillRunning
+ 247              		.thumb
+ 248              		.thumb_func
+ 249              		.type	xIsCreateTaskStillRunning, %function
+ 250              	xIsCreateTaskStillRunning:
+ 251              	.LFB71:
+ 165:..\..\Common\Minimal/death.c **** }
+ 166:..\..\Common\Minimal/death.c **** /*-----------------------------------------------------------*/
+ 167:..\..\Common\Minimal/death.c **** 
+ 168:..\..\Common\Minimal/death.c **** /* This is called to check that the creator task is still running and that there
+ 169:..\..\Common\Minimal/death.c **** are not any more than four extra tasks. */
+ 170:..\..\Common\Minimal/death.c **** BaseType_t xIsCreateTaskStillRunning( void )
+ 171:..\..\Common\Minimal/death.c **** {
+ 252              		.loc 1 171 0
+ 253              		.cfi_startproc
+ 254              		@ args = 0, pretend = 0, frame = 8
+ 255              		@ frame_needed = 1, uses_anonymous_args = 0
+ 256 0000 80B5     		push	{r7, lr}
+ 257              		.cfi_def_cfa_offset 8
+ 258              		.cfi_offset 7, -8
+ 259              		.cfi_offset 14, -4
+ 260 0002 82B0     		sub	sp, sp, #8
+ 261              		.cfi_def_cfa_offset 16
+ 262 0004 00AF     		add	r7, sp, #0
+ 263              		.cfi_def_cfa_register 7
+ 172:..\..\Common\Minimal/death.c **** static uint16_t usLastCreationCount = 0xfff;
+ 173:..\..\Common\Minimal/death.c **** BaseType_t xReturn = pdTRUE;
+ 264              		.loc 1 173 0
+ 265 0006 0123     		movs	r3, #1
+ 266 0008 7B60     		str	r3, [r7, #4]
+ 174:..\..\Common\Minimal/death.c **** static UBaseType_t uxTasksRunningNow;
+ 175:..\..\Common\Minimal/death.c **** 
+ 176:..\..\Common\Minimal/death.c **** 	if( usLastCreationCount == usCreationCount )
+ 267              		.loc 1 176 0
+ 268 000a 164B     		ldr	r3, .L18
+ 269 000c 1A88     		ldrh	r2, [r3]
+ 270 000e 164B     		ldr	r3, .L18+4
+ 271 0010 1B88     		ldrh	r3, [r3]	@ movhi
+ 272 0012 9BB2     		uxth	r3, r3
+ 273 0014 9A42     		cmp	r2, r3
+ 274 0016 02D1     		bne	.L13
+ 177:..\..\Common\Minimal/death.c **** 	{
+ 178:..\..\Common\Minimal/death.c **** 		xReturn = pdFALSE;
+ 275              		.loc 1 178 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 9
+
+
+ 276 0018 0023     		movs	r3, #0
+ 277 001a 7B60     		str	r3, [r7, #4]
+ 278 001c 04E0     		b	.L14
+ 279              	.L13:
+ 179:..\..\Common\Minimal/death.c **** 	}
+ 180:..\..\Common\Minimal/death.c **** 	else
+ 181:..\..\Common\Minimal/death.c **** 	{
+ 182:..\..\Common\Minimal/death.c **** 		usLastCreationCount = usCreationCount;
+ 280              		.loc 1 182 0
+ 281 001e 124B     		ldr	r3, .L18+4
+ 282 0020 1B88     		ldrh	r3, [r3]	@ movhi
+ 283 0022 9AB2     		uxth	r2, r3
+ 284 0024 0F4B     		ldr	r3, .L18
+ 285 0026 1A80     		strh	r2, [r3]	@ movhi
+ 286              	.L14:
+ 183:..\..\Common\Minimal/death.c **** 	}
+ 184:..\..\Common\Minimal/death.c **** 
+ 185:..\..\Common\Minimal/death.c **** 	uxTasksRunningNow = ( UBaseType_t ) uxTaskGetNumberOfTasks();
+ 287              		.loc 1 185 0
+ 288 0028 FFF7FEFF 		bl	uxTaskGetNumberOfTasks
+ 289 002c 0246     		mov	r2, r0
+ 290 002e 0F4B     		ldr	r3, .L18+8
+ 291 0030 1A60     		str	r2, [r3]
+ 186:..\..\Common\Minimal/death.c **** 
+ 187:..\..\Common\Minimal/death.c **** 	if( uxTasksRunningNow < uxTasksRunningAtStart )
+ 292              		.loc 1 187 0
+ 293 0032 0E4B     		ldr	r3, .L18+8
+ 294 0034 1A68     		ldr	r2, [r3]
+ 295 0036 0E4B     		ldr	r3, .L18+12
+ 296 0038 1B68     		ldr	r3, [r3]
+ 297 003a 9A42     		cmp	r2, r3
+ 298 003c 02D2     		bcs	.L15
+ 188:..\..\Common\Minimal/death.c **** 	{
+ 189:..\..\Common\Minimal/death.c **** 		xReturn = pdFALSE;
+ 299              		.loc 1 189 0
+ 300 003e 0023     		movs	r3, #0
+ 301 0040 7B60     		str	r3, [r7, #4]
+ 302 0042 09E0     		b	.L16
+ 303              	.L15:
+ 190:..\..\Common\Minimal/death.c **** 	}
+ 191:..\..\Common\Minimal/death.c **** 	else if( ( uxTasksRunningNow - uxTasksRunningAtStart ) > uxMaxNumberOfExtraTasksRunning )
+ 304              		.loc 1 191 0
+ 305 0044 094B     		ldr	r3, .L18+8
+ 306 0046 1A68     		ldr	r2, [r3]
+ 307 0048 094B     		ldr	r3, .L18+12
+ 308 004a 1B68     		ldr	r3, [r3]
+ 309 004c D31A     		subs	r3, r2, r3
+ 310 004e 0322     		movs	r2, #3
+ 311 0050 9342     		cmp	r3, r2
+ 312 0052 01D9     		bls	.L16
+ 192:..\..\Common\Minimal/death.c **** 	{
+ 193:..\..\Common\Minimal/death.c **** 		xReturn = pdFALSE;
+ 313              		.loc 1 193 0
+ 314 0054 0023     		movs	r3, #0
+ 315 0056 7B60     		str	r3, [r7, #4]
+ 316              	.L16:
+ 194:..\..\Common\Minimal/death.c **** 	}
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 10
+
+
+ 195:..\..\Common\Minimal/death.c **** 	else
+ 196:..\..\Common\Minimal/death.c **** 	{
+ 197:..\..\Common\Minimal/death.c **** 		/* Everything is okay. */
+ 198:..\..\Common\Minimal/death.c **** 	}
+ 199:..\..\Common\Minimal/death.c **** 
+ 200:..\..\Common\Minimal/death.c **** 	return xReturn;
+ 317              		.loc 1 200 0
+ 318 0058 7B68     		ldr	r3, [r7, #4]
+ 201:..\..\Common\Minimal/death.c **** }
+ 319              		.loc 1 201 0
+ 320 005a 1846     		mov	r0, r3
+ 321 005c 0837     		adds	r7, r7, #8
+ 322              		.cfi_def_cfa_offset 8
+ 323 005e BD46     		mov	sp, r7
+ 324              		.cfi_def_cfa_register 13
+ 325              		@ sp needed
+ 326 0060 80BD     		pop	{r7, pc}
+ 327              	.L19:
+ 328 0062 00BF     		.align	2
+ 329              	.L18:
+ 330 0064 00000000 		.word	usLastCreationCount.6672
+ 331 0068 00000000 		.word	usCreationCount
+ 332 006c 08000000 		.word	uxTasksRunningNow.6674
+ 333 0070 04000000 		.word	uxTasksRunningAtStart
+ 334              		.cfi_endproc
+ 335              	.LFE71:
+ 336              		.size	xIsCreateTaskStillRunning, .-xIsCreateTaskStillRunning
+ 337              		.data
+ 338              		.align	1
+ 339              		.type	usLastCreationCount.6672, %object
+ 340              		.size	usLastCreationCount.6672, 2
+ 341              	usLastCreationCount.6672:
+ 342 0000 FF0F     		.short	4095
+ 343              		.bss
+ 344              		.align	2
+ 345              	uxTasksRunningNow.6674:
+ 346 0008 00000000 		.space	4
+ 347              		.text
+ 348              	.Letext0:
+ 349              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 350              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 351              		.file 4 "../../../Source/portable/GCC/ARM_CM3/portmacro.h"
+ 352              		.file 5 "../../../Source/include/task.h"
+ 353              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 354              		.section	.debug_info,"",%progbits
+ 355              	.Ldebug_info0:
+ 356 0000 75020000 		.4byte	0x275
+ 357 0004 0400     		.2byte	0x4
+ 358 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 359 000a 04       		.byte	0x4
+ 360 000b 01       		.uleb128 0x1
+ 361 000c 4E000000 		.4byte	.LASF37
+ 362 0010 01       		.byte	0x1
+ 363 0011 27000000 		.4byte	.LASF38
+ 364 0015 EF010000 		.4byte	.LASF39
+ 365 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 366 001d 00000000 		.4byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 11
+
+
+ 367 0021 00000000 		.4byte	.Ldebug_line0
+ 368 0025 02       		.uleb128 0x2
+ 369 0026 04       		.byte	0x4
+ 370 0027 07       		.byte	0x7
+ 371 0028 CB010000 		.4byte	.LASF0
+ 372 002c 03       		.uleb128 0x3
+ 373 002d 04       		.byte	0x4
+ 374 002e 05       		.byte	0x5
+ 375 002f 696E7400 		.ascii	"int\000"
+ 376 0033 02       		.uleb128 0x2
+ 377 0034 01       		.byte	0x1
+ 378 0035 06       		.byte	0x6
+ 379 0036 14030000 		.4byte	.LASF1
+ 380 003a 02       		.uleb128 0x2
+ 381 003b 01       		.byte	0x1
+ 382 003c 08       		.byte	0x8
+ 383 003d 55010000 		.4byte	.LASF2
+ 384 0041 02       		.uleb128 0x2
+ 385 0042 02       		.byte	0x2
+ 386 0043 05       		.byte	0x5
+ 387 0044 CC020000 		.4byte	.LASF3
+ 388 0048 04       		.uleb128 0x4
+ 389 0049 63010000 		.4byte	.LASF5
+ 390 004d 02       		.byte	0x2
+ 391 004e 2B       		.byte	0x2b
+ 392 004f 53000000 		.4byte	0x53
+ 393 0053 02       		.uleb128 0x2
+ 394 0054 02       		.byte	0x2
+ 395 0055 07       		.byte	0x7
+ 396 0056 35010000 		.4byte	.LASF4
+ 397 005a 04       		.uleb128 0x4
+ 398 005b 44000000 		.4byte	.LASF6
+ 399 005f 02       		.byte	0x2
+ 400 0060 3F       		.byte	0x3f
+ 401 0061 65000000 		.4byte	0x65
+ 402 0065 02       		.uleb128 0x2
+ 403 0066 04       		.byte	0x4
+ 404 0067 05       		.byte	0x5
+ 405 0068 0B030000 		.4byte	.LASF7
+ 406 006c 04       		.uleb128 0x4
+ 407 006d 80010000 		.4byte	.LASF8
+ 408 0071 02       		.byte	0x2
+ 409 0072 41       		.byte	0x41
+ 410 0073 77000000 		.4byte	0x77
+ 411 0077 02       		.uleb128 0x2
+ 412 0078 04       		.byte	0x4
+ 413 0079 07       		.byte	0x7
+ 414 007a 6E010000 		.4byte	.LASF9
+ 415 007e 02       		.uleb128 0x2
+ 416 007f 08       		.byte	0x8
+ 417 0080 05       		.byte	0x5
+ 418 0081 00000000 		.4byte	.LASF10
+ 419 0085 02       		.uleb128 0x2
+ 420 0086 08       		.byte	0x8
+ 421 0087 07       		.byte	0x7
+ 422 0088 D8010000 		.4byte	.LASF11
+ 423 008c 02       		.uleb128 0x2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 12
+
+
+ 424 008d 04       		.byte	0x4
+ 425 008e 07       		.byte	0x7
+ 426 008f 7F020000 		.4byte	.LASF12
+ 427 0093 05       		.uleb128 0x5
+ 428 0094 04       		.byte	0x4
+ 429 0095 02       		.uleb128 0x2
+ 430 0096 01       		.byte	0x1
+ 431 0097 08       		.byte	0x8
+ 432 0098 9B020000 		.4byte	.LASF13
+ 433 009c 04       		.uleb128 0x4
+ 434 009d D6020000 		.4byte	.LASF14
+ 435 00a1 03       		.byte	0x3
+ 436 00a2 21       		.byte	0x21
+ 437 00a3 48000000 		.4byte	0x48
+ 438 00a7 04       		.uleb128 0x4
+ 439 00a8 77020000 		.4byte	.LASF15
+ 440 00ac 03       		.byte	0x3
+ 441 00ad 2C       		.byte	0x2c
+ 442 00ae 5A000000 		.4byte	0x5a
+ 443 00b2 04       		.uleb128 0x4
+ 444 00b3 02030000 		.4byte	.LASF16
+ 445 00b7 03       		.byte	0x3
+ 446 00b8 2D       		.byte	0x2d
+ 447 00b9 6C000000 		.4byte	0x6c
+ 448 00bd 02       		.uleb128 0x2
+ 449 00be 04       		.byte	0x4
+ 450 00bf 04       		.byte	0x4
+ 451 00c0 FD000000 		.4byte	.LASF17
+ 452 00c4 02       		.uleb128 0x2
+ 453 00c5 08       		.byte	0x8
+ 454 00c6 04       		.byte	0x4
+ 455 00c7 E9000000 		.4byte	.LASF18
+ 456 00cb 06       		.uleb128 0x6
+ 457 00cc 9C000000 		.4byte	0x9c
+ 458 00d0 04       		.uleb128 0x4
+ 459 00d1 45030000 		.4byte	.LASF19
+ 460 00d5 04       		.byte	0x4
+ 461 00d6 38       		.byte	0x38
+ 462 00d7 65000000 		.4byte	0x65
+ 463 00db 04       		.uleb128 0x4
+ 464 00dc 03010000 		.4byte	.LASF20
+ 465 00e0 04       		.byte	0x4
+ 466 00e1 39       		.byte	0x39
+ 467 00e2 77000000 		.4byte	0x77
+ 468 00e6 04       		.uleb128 0x4
+ 469 00e7 1C000000 		.4byte	.LASF21
+ 470 00eb 04       		.byte	0x4
+ 471 00ec 3F       		.byte	0x3f
+ 472 00ed B2000000 		.4byte	0xb2
+ 473 00f1 06       		.uleb128 0x6
+ 474 00f2 DB000000 		.4byte	0xdb
+ 475 00f6 04       		.uleb128 0x4
+ 476 00f7 F5020000 		.4byte	.LASF22
+ 477 00fb 05       		.byte	0x5
+ 478 00fc 3E       		.byte	0x3e
+ 479 00fd 01010000 		.4byte	0x101
+ 480 0101 07       		.uleb128 0x7
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 13
+
+
+ 481 0102 04       		.byte	0x4
+ 482 0103 07010000 		.4byte	0x107
+ 483 0107 08       		.uleb128 0x8
+ 484 0108 8B010000 		.4byte	.LASF40
+ 485 010c 09       		.uleb128 0x9
+ 486 010d 30030000 		.4byte	.LASF41
+ 487 0111 01       		.byte	0x1
+ 488 0112 58       		.byte	0x58
+ 489 0113 00000000 		.4byte	.LFB68
+ 490 0117 2C000000 		.4byte	.LFE68-.LFB68
+ 491 011b 01       		.uleb128 0x1
+ 492 011c 9C       		.byte	0x9c
+ 493 011d 30010000 		.4byte	0x130
+ 494 0121 0A       		.uleb128 0xa
+ 495 0122 C0010000 		.4byte	.LASF23
+ 496 0126 01       		.byte	0x1
+ 497 0127 58       		.byte	0x58
+ 498 0128 DB000000 		.4byte	0xdb
+ 499 012c 02       		.uleb128 0x2
+ 500 012d 91       		.byte	0x91
+ 501 012e 74       		.sleb128 -12
+ 502 012f 00       		.byte	0
+ 503 0130 0B       		.uleb128 0xb
+ 504 0131 0E000000 		.4byte	.LASF27
+ 505 0135 01       		.byte	0x1
+ 506 0136 5E       		.byte	0x5e
+ 507 0137 00000000 		.4byte	.LFB69
+ 508 013b 50000000 		.4byte	.LFE69-.LFB69
+ 509 013f 01       		.uleb128 0x1
+ 510 0140 9C       		.byte	0x9c
+ 511 0141 8A010000 		.4byte	0x18a
+ 512 0145 0A       		.uleb128 0xa
+ 513 0146 A0020000 		.4byte	.LASF24
+ 514 014a 01       		.byte	0x1
+ 515 014b 5E       		.byte	0x5e
+ 516 014c 93000000 		.4byte	0x93
+ 517 0150 02       		.uleb128 0x2
+ 518 0151 91       		.byte	0x91
+ 519 0152 64       		.sleb128 -28
+ 520 0153 0C       		.uleb128 0xc
+ 521 0154 6C3100   		.ascii	"l1\000"
+ 522 0157 01       		.byte	0x1
+ 523 0158 60       		.byte	0x60
+ 524 0159 8A010000 		.4byte	0x18a
+ 525 015d 02       		.uleb128 0x2
+ 526 015e 91       		.byte	0x91
+ 527 015f 6C       		.sleb128 -20
+ 528 0160 0C       		.uleb128 0xc
+ 529 0161 6C3200   		.ascii	"l2\000"
+ 530 0164 01       		.byte	0x1
+ 531 0165 60       		.byte	0x60
+ 532 0166 8A010000 		.4byte	0x18a
+ 533 016a 02       		.uleb128 0x2
+ 534 016b 91       		.byte	0x91
+ 535 016c 68       		.sleb128 -24
+ 536 016d 0D       		.uleb128 0xd
+ 537 016e 8F020000 		.4byte	.LASF25
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 14
+
+
+ 538 0172 01       		.byte	0x1
+ 539 0173 61       		.byte	0x61
+ 540 0174 F6000000 		.4byte	0xf6
+ 541 0178 02       		.uleb128 0x2
+ 542 0179 91       		.byte	0x91
+ 543 017a 74       		.sleb128 -12
+ 544 017b 0D       		.uleb128 0xd
+ 545 017c 88020000 		.4byte	.LASF26
+ 546 0180 01       		.byte	0x1
+ 547 0181 62       		.byte	0x62
+ 548 0182 8F010000 		.4byte	0x18f
+ 549 0186 02       		.uleb128 0x2
+ 550 0187 91       		.byte	0x91
+ 551 0188 70       		.sleb128 -16
+ 552 0189 00       		.byte	0
+ 553 018a 06       		.uleb128 0x6
+ 554 018b 65000000 		.4byte	0x65
+ 555 018f 0E       		.uleb128 0xe
+ 556 0190 E6000000 		.4byte	0xe6
+ 557 0194 0B       		.uleb128 0xb
+ 558 0195 F0000000 		.4byte	.LASF28
+ 559 0199 01       		.byte	0x1
+ 560 019a 8A       		.byte	0x8a
+ 561 019b 00000000 		.4byte	.LFB70
+ 562 019f 84000000 		.4byte	.LFE70-.LFB70
+ 563 01a3 01       		.uleb128 0x1
+ 564 01a4 9C       		.byte	0x9c
+ 565 01a5 D4010000 		.4byte	0x1d4
+ 566 01a9 0A       		.uleb128 0xa
+ 567 01aa A0020000 		.4byte	.LASF24
+ 568 01ae 01       		.byte	0x1
+ 569 01af 8A       		.byte	0x8a
+ 570 01b0 93000000 		.4byte	0x93
+ 571 01b4 02       		.uleb128 0x2
+ 572 01b5 91       		.byte	0x91
+ 573 01b6 6C       		.sleb128 -20
+ 574 01b7 0D       		.uleb128 0xd
+ 575 01b8 88020000 		.4byte	.LASF26
+ 576 01bc 01       		.byte	0x1
+ 577 01bd 8C       		.byte	0x8c
+ 578 01be 8F010000 		.4byte	0x18f
+ 579 01c2 02       		.uleb128 0x2
+ 580 01c3 91       		.byte	0x91
+ 581 01c4 74       		.sleb128 -12
+ 582 01c5 0D       		.uleb128 0xd
+ 583 01c6 C0010000 		.4byte	.LASF23
+ 584 01ca 01       		.byte	0x1
+ 585 01cb 8D       		.byte	0x8d
+ 586 01cc DB000000 		.4byte	0xdb
+ 587 01d0 02       		.uleb128 0x2
+ 588 01d1 91       		.byte	0x91
+ 589 01d2 70       		.sleb128 -16
+ 590 01d3 00       		.byte	0
+ 591 01d4 0F       		.uleb128 0xf
+ 592 01d5 A6010000 		.4byte	.LASF42
+ 593 01d9 01       		.byte	0x1
+ 594 01da AA       		.byte	0xaa
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 15
+
+
+ 595 01db D0000000 		.4byte	0xd0
+ 596 01df 00000000 		.4byte	.LFB71
+ 597 01e3 74000000 		.4byte	.LFE71-.LFB71
+ 598 01e7 01       		.uleb128 0x1
+ 599 01e8 9C       		.byte	0x9c
+ 600 01e9 1E020000 		.4byte	0x21e
+ 601 01ed 0D       		.uleb128 0xd
+ 602 01ee 21010000 		.4byte	.LASF29
+ 603 01f2 01       		.byte	0x1
+ 604 01f3 AC       		.byte	0xac
+ 605 01f4 9C000000 		.4byte	0x9c
+ 606 01f8 05       		.uleb128 0x5
+ 607 01f9 03       		.byte	0x3
+ 608 01fa 00000000 		.4byte	usLastCreationCount.6672
+ 609 01fe 0D       		.uleb128 0xd
+ 610 01ff 9E010000 		.4byte	.LASF30
+ 611 0203 01       		.byte	0x1
+ 612 0204 AD       		.byte	0xad
+ 613 0205 D0000000 		.4byte	0xd0
+ 614 0209 02       		.uleb128 0x2
+ 615 020a 91       		.byte	0x91
+ 616 020b 74       		.sleb128 -12
+ 617 020c 0D       		.uleb128 0xd
+ 618 020d 0F010000 		.4byte	.LASF31
+ 619 0211 01       		.byte	0x1
+ 620 0212 AE       		.byte	0xae
+ 621 0213 DB000000 		.4byte	0xdb
+ 622 0217 05       		.uleb128 0x5
+ 623 0218 03       		.byte	0x3
+ 624 0219 08000000 		.4byte	uxTasksRunningNow.6674
+ 625 021d 00       		.byte	0
+ 626 021e 0D       		.uleb128 0xd
+ 627 021f 20030000 		.4byte	.LASF32
+ 628 0223 01       		.byte	0x1
+ 629 0224 44       		.byte	0x44
+ 630 0225 CB000000 		.4byte	0xcb
+ 631 0229 05       		.uleb128 0x5
+ 632 022a 03       		.byte	0x3
+ 633 022b 00000000 		.4byte	usCreationCount
+ 634 022f 0D       		.uleb128 0xd
+ 635 0230 DF020000 		.4byte	.LASF33
+ 636 0234 01       		.byte	0x1
+ 637 0235 49       		.byte	0x49
+ 638 0236 F1000000 		.4byte	0xf1
+ 639 023a 05       		.uleb128 0x5
+ 640 023b 03       		.byte	0x3
+ 641 023c 04000000 		.4byte	uxTasksRunningAtStart
+ 642 0240 0D       		.uleb128 0xd
+ 643 0241 AD020000 		.4byte	.LASF34
+ 644 0245 01       		.byte	0x1
+ 645 0246 50       		.byte	0x50
+ 646 0247 51020000 		.4byte	0x251
+ 647 024b 05       		.uleb128 0x5
+ 648 024c 03       		.byte	0x3
+ 649 024d 00000000 		.4byte	uxMaxNumberOfExtraTasksRunning
+ 650 0251 0E       		.uleb128 0xe
+ 651 0252 DB000000 		.4byte	0xdb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 16
+
+
+ 652 0256 10       		.uleb128 0x10
+ 653 0257 48010000 		.4byte	.LASF35
+ 654 025b 06       		.byte	0x6
+ 655 025c 9606     		.2byte	0x696
+ 656 025e 62020000 		.4byte	0x262
+ 657 0262 06       		.uleb128 0x6
+ 658 0263 A7000000 		.4byte	0xa7
+ 659 0267 11       		.uleb128 0x11
+ 660 0268 DC000000 		.4byte	.LASF36
+ 661 026c 01       		.byte	0x1
+ 662 026d 54       		.byte	0x54
+ 663 026e F6000000 		.4byte	0xf6
+ 664 0272 05       		.uleb128 0x5
+ 665 0273 03       		.byte	0x3
+ 666 0274 00000000 		.4byte	xCreatedTask
+ 667 0278 00       		.byte	0
+ 668              		.section	.debug_abbrev,"",%progbits
+ 669              	.Ldebug_abbrev0:
+ 670 0000 01       		.uleb128 0x1
+ 671 0001 11       		.uleb128 0x11
+ 672 0002 01       		.byte	0x1
+ 673 0003 25       		.uleb128 0x25
+ 674 0004 0E       		.uleb128 0xe
+ 675 0005 13       		.uleb128 0x13
+ 676 0006 0B       		.uleb128 0xb
+ 677 0007 03       		.uleb128 0x3
+ 678 0008 0E       		.uleb128 0xe
+ 679 0009 1B       		.uleb128 0x1b
+ 680 000a 0E       		.uleb128 0xe
+ 681 000b 55       		.uleb128 0x55
+ 682 000c 17       		.uleb128 0x17
+ 683 000d 11       		.uleb128 0x11
+ 684 000e 01       		.uleb128 0x1
+ 685 000f 10       		.uleb128 0x10
+ 686 0010 17       		.uleb128 0x17
+ 687 0011 00       		.byte	0
+ 688 0012 00       		.byte	0
+ 689 0013 02       		.uleb128 0x2
+ 690 0014 24       		.uleb128 0x24
+ 691 0015 00       		.byte	0
+ 692 0016 0B       		.uleb128 0xb
+ 693 0017 0B       		.uleb128 0xb
+ 694 0018 3E       		.uleb128 0x3e
+ 695 0019 0B       		.uleb128 0xb
+ 696 001a 03       		.uleb128 0x3
+ 697 001b 0E       		.uleb128 0xe
+ 698 001c 00       		.byte	0
+ 699 001d 00       		.byte	0
+ 700 001e 03       		.uleb128 0x3
+ 701 001f 24       		.uleb128 0x24
+ 702 0020 00       		.byte	0
+ 703 0021 0B       		.uleb128 0xb
+ 704 0022 0B       		.uleb128 0xb
+ 705 0023 3E       		.uleb128 0x3e
+ 706 0024 0B       		.uleb128 0xb
+ 707 0025 03       		.uleb128 0x3
+ 708 0026 08       		.uleb128 0x8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 17
+
+
+ 709 0027 00       		.byte	0
+ 710 0028 00       		.byte	0
+ 711 0029 04       		.uleb128 0x4
+ 712 002a 16       		.uleb128 0x16
+ 713 002b 00       		.byte	0
+ 714 002c 03       		.uleb128 0x3
+ 715 002d 0E       		.uleb128 0xe
+ 716 002e 3A       		.uleb128 0x3a
+ 717 002f 0B       		.uleb128 0xb
+ 718 0030 3B       		.uleb128 0x3b
+ 719 0031 0B       		.uleb128 0xb
+ 720 0032 49       		.uleb128 0x49
+ 721 0033 13       		.uleb128 0x13
+ 722 0034 00       		.byte	0
+ 723 0035 00       		.byte	0
+ 724 0036 05       		.uleb128 0x5
+ 725 0037 0F       		.uleb128 0xf
+ 726 0038 00       		.byte	0
+ 727 0039 0B       		.uleb128 0xb
+ 728 003a 0B       		.uleb128 0xb
+ 729 003b 00       		.byte	0
+ 730 003c 00       		.byte	0
+ 731 003d 06       		.uleb128 0x6
+ 732 003e 35       		.uleb128 0x35
+ 733 003f 00       		.byte	0
+ 734 0040 49       		.uleb128 0x49
+ 735 0041 13       		.uleb128 0x13
+ 736 0042 00       		.byte	0
+ 737 0043 00       		.byte	0
+ 738 0044 07       		.uleb128 0x7
+ 739 0045 0F       		.uleb128 0xf
+ 740 0046 00       		.byte	0
+ 741 0047 0B       		.uleb128 0xb
+ 742 0048 0B       		.uleb128 0xb
+ 743 0049 49       		.uleb128 0x49
+ 744 004a 13       		.uleb128 0x13
+ 745 004b 00       		.byte	0
+ 746 004c 00       		.byte	0
+ 747 004d 08       		.uleb128 0x8
+ 748 004e 13       		.uleb128 0x13
+ 749 004f 00       		.byte	0
+ 750 0050 03       		.uleb128 0x3
+ 751 0051 0E       		.uleb128 0xe
+ 752 0052 3C       		.uleb128 0x3c
+ 753 0053 19       		.uleb128 0x19
+ 754 0054 00       		.byte	0
+ 755 0055 00       		.byte	0
+ 756 0056 09       		.uleb128 0x9
+ 757 0057 2E       		.uleb128 0x2e
+ 758 0058 01       		.byte	0x1
+ 759 0059 3F       		.uleb128 0x3f
+ 760 005a 19       		.uleb128 0x19
+ 761 005b 03       		.uleb128 0x3
+ 762 005c 0E       		.uleb128 0xe
+ 763 005d 3A       		.uleb128 0x3a
+ 764 005e 0B       		.uleb128 0xb
+ 765 005f 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 18
+
+
+ 766 0060 0B       		.uleb128 0xb
+ 767 0061 27       		.uleb128 0x27
+ 768 0062 19       		.uleb128 0x19
+ 769 0063 11       		.uleb128 0x11
+ 770 0064 01       		.uleb128 0x1
+ 771 0065 12       		.uleb128 0x12
+ 772 0066 06       		.uleb128 0x6
+ 773 0067 40       		.uleb128 0x40
+ 774 0068 18       		.uleb128 0x18
+ 775 0069 9642     		.uleb128 0x2116
+ 776 006b 19       		.uleb128 0x19
+ 777 006c 01       		.uleb128 0x1
+ 778 006d 13       		.uleb128 0x13
+ 779 006e 00       		.byte	0
+ 780 006f 00       		.byte	0
+ 781 0070 0A       		.uleb128 0xa
+ 782 0071 05       		.uleb128 0x5
+ 783 0072 00       		.byte	0
+ 784 0073 03       		.uleb128 0x3
+ 785 0074 0E       		.uleb128 0xe
+ 786 0075 3A       		.uleb128 0x3a
+ 787 0076 0B       		.uleb128 0xb
+ 788 0077 3B       		.uleb128 0x3b
+ 789 0078 0B       		.uleb128 0xb
+ 790 0079 49       		.uleb128 0x49
+ 791 007a 13       		.uleb128 0x13
+ 792 007b 02       		.uleb128 0x2
+ 793 007c 18       		.uleb128 0x18
+ 794 007d 00       		.byte	0
+ 795 007e 00       		.byte	0
+ 796 007f 0B       		.uleb128 0xb
+ 797 0080 2E       		.uleb128 0x2e
+ 798 0081 01       		.byte	0x1
+ 799 0082 03       		.uleb128 0x3
+ 800 0083 0E       		.uleb128 0xe
+ 801 0084 3A       		.uleb128 0x3a
+ 802 0085 0B       		.uleb128 0xb
+ 803 0086 3B       		.uleb128 0x3b
+ 804 0087 0B       		.uleb128 0xb
+ 805 0088 27       		.uleb128 0x27
+ 806 0089 19       		.uleb128 0x19
+ 807 008a 11       		.uleb128 0x11
+ 808 008b 01       		.uleb128 0x1
+ 809 008c 12       		.uleb128 0x12
+ 810 008d 06       		.uleb128 0x6
+ 811 008e 40       		.uleb128 0x40
+ 812 008f 18       		.uleb128 0x18
+ 813 0090 9642     		.uleb128 0x2116
+ 814 0092 19       		.uleb128 0x19
+ 815 0093 01       		.uleb128 0x1
+ 816 0094 13       		.uleb128 0x13
+ 817 0095 00       		.byte	0
+ 818 0096 00       		.byte	0
+ 819 0097 0C       		.uleb128 0xc
+ 820 0098 34       		.uleb128 0x34
+ 821 0099 00       		.byte	0
+ 822 009a 03       		.uleb128 0x3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 19
+
+
+ 823 009b 08       		.uleb128 0x8
+ 824 009c 3A       		.uleb128 0x3a
+ 825 009d 0B       		.uleb128 0xb
+ 826 009e 3B       		.uleb128 0x3b
+ 827 009f 0B       		.uleb128 0xb
+ 828 00a0 49       		.uleb128 0x49
+ 829 00a1 13       		.uleb128 0x13
+ 830 00a2 02       		.uleb128 0x2
+ 831 00a3 18       		.uleb128 0x18
+ 832 00a4 00       		.byte	0
+ 833 00a5 00       		.byte	0
+ 834 00a6 0D       		.uleb128 0xd
+ 835 00a7 34       		.uleb128 0x34
+ 836 00a8 00       		.byte	0
+ 837 00a9 03       		.uleb128 0x3
+ 838 00aa 0E       		.uleb128 0xe
+ 839 00ab 3A       		.uleb128 0x3a
+ 840 00ac 0B       		.uleb128 0xb
+ 841 00ad 3B       		.uleb128 0x3b
+ 842 00ae 0B       		.uleb128 0xb
+ 843 00af 49       		.uleb128 0x49
+ 844 00b0 13       		.uleb128 0x13
+ 845 00b1 02       		.uleb128 0x2
+ 846 00b2 18       		.uleb128 0x18
+ 847 00b3 00       		.byte	0
+ 848 00b4 00       		.byte	0
+ 849 00b5 0E       		.uleb128 0xe
+ 850 00b6 26       		.uleb128 0x26
+ 851 00b7 00       		.byte	0
+ 852 00b8 49       		.uleb128 0x49
+ 853 00b9 13       		.uleb128 0x13
+ 854 00ba 00       		.byte	0
+ 855 00bb 00       		.byte	0
+ 856 00bc 0F       		.uleb128 0xf
+ 857 00bd 2E       		.uleb128 0x2e
+ 858 00be 01       		.byte	0x1
+ 859 00bf 3F       		.uleb128 0x3f
+ 860 00c0 19       		.uleb128 0x19
+ 861 00c1 03       		.uleb128 0x3
+ 862 00c2 0E       		.uleb128 0xe
+ 863 00c3 3A       		.uleb128 0x3a
+ 864 00c4 0B       		.uleb128 0xb
+ 865 00c5 3B       		.uleb128 0x3b
+ 866 00c6 0B       		.uleb128 0xb
+ 867 00c7 27       		.uleb128 0x27
+ 868 00c8 19       		.uleb128 0x19
+ 869 00c9 49       		.uleb128 0x49
+ 870 00ca 13       		.uleb128 0x13
+ 871 00cb 11       		.uleb128 0x11
+ 872 00cc 01       		.uleb128 0x1
+ 873 00cd 12       		.uleb128 0x12
+ 874 00ce 06       		.uleb128 0x6
+ 875 00cf 40       		.uleb128 0x40
+ 876 00d0 18       		.uleb128 0x18
+ 877 00d1 9642     		.uleb128 0x2116
+ 878 00d3 19       		.uleb128 0x19
+ 879 00d4 01       		.uleb128 0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 20
+
+
+ 880 00d5 13       		.uleb128 0x13
+ 881 00d6 00       		.byte	0
+ 882 00d7 00       		.byte	0
+ 883 00d8 10       		.uleb128 0x10
+ 884 00d9 34       		.uleb128 0x34
+ 885 00da 00       		.byte	0
+ 886 00db 03       		.uleb128 0x3
+ 887 00dc 0E       		.uleb128 0xe
+ 888 00dd 3A       		.uleb128 0x3a
+ 889 00de 0B       		.uleb128 0xb
+ 890 00df 3B       		.uleb128 0x3b
+ 891 00e0 05       		.uleb128 0x5
+ 892 00e1 49       		.uleb128 0x49
+ 893 00e2 13       		.uleb128 0x13
+ 894 00e3 3F       		.uleb128 0x3f
+ 895 00e4 19       		.uleb128 0x19
+ 896 00e5 3C       		.uleb128 0x3c
+ 897 00e6 19       		.uleb128 0x19
+ 898 00e7 00       		.byte	0
+ 899 00e8 00       		.byte	0
+ 900 00e9 11       		.uleb128 0x11
+ 901 00ea 34       		.uleb128 0x34
+ 902 00eb 00       		.byte	0
+ 903 00ec 03       		.uleb128 0x3
+ 904 00ed 0E       		.uleb128 0xe
+ 905 00ee 3A       		.uleb128 0x3a
+ 906 00ef 0B       		.uleb128 0xb
+ 907 00f0 3B       		.uleb128 0x3b
+ 908 00f1 0B       		.uleb128 0xb
+ 909 00f2 49       		.uleb128 0x49
+ 910 00f3 13       		.uleb128 0x13
+ 911 00f4 3F       		.uleb128 0x3f
+ 912 00f5 19       		.uleb128 0x19
+ 913 00f6 02       		.uleb128 0x2
+ 914 00f7 18       		.uleb128 0x18
+ 915 00f8 00       		.byte	0
+ 916 00f9 00       		.byte	0
+ 917 00fa 00       		.byte	0
+ 918              		.section	.debug_aranges,"",%progbits
+ 919 0000 34000000 		.4byte	0x34
+ 920 0004 0200     		.2byte	0x2
+ 921 0006 00000000 		.4byte	.Ldebug_info0
+ 922 000a 04       		.byte	0x4
+ 923 000b 00       		.byte	0
+ 924 000c 0000     		.2byte	0
+ 925 000e 0000     		.2byte	0
+ 926 0010 00000000 		.4byte	.LFB68
+ 927 0014 2C000000 		.4byte	.LFE68-.LFB68
+ 928 0018 00000000 		.4byte	.LFB69
+ 929 001c 50000000 		.4byte	.LFE69-.LFB69
+ 930 0020 00000000 		.4byte	.LFB70
+ 931 0024 84000000 		.4byte	.LFE70-.LFB70
+ 932 0028 00000000 		.4byte	.LFB71
+ 933 002c 74000000 		.4byte	.LFE71-.LFB71
+ 934 0030 00000000 		.4byte	0
+ 935 0034 00000000 		.4byte	0
+ 936              		.section	.debug_ranges,"",%progbits
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 21
+
+
+ 937              	.Ldebug_ranges0:
+ 938 0000 00000000 		.4byte	.LFB68
+ 939 0004 2C000000 		.4byte	.LFE68
+ 940 0008 00000000 		.4byte	.LFB69
+ 941 000c 50000000 		.4byte	.LFE69
+ 942 0010 00000000 		.4byte	.LFB70
+ 943 0014 84000000 		.4byte	.LFE70
+ 944 0018 00000000 		.4byte	.LFB71
+ 945 001c 74000000 		.4byte	.LFE71
+ 946 0020 00000000 		.4byte	0
+ 947 0024 00000000 		.4byte	0
+ 948              		.section	.debug_line,"",%progbits
+ 949              	.Ldebug_line0:
+ 950 0000 28020000 		.section	.debug_str,"MS",%progbits,1
+ 950      0200A601 
+ 950      00000201 
+ 950      FB0E0D00 
+ 950      01010101 
+ 951              	.LASF10:
+ 952 0000 6C6F6E67 		.ascii	"long long int\000"
+ 952      206C6F6E 
+ 952      6720696E 
+ 952      7400
+ 953              	.LASF27:
+ 954 000e 76537569 		.ascii	"vSuicidalTask\000"
+ 954      63696461 
+ 954      6C546173 
+ 954      6B00
+ 955              	.LASF21:
+ 956 001c 5469636B 		.ascii	"TickType_t\000"
+ 956      54797065 
+ 956      5F7400
+ 957              	.LASF38:
+ 958 0027 2E2E5C2E 		.ascii	"..\\..\\Common\\Minimal\\death.c\000"
+ 958      2E5C436F 
+ 958      6D6D6F6E 
+ 958      5C4D696E 
+ 958      696D616C 
+ 959              	.LASF6:
+ 960 0044 5F5F696E 		.ascii	"__int32_t\000"
+ 960      7433325F 
+ 960      7400
+ 961              	.LASF37:
+ 962 004e 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 962      4320342E 
+ 962      392E3320 
+ 962      32303135 
+ 962      30333033 
+ 963 0081 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 963      20726576 
+ 963      6973696F 
+ 963      6E203232 
+ 963      31323230 
+ 964 00b4 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 964      66756E63 
+ 964      74696F6E 
+ 964      2D736563 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 22
+
+
+ 964      74696F6E 
+ 965              	.LASF36:
+ 966 00dc 78437265 		.ascii	"xCreatedTask\000"
+ 966      61746564 
+ 966      5461736B 
+ 966      00
+ 967              	.LASF18:
+ 968 00e9 646F7562 		.ascii	"double\000"
+ 968      6C6500
+ 969              	.LASF28:
+ 970 00f0 76437265 		.ascii	"vCreateTasks\000"
+ 970      61746554 
+ 970      61736B73 
+ 970      00
+ 971              	.LASF17:
+ 972 00fd 666C6F61 		.ascii	"float\000"
+ 972      7400
+ 973              	.LASF20:
+ 974 0103 55426173 		.ascii	"UBaseType_t\000"
+ 974      65547970 
+ 974      655F7400 
+ 975              	.LASF31:
+ 976 010f 75785461 		.ascii	"uxTasksRunningNow\000"
+ 976      736B7352 
+ 976      756E6E69 
+ 976      6E674E6F 
+ 976      7700
+ 977              	.LASF29:
+ 978 0121 75734C61 		.ascii	"usLastCreationCount\000"
+ 978      73744372 
+ 978      65617469 
+ 978      6F6E436F 
+ 978      756E7400 
+ 979              	.LASF4:
+ 980 0135 73686F72 		.ascii	"short unsigned int\000"
+ 980      7420756E 
+ 980      7369676E 
+ 980      65642069 
+ 980      6E7400
+ 981              	.LASF35:
+ 982 0148 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 982      52784275 
+ 982      66666572 
+ 982      00
+ 983              	.LASF2:
+ 984 0155 756E7369 		.ascii	"unsigned char\000"
+ 984      676E6564 
+ 984      20636861 
+ 984      7200
+ 985              	.LASF5:
+ 986 0163 5F5F7569 		.ascii	"__uint16_t\000"
+ 986      6E743136 
+ 986      5F7400
+ 987              	.LASF9:
+ 988 016e 6C6F6E67 		.ascii	"long unsigned int\000"
+ 988      20756E73 
+ 988      69676E65 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 23
+
+
+ 988      6420696E 
+ 988      7400
+ 989              	.LASF8:
+ 990 0180 5F5F7569 		.ascii	"__uint32_t\000"
+ 990      6E743332 
+ 990      5F7400
+ 991              	.LASF40:
+ 992 018b 5461736B 		.ascii	"TaskControlBlock_t\000"
+ 992      436F6E74 
+ 992      726F6C42 
+ 992      6C6F636B 
+ 992      5F7400
+ 993              	.LASF30:
+ 994 019e 78526574 		.ascii	"xReturn\000"
+ 994      75726E00 
+ 995              	.LASF42:
+ 996 01a6 78497343 		.ascii	"xIsCreateTaskStillRunning\000"
+ 996      72656174 
+ 996      65546173 
+ 996      6B537469 
+ 996      6C6C5275 
+ 997              	.LASF23:
+ 998 01c0 75785072 		.ascii	"uxPriority\000"
+ 998      696F7269 
+ 998      747900
+ 999              	.LASF0:
+ 1000 01cb 756E7369 		.ascii	"unsigned int\000"
+ 1000      676E6564 
+ 1000      20696E74 
+ 1000      00
+ 1001              	.LASF11:
+ 1002 01d8 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1002      206C6F6E 
+ 1002      6720756E 
+ 1002      7369676E 
+ 1002      65642069 
+ 1003              	.LASF39:
+ 1004 01ef 453A5C47 		.ascii	"E:\\GitHub\\FreeRTOS\\freertos-code-2543-trunk\\fre"
+ 1004      69744875 
+ 1004      625C4672 
+ 1004      65655254 
+ 1004      4F535C66 
+ 1005 021e 6572746F 		.ascii	"ertos-code-2543-trunk\\FreeRTOS\\Demo\\CORTEX_CY8C5"
+ 1005      732D636F 
+ 1005      64652D32 
+ 1005      3534332D 
+ 1005      7472756E 
+ 1006 024e 3538385F 		.ascii	"588_PSoC_Creator_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1006      50536F43 
+ 1006      5F437265 
+ 1006      61746F72 
+ 1006      5F474343 
+ 1007              	.LASF15:
+ 1008 0277 696E7433 		.ascii	"int32_t\000"
+ 1008      325F7400 
+ 1009              	.LASF12:
+ 1010 027f 73697A65 		.ascii	"sizetype\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 24
+
+
+ 1010      74797065 
+ 1010      00
+ 1011              	.LASF26:
+ 1012 0288 7844656C 		.ascii	"xDelay\000"
+ 1012      617900
+ 1013              	.LASF25:
+ 1014 028f 78546173 		.ascii	"xTaskToKill\000"
+ 1014      6B546F4B 
+ 1014      696C6C00 
+ 1015              	.LASF13:
+ 1016 029b 63686172 		.ascii	"char\000"
+ 1016      00
+ 1017              	.LASF24:
+ 1018 02a0 70765061 		.ascii	"pvParameters\000"
+ 1018      72616D65 
+ 1018      74657273 
+ 1018      00
+ 1019              	.LASF34:
+ 1020 02ad 75784D61 		.ascii	"uxMaxNumberOfExtraTasksRunning\000"
+ 1020      784E756D 
+ 1020      6265724F 
+ 1020      66457874 
+ 1020      72615461 
+ 1021              	.LASF3:
+ 1022 02cc 73686F72 		.ascii	"short int\000"
+ 1022      7420696E 
+ 1022      7400
+ 1023              	.LASF14:
+ 1024 02d6 75696E74 		.ascii	"uint16_t\000"
+ 1024      31365F74 
+ 1024      00
+ 1025              	.LASF33:
+ 1026 02df 75785461 		.ascii	"uxTasksRunningAtStart\000"
+ 1026      736B7352 
+ 1026      756E6E69 
+ 1026      6E674174 
+ 1026      53746172 
+ 1027              	.LASF22:
+ 1028 02f5 5461736B 		.ascii	"TaskHandle_t\000"
+ 1028      48616E64 
+ 1028      6C655F74 
+ 1028      00
+ 1029              	.LASF16:
+ 1030 0302 75696E74 		.ascii	"uint32_t\000"
+ 1030      33325F74 
+ 1030      00
+ 1031              	.LASF7:
+ 1032 030b 6C6F6E67 		.ascii	"long int\000"
+ 1032      20696E74 
+ 1032      00
+ 1033              	.LASF1:
+ 1034 0314 7369676E 		.ascii	"signed char\000"
+ 1034      65642063 
+ 1034      68617200 
+ 1035              	.LASF32:
+ 1036 0320 75734372 		.ascii	"usCreationCount\000"
+ 1036      65617469 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccu0TLTk.s 			page 25
+
+
+ 1036      6F6E436F 
+ 1036      756E7400 
+ 1037              	.LASF41:
+ 1038 0330 76437265 		.ascii	"vCreateSuicidalTasks\000"
+ 1038      61746553 
+ 1038      75696369 
+ 1038      64616C54 
+ 1038      61736B73 
+ 1039              	.LASF19:
+ 1040 0345 42617365 		.ascii	"BaseType_t\000"
+ 1040      54797065 
+ 1040      5F7400
+ 1041              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

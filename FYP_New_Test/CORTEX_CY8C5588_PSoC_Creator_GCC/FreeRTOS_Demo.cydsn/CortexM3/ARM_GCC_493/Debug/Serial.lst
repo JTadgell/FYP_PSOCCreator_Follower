@@ -1,0 +1,2264 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"Serial.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	xSerialTxQueue:
+  21 0000 00000000 		.space	4
+  22              		.align	2
+  23              	xSerialRxQueue:
+  24 0004 00000000 		.space	4
+  25              		.section	.text.xSerialPortInitMinimal,"ax",%progbits
+  26              		.align	2
+  27              		.global	xSerialPortInitMinimal
+  28              		.thumb
+  29              		.thumb_func
+  30              		.type	xSerialPortInitMinimal, %function
+  31              	xSerialPortInitMinimal:
+  32              	.LFB68:
+  33              		.file 1 "Serial.c"
+   1:Serial.c      **** /*
+   2:Serial.c      ****  * FreeRTOS Kernel V10.0.1
+   3:Serial.c      ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:Serial.c      ****  *
+   5:Serial.c      ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:Serial.c      ****  * this software and associated documentation files (the "Software"), to deal in
+   7:Serial.c      ****  * the Software without restriction, including without limitation the rights to
+   8:Serial.c      ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:Serial.c      ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:Serial.c      ****  * subject to the following conditions:
+  11:Serial.c      ****  *
+  12:Serial.c      ****  * The above copyright notice and this permission notice shall be included in all
+  13:Serial.c      ****  * copies or substantial portions of the Software.
+  14:Serial.c      ****  *
+  15:Serial.c      ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:Serial.c      ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:Serial.c      ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:Serial.c      ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:Serial.c      ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:Serial.c      ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:Serial.c      ****  *
+  22:Serial.c      ****  * http://www.FreeRTOS.org
+  23:Serial.c      ****  * http://aws.amazon.com/freertos
+  24:Serial.c      ****  *
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 2
+
+
+  25:Serial.c      ****  * 1 tab == 4 spaces!
+  26:Serial.c      ****  */
+  27:Serial.c      **** 
+  28:Serial.c      **** #include <device.h>
+  29:Serial.c      **** #include "FreeRTOS.h"
+  30:Serial.c      **** #include "queue.h"
+  31:Serial.c      **** #include "task.h"
+  32:Serial.c      **** #include "serial.h"
+  33:Serial.c      **** /*---------------------------------------------------------------------------*/
+  34:Serial.c      **** 
+  35:Serial.c      **** #define serialSTRING_DELAY_TICKS		( portMAX_DELAY )
+  36:Serial.c      **** /*---------------------------------------------------------------------------*/
+  37:Serial.c      **** 
+  38:Serial.c      **** CY_ISR_PROTO( vUartRxISR );
+  39:Serial.c      **** CY_ISR_PROTO( vUartTxISR );
+  40:Serial.c      **** /*---------------------------------------------------------------------------*/
+  41:Serial.c      **** 
+  42:Serial.c      **** static QueueHandle_t xSerialTxQueue = NULL;
+  43:Serial.c      **** static QueueHandle_t xSerialRxQueue = NULL;
+  44:Serial.c      **** /*---------------------------------------------------------------------------*/
+  45:Serial.c      **** 
+  46:Serial.c      **** xComPortHandle xSerialPortInitMinimal( unsigned long ulWantedBaud, unsigned portBASE_TYPE uxQueueLe
+  47:Serial.c      **** {
+  34              		.loc 1 47 0
+  35              		.cfi_startproc
+  36              		@ args = 0, pretend = 0, frame = 8
+  37              		@ frame_needed = 1, uses_anonymous_args = 0
+  38 0000 80B5     		push	{r7, lr}
+  39              		.cfi_def_cfa_offset 8
+  40              		.cfi_offset 7, -8
+  41              		.cfi_offset 14, -4
+  42 0002 82B0     		sub	sp, sp, #8
+  43              		.cfi_def_cfa_offset 16
+  44 0004 00AF     		add	r7, sp, #0
+  45              		.cfi_def_cfa_register 7
+  46 0006 7860     		str	r0, [r7, #4]
+  47 0008 3960     		str	r1, [r7]
+  48:Serial.c      **** 	/* Configure Rx. */
+  49:Serial.c      **** 	xSerialRxQueue = xQueueCreate( uxQueueLength, sizeof( signed char ) );	
+  48              		.loc 1 49 0
+  49 000a 3868     		ldr	r0, [r7]
+  50 000c 0121     		movs	r1, #1
+  51 000e 0022     		movs	r2, #0
+  52 0010 FFF7FEFF 		bl	xQueueGenericCreate
+  53 0014 0246     		mov	r2, r0
+  54 0016 134B     		ldr	r3, .L5
+  55 0018 1A60     		str	r2, [r3]
+  50:Serial.c      **** 	isr_UART1_RX_BYTE_RECEIVED_ClearPending();
+  56              		.loc 1 50 0
+  57 001a FFF7FEFF 		bl	isr_UART1_RX_BYTE_RECEIVED_ClearPending
+  51:Serial.c      **** 	isr_UART1_RX_BYTE_RECEIVED_StartEx(vUartRxISR);
+  58              		.loc 1 51 0
+  59 001e 1248     		ldr	r0, .L5+4
+  60 0020 FFF7FEFF 		bl	isr_UART1_RX_BYTE_RECEIVED_StartEx
+  52:Serial.c      **** 
+  53:Serial.c      **** 	/* Configure Tx */
+  54:Serial.c      **** 	xSerialTxQueue = xQueueCreate( uxQueueLength, sizeof( signed char ) );
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 3
+
+
+  61              		.loc 1 54 0
+  62 0024 3868     		ldr	r0, [r7]
+  63 0026 0121     		movs	r1, #1
+  64 0028 0022     		movs	r2, #0
+  65 002a FFF7FEFF 		bl	xQueueGenericCreate
+  66 002e 0246     		mov	r2, r0
+  67 0030 0E4B     		ldr	r3, .L5+8
+  68 0032 1A60     		str	r2, [r3]
+  55:Serial.c      **** 	isr_UART1_TX_BYTE_COMPLETE_ClearPending() ;
+  69              		.loc 1 55 0
+  70 0034 FFF7FEFF 		bl	isr_UART1_TX_BYTE_COMPLETE_ClearPending
+  56:Serial.c      **** 	isr_UART1_TX_BYTE_COMPLETE_StartEx(vUartTxISR);
+  71              		.loc 1 56 0
+  72 0038 0D48     		ldr	r0, .L5+12
+  73 003a FFF7FEFF 		bl	isr_UART1_TX_BYTE_COMPLETE_StartEx
+  57:Serial.c      **** 
+  58:Serial.c      **** 	/* Clear the interrupt modes for the Tx for the time being. */
+  59:Serial.c      **** 	UART_1_SetTxInterruptMode( 0 );
+  74              		.loc 1 59 0
+  75 003e 0020     		movs	r0, #0
+  76 0040 FFF7FEFF 		bl	UART_1_SetTxInterruptMode
+  60:Serial.c      **** 
+  61:Serial.c      **** 	/* Both configured successfully. */
+  62:Serial.c      **** 	return ( xComPortHandle )( xSerialTxQueue && xSerialRxQueue );
+  77              		.loc 1 62 0
+  78 0044 094B     		ldr	r3, .L5+8
+  79 0046 1B68     		ldr	r3, [r3]
+  80 0048 002B     		cmp	r3, #0
+  81 004a 05D0     		beq	.L2
+  82              		.loc 1 62 0 is_stmt 0 discriminator 1
+  83 004c 054B     		ldr	r3, .L5
+  84 004e 1B68     		ldr	r3, [r3]
+  85 0050 002B     		cmp	r3, #0
+  86 0052 01D0     		beq	.L2
+  87              		.loc 1 62 0 discriminator 3
+  88 0054 0123     		movs	r3, #1
+  89 0056 00E0     		b	.L3
+  90              	.L2:
+  91              		.loc 1 62 0 discriminator 4
+  92 0058 0023     		movs	r3, #0
+  93              	.L3:
+  63:Serial.c      **** }
+  94              		.loc 1 63 0 is_stmt 1 discriminator 6
+  95 005a 1846     		mov	r0, r3
+  96 005c 0837     		adds	r7, r7, #8
+  97              		.cfi_def_cfa_offset 8
+  98 005e BD46     		mov	sp, r7
+  99              		.cfi_def_cfa_register 13
+ 100              		@ sp needed
+ 101 0060 80BD     		pop	{r7, pc}
+ 102              	.L6:
+ 103 0062 00BF     		.align	2
+ 104              	.L5:
+ 105 0064 04000000 		.word	xSerialRxQueue
+ 106 0068 00000000 		.word	vUartRxISR
+ 107 006c 00000000 		.word	xSerialTxQueue
+ 108 0070 00000000 		.word	vUartTxISR
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 4
+
+
+ 109              		.cfi_endproc
+ 110              	.LFE68:
+ 111              		.size	xSerialPortInitMinimal, .-xSerialPortInitMinimal
+ 112              		.section	.text.vSerialPutString,"ax",%progbits
+ 113              		.align	2
+ 114              		.global	vSerialPutString
+ 115              		.thumb
+ 116              		.thumb_func
+ 117              		.type	vSerialPutString, %function
+ 118              	vSerialPutString:
+ 119              	.LFB69:
+  64:Serial.c      **** /*---------------------------------------------------------------------------*/
+  65:Serial.c      **** 
+  66:Serial.c      **** void vSerialPutString( xComPortHandle pxPort, const signed char * const pcString, unsigned short us
+  67:Serial.c      **** {
+ 120              		.loc 1 67 0
+ 121              		.cfi_startproc
+ 122              		@ args = 0, pretend = 0, frame = 24
+ 123              		@ frame_needed = 1, uses_anonymous_args = 0
+ 124 0000 80B5     		push	{r7, lr}
+ 125              		.cfi_def_cfa_offset 8
+ 126              		.cfi_offset 7, -8
+ 127              		.cfi_offset 14, -4
+ 128 0002 86B0     		sub	sp, sp, #24
+ 129              		.cfi_def_cfa_offset 32
+ 130 0004 00AF     		add	r7, sp, #0
+ 131              		.cfi_def_cfa_register 7
+ 132 0006 F860     		str	r0, [r7, #12]
+ 133 0008 B960     		str	r1, [r7, #8]
+ 134 000a 1346     		mov	r3, r2
+ 135 000c FB80     		strh	r3, [r7, #6]	@ movhi
+  68:Serial.c      **** unsigned short usIndex = 0;
+ 136              		.loc 1 68 0
+ 137 000e 0023     		movs	r3, #0
+ 138 0010 FB82     		strh	r3, [r7, #22]	@ movhi
+  69:Serial.c      **** 
+  70:Serial.c      **** 	for( usIndex = 0; usIndex < usStringLength; usIndex++ )
+ 139              		.loc 1 70 0
+ 140 0012 0023     		movs	r3, #0
+ 141 0014 FB82     		strh	r3, [r7, #22]	@ movhi
+ 142 0016 14E0     		b	.L8
+ 143              	.L11:
+  71:Serial.c      **** 	{
+  72:Serial.c      **** 		/* Check for pre-mature end of line. */
+  73:Serial.c      **** 		if( '\0' == pcString[ usIndex ] )
+ 144              		.loc 1 73 0
+ 145 0018 FB8A     		ldrh	r3, [r7, #22]
+ 146 001a BA68     		ldr	r2, [r7, #8]
+ 147 001c 1344     		add	r3, r3, r2
+ 148 001e 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 149 0020 002B     		cmp	r3, #0
+ 150 0022 00D1     		bne	.L9
+  74:Serial.c      **** 		{
+  75:Serial.c      **** 			break;
+ 151              		.loc 1 75 0
+ 152 0024 11E0     		b	.L7
+ 153              	.L9:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 5
+
+
+  76:Serial.c      **** 		}
+  77:Serial.c      **** 		
+  78:Serial.c      **** 		/* Send out, one character at a time. */
+  79:Serial.c      **** 		if( pdTRUE != xSerialPutChar( NULL, pcString[ usIndex ], serialSTRING_DELAY_TICKS ) )
+ 154              		.loc 1 79 0
+ 155 0026 FB8A     		ldrh	r3, [r7, #22]
+ 156 0028 BA68     		ldr	r2, [r7, #8]
+ 157 002a 1344     		add	r3, r3, r2
+ 158 002c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 159 002e 5BB2     		sxtb	r3, r3
+ 160 0030 0020     		movs	r0, #0
+ 161 0032 1946     		mov	r1, r3
+ 162 0034 4FF0FF32 		mov	r2, #-1
+ 163 0038 FFF7FEFF 		bl	xSerialPutChar
+  70:Serial.c      **** 	{
+ 164              		.loc 1 70 0
+ 165 003c FB8A     		ldrh	r3, [r7, #22]
+ 166 003e 0133     		adds	r3, r3, #1
+ 167 0040 FB82     		strh	r3, [r7, #22]	@ movhi
+ 168              	.L8:
+  70:Serial.c      **** 	{
+ 169              		.loc 1 70 0 is_stmt 0 discriminator 1
+ 170 0042 FA8A     		ldrh	r2, [r7, #22]
+ 171 0044 FB88     		ldrh	r3, [r7, #6]
+ 172 0046 9A42     		cmp	r2, r3
+ 173 0048 E6D3     		bcc	.L11
+ 174              	.L7:
+  80:Serial.c      **** 		{
+  81:Serial.c      **** 			/* Failed to send, this will be picked up in the receive comtest task. */
+  82:Serial.c      **** 		}
+  83:Serial.c      **** 	}
+  84:Serial.c      **** }
+ 175              		.loc 1 84 0 is_stmt 1
+ 176 004a 1837     		adds	r7, r7, #24
+ 177              		.cfi_def_cfa_offset 8
+ 178 004c BD46     		mov	sp, r7
+ 179              		.cfi_def_cfa_register 13
+ 180              		@ sp needed
+ 181 004e 80BD     		pop	{r7, pc}
+ 182              		.cfi_endproc
+ 183              	.LFE69:
+ 184              		.size	vSerialPutString, .-vSerialPutString
+ 185              		.section	.text.xSerialGetChar,"ax",%progbits
+ 186              		.align	2
+ 187              		.global	xSerialGetChar
+ 188              		.thumb
+ 189              		.thumb_func
+ 190              		.type	xSerialGetChar, %function
+ 191              	xSerialGetChar:
+ 192              	.LFB70:
+  85:Serial.c      **** /*---------------------------------------------------------------------------*/
+  86:Serial.c      **** 
+  87:Serial.c      **** signed portBASE_TYPE xSerialGetChar( xComPortHandle pxPort, signed char *pcRxedChar, TickType_t xBl
+  88:Serial.c      **** {
+ 193              		.loc 1 88 0
+ 194              		.cfi_startproc
+ 195              		@ args = 0, pretend = 0, frame = 24
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 6
+
+
+ 196              		@ frame_needed = 1, uses_anonymous_args = 0
+ 197 0000 80B5     		push	{r7, lr}
+ 198              		.cfi_def_cfa_offset 8
+ 199              		.cfi_offset 7, -8
+ 200              		.cfi_offset 14, -4
+ 201 0002 86B0     		sub	sp, sp, #24
+ 202              		.cfi_def_cfa_offset 32
+ 203 0004 00AF     		add	r7, sp, #0
+ 204              		.cfi_def_cfa_register 7
+ 205 0006 F860     		str	r0, [r7, #12]
+ 206 0008 B960     		str	r1, [r7, #8]
+ 207 000a 7A60     		str	r2, [r7, #4]
+  89:Serial.c      **** portBASE_TYPE xReturn = pdFALSE;
+ 208              		.loc 1 89 0
+ 209 000c 0023     		movs	r3, #0
+ 210 000e 7B61     		str	r3, [r7, #20]
+  90:Serial.c      **** 
+  91:Serial.c      **** 	if( pdTRUE == xQueueReceive( xSerialRxQueue, pcRxedChar, xBlockTime ) )
+ 211              		.loc 1 91 0
+ 212 0010 084B     		ldr	r3, .L15
+ 213 0012 1B68     		ldr	r3, [r3]
+ 214 0014 1846     		mov	r0, r3
+ 215 0016 B968     		ldr	r1, [r7, #8]
+ 216 0018 7A68     		ldr	r2, [r7, #4]
+ 217 001a FFF7FEFF 		bl	xQueueReceive
+ 218 001e 0346     		mov	r3, r0
+ 219 0020 012B     		cmp	r3, #1
+ 220 0022 01D1     		bne	.L13
+  92:Serial.c      **** 	{
+  93:Serial.c      **** 		/* Picked up a character. */
+  94:Serial.c      **** 		xReturn = pdTRUE;
+ 221              		.loc 1 94 0
+ 222 0024 0123     		movs	r3, #1
+ 223 0026 7B61     		str	r3, [r7, #20]
+ 224              	.L13:
+  95:Serial.c      **** 	}
+  96:Serial.c      **** 	return xReturn;
+ 225              		.loc 1 96 0
+ 226 0028 7B69     		ldr	r3, [r7, #20]
+  97:Serial.c      **** }
+ 227              		.loc 1 97 0
+ 228 002a 1846     		mov	r0, r3
+ 229 002c 1837     		adds	r7, r7, #24
+ 230              		.cfi_def_cfa_offset 8
+ 231 002e BD46     		mov	sp, r7
+ 232              		.cfi_def_cfa_register 13
+ 233              		@ sp needed
+ 234 0030 80BD     		pop	{r7, pc}
+ 235              	.L16:
+ 236 0032 00BF     		.align	2
+ 237              	.L15:
+ 238 0034 04000000 		.word	xSerialRxQueue
+ 239              		.cfi_endproc
+ 240              	.LFE70:
+ 241              		.size	xSerialGetChar, .-xSerialGetChar
+ 242              		.section	.text.xSerialPutChar,"ax",%progbits
+ 243              		.align	2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 7
+
+
+ 244              		.global	xSerialPutChar
+ 245              		.thumb
+ 246              		.thumb_func
+ 247              		.type	xSerialPutChar, %function
+ 248              	xSerialPutChar:
+ 249              	.LFB71:
+  98:Serial.c      **** /*---------------------------------------------------------------------------*/
+  99:Serial.c      **** 
+ 100:Serial.c      **** signed portBASE_TYPE xSerialPutChar( xComPortHandle pxPort, signed char cOutChar, TickType_t xBlock
+ 101:Serial.c      **** {
+ 250              		.loc 1 101 0
+ 251              		.cfi_startproc
+ 252              		@ args = 0, pretend = 0, frame = 24
+ 253              		@ frame_needed = 1, uses_anonymous_args = 0
+ 254 0000 80B5     		push	{r7, lr}
+ 255              		.cfi_def_cfa_offset 8
+ 256              		.cfi_offset 7, -8
+ 257              		.cfi_offset 14, -4
+ 258 0002 86B0     		sub	sp, sp, #24
+ 259              		.cfi_def_cfa_offset 32
+ 260 0004 00AF     		add	r7, sp, #0
+ 261              		.cfi_def_cfa_register 7
+ 262 0006 F860     		str	r0, [r7, #12]
+ 263 0008 0B46     		mov	r3, r1
+ 264 000a 7A60     		str	r2, [r7, #4]
+ 265 000c FB72     		strb	r3, [r7, #11]
+ 102:Serial.c      **** portBASE_TYPE xReturn = pdFALSE;
+ 266              		.loc 1 102 0
+ 267 000e 0023     		movs	r3, #0
+ 268 0010 7B61     		str	r3, [r7, #20]
+ 103:Serial.c      **** 
+ 104:Serial.c      **** 	/* The ISR is processing characters is so just add to the end of the queue. */
+ 105:Serial.c      **** 	if( pdTRUE == xQueueSend( xSerialTxQueue, &cOutChar, xBlockTime ) )
+ 269              		.loc 1 105 0
+ 270 0012 0F4B     		ldr	r3, .L21
+ 271 0014 1A68     		ldr	r2, [r3]
+ 272 0016 07F10B03 		add	r3, r7, #11
+ 273 001a 1046     		mov	r0, r2
+ 274 001c 1946     		mov	r1, r3
+ 275 001e 7A68     		ldr	r2, [r7, #4]
+ 276 0020 0023     		movs	r3, #0
+ 277 0022 FFF7FEFF 		bl	xQueueGenericSend
+ 278 0026 0346     		mov	r3, r0
+ 279 0028 012B     		cmp	r3, #1
+ 280 002a 02D1     		bne	.L18
+ 106:Serial.c      **** 	{	
+ 107:Serial.c      **** 		xReturn = pdTRUE;
+ 281              		.loc 1 107 0
+ 282 002c 0123     		movs	r3, #1
+ 283 002e 7B61     		str	r3, [r7, #20]
+ 284 0030 01E0     		b	.L19
+ 285              	.L18:
+ 108:Serial.c      **** 	}
+ 109:Serial.c      **** 	else
+ 110:Serial.c      **** 	{
+ 111:Serial.c      **** 		/* The queue is probably full. */
+ 112:Serial.c      **** 		xReturn = pdFALSE;
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 8
+
+
+ 286              		.loc 1 112 0
+ 287 0032 0023     		movs	r3, #0
+ 288 0034 7B61     		str	r3, [r7, #20]
+ 289              	.L19:
+ 113:Serial.c      **** 	}
+ 114:Serial.c      **** 
+ 115:Serial.c      **** 	/* Make sure that the interrupt will fire in the case where:
+ 116:Serial.c      **** 	    Currently sending so the Tx Complete will fire.
+ 117:Serial.c      **** 	    Not sending so the Empty will fire.	*/
+ 118:Serial.c      **** 	taskENTER_CRITICAL();
+ 290              		.loc 1 118 0
+ 291 0036 FFF7FEFF 		bl	vPortEnterCritical
+ 119:Serial.c      **** 		UART_1_SetTxInterruptMode( UART_1_TX_STS_COMPLETE | UART_1_TX_STS_FIFO_EMPTY );
+ 292              		.loc 1 119 0
+ 293 003a 0320     		movs	r0, #3
+ 294 003c FFF7FEFF 		bl	UART_1_SetTxInterruptMode
+ 120:Serial.c      **** 	taskEXIT_CRITICAL();
+ 295              		.loc 1 120 0
+ 296 0040 FFF7FEFF 		bl	vPortExitCritical
+ 121:Serial.c      **** 	
+ 122:Serial.c      **** 	return xReturn;
+ 297              		.loc 1 122 0
+ 298 0044 7B69     		ldr	r3, [r7, #20]
+ 123:Serial.c      **** }
+ 299              		.loc 1 123 0
+ 300 0046 1846     		mov	r0, r3
+ 301 0048 1837     		adds	r7, r7, #24
+ 302              		.cfi_def_cfa_offset 8
+ 303 004a BD46     		mov	sp, r7
+ 304              		.cfi_def_cfa_register 13
+ 305              		@ sp needed
+ 306 004c 80BD     		pop	{r7, pc}
+ 307              	.L22:
+ 308 004e 00BF     		.align	2
+ 309              	.L21:
+ 310 0050 00000000 		.word	xSerialTxQueue
+ 311              		.cfi_endproc
+ 312              	.LFE71:
+ 313              		.size	xSerialPutChar, .-xSerialPutChar
+ 314              		.section	.text.vUartRxISR,"ax",%progbits
+ 315              		.align	2
+ 316              		.global	vUartRxISR
+ 317              		.thumb
+ 318              		.thumb_func
+ 319              		.type	vUartRxISR, %function
+ 320              	vUartRxISR:
+ 321              	.LFB72:
+ 124:Serial.c      **** /*---------------------------------------------------------------------------*/
+ 125:Serial.c      **** 
+ 126:Serial.c      **** CY_ISR(vUartRxISR)
+ 127:Serial.c      **** {
+ 322              		.loc 1 127 0
+ 323              		.cfi_startproc
+ 324              		@ args = 0, pretend = 0, frame = 24
+ 325              		@ frame_needed = 1, uses_anonymous_args = 0
+ 326 0000 80B5     		push	{r7, lr}
+ 327              		.cfi_def_cfa_offset 8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 9
+
+
+ 328              		.cfi_offset 7, -8
+ 329              		.cfi_offset 14, -4
+ 330 0002 86B0     		sub	sp, sp, #24
+ 331              		.cfi_def_cfa_offset 32
+ 332 0004 00AF     		add	r7, sp, #0
+ 333              		.cfi_def_cfa_register 7
+ 128:Serial.c      **** portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+ 334              		.loc 1 128 0
+ 335 0006 0023     		movs	r3, #0
+ 336 0008 7B60     		str	r3, [r7, #4]
+ 129:Serial.c      **** volatile unsigned char ucStatus = 0;
+ 337              		.loc 1 129 0
+ 338 000a 0023     		movs	r3, #0
+ 339 000c FB70     		strb	r3, [r7, #3]
+ 130:Serial.c      **** signed char cInChar = 0;
+ 340              		.loc 1 130 0
+ 341 000e 0023     		movs	r3, #0
+ 342 0010 BB70     		strb	r3, [r7, #2]
+ 131:Serial.c      **** unsigned long ulMask = 0;
+ 343              		.loc 1 131 0
+ 344 0012 0023     		movs	r3, #0
+ 345 0014 7B61     		str	r3, [r7, #20]
+ 132:Serial.c      **** 
+ 133:Serial.c      **** 	/* Read the status to acknowledge. */
+ 134:Serial.c      **** 	ucStatus = UART_1_ReadRxStatus();
+ 346              		.loc 1 134 0
+ 347 0016 FFF7FEFF 		bl	UART_1_ReadRxStatus
+ 348 001a 0346     		mov	r3, r0
+ 349 001c FB70     		strb	r3, [r7, #3]
+ 135:Serial.c      **** 
+ 136:Serial.c      **** 	/* Only interested in a character being received. */
+ 137:Serial.c      **** 	if( 0 != ( ucStatus & UART_1_RX_STS_FIFO_NOTEMPTY ) )
+ 350              		.loc 1 137 0
+ 351 001e FB78     		ldrb	r3, [r7, #3]
+ 352 0020 DBB2     		uxtb	r3, r3
+ 353 0022 03F02003 		and	r3, r3, #32
+ 354 0026 002B     		cmp	r3, #0
+ 355 0028 21D0     		beq	.L24
+ 138:Serial.c      **** 	{
+ 139:Serial.c      **** 		/* Get the character. */
+ 140:Serial.c      **** 		cInChar = UART_1_GetChar();
+ 356              		.loc 1 140 0
+ 357 002a FFF7FEFF 		bl	UART_1_GetChar
+ 358 002e 0346     		mov	r3, r0
+ 359 0030 DBB2     		uxtb	r3, r3
+ 360 0032 BB70     		strb	r3, [r7, #2]
+ 361              	.LBB10:
+ 362              	.LBB11:
+ 363              		.file 2 "..\\..\\FreeRTOS_Source\\portable\\GCC\\ARM_CM3/portmacro.h"
+   1:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*
+   2:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+   5:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 10
+
+
+   9:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * subject to the following conditions:
+  11:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  12:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * copies or substantial portions of the Software.
+  14:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  15:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  22:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * http://www.FreeRTOS.org
+  23:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * http://aws.amazon.com/freertos
+  24:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  25:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * 1 tab == 4 spaces!
+  26:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  */
+  27:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  28:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  29:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef PORTMACRO_H
+  30:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define PORTMACRO_H
+  31:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  32:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifdef __cplusplus
+  33:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern "C" {
+  34:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+  35:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  36:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------
+  37:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * Port specific definitions.
+  38:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  39:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * The settings in this file configure FreeRTOS correctly for the
+  40:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * given hardware and compiler.
+  41:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *
+  42:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  * These settings should not be altered.
+  43:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  *-----------------------------------------------------------
+  44:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h ****  */
+  45:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  46:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Type definitions. */
+  47:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portCHAR		char
+  48:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portFLOAT		float
+  49:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portDOUBLE		double
+  50:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portLONG		long
+  51:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSHORT		short
+  52:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSTACK_TYPE	uint32_t
+  53:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portBASE_TYPE	long
+  54:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  55:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef portSTACK_TYPE StackType_t;
+  56:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef long BaseType_t;
+  57:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** typedef unsigned long UBaseType_t;
+  58:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  59:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #if( configUSE_16_BIT_TICKS == 1 )
+  60:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	typedef uint16_t TickType_t;
+  61:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portMAX_DELAY ( TickType_t ) 0xffff
+  62:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #else
+  63:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	typedef uint32_t TickType_t;
+  64:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portMAX_DELAY ( TickType_t ) 0xffffffffUL
+  65:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 11
+
+
+  66:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
+  67:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	not need to be guarded with a critical section. */
+  68:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portTICK_TYPE_IS_ATOMIC 1
+  69:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+  70:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  71:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  72:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Architecture specifics. */
+  73:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSTACK_GROWTH			( -1 )
+  74:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTICK_PERIOD_MS			( ( TickType_t ) 1000 / configTICK_RATE_HZ )
+  75:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portBYTE_ALIGNMENT			8
+  76:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  77:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  78:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Scheduler utilities. */
+  79:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portYIELD() 															\
+  80:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {																				\
+  81:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Set a PendSV to request a context switch. */								\
+  82:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	portNVIC_INT_CTRL_REG = portNVIC_PENDSVSET_BIT;								\
+  83:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 																				\
+  84:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Barriers are normally not required but do ensure the code is completely	\
+  85:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	within the specified behaviour for the architecture. */						\
+  86:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "dsb" ::: "memory" );										\
+  87:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "isb" );													\
+  88:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+  89:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  90:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNVIC_INT_CTRL_REG		( * ( ( volatile uint32_t * ) 0xe000ed04 ) )
+  91:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNVIC_PENDSVSET_BIT		( 1UL << 28UL )
+  92:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portEND_SWITCHING_ISR( xSwitchRequired ) if( xSwitchRequired != pdFALSE ) portYIELD()
+  93:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portYIELD_FROM_ISR( x ) portEND_SWITCHING_ISR( x )
+  94:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+  95:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+  96:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Critical section management. */
+  97:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern void vPortEnterCritical( void );
+  98:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** extern void vPortExitCritical( void );
+  99:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portSET_INTERRUPT_MASK_FROM_ISR()		ulPortRaiseBASEPRI()
+ 100:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portCLEAR_INTERRUPT_MASK_FROM_ISR(x)	vPortSetBASEPRI(x)
+ 101:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portDISABLE_INTERRUPTS()				vPortRaiseBASEPRI()
+ 102:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portENABLE_INTERRUPTS()					vPortSetBASEPRI(0)
+ 103:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portENTER_CRITICAL()					vPortEnterCritical()
+ 104:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portEXIT_CRITICAL()						vPortExitCritical()
+ 105:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 106:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 107:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 108:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Task function macros as described on the FreeRTOS.org WEB site.  These are
+ 109:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** not necessary for to use this port.  They are defined so the common demo files
+ 110:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** (which build with all the ports) will build. */
+ 111:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTASK_FUNCTION_PROTO( vFunction, pvParameters ) void vFunction( void *pvParameters )
+ 112:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portTASK_FUNCTION( vFunction, pvParameters ) void vFunction( void *pvParameters )
+ 113:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 114:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 115:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Tickless idle/low power functionality. */
+ 116:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef portSUPPRESS_TICKS_AND_SLEEP
+ 117:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	extern void vPortSuppressTicksAndSleep( TickType_t xExpectedIdleTime );
+ 118:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portSUPPRESS_TICKS_AND_SLEEP( xExpectedIdleTime ) vPortSuppressTicksAndSleep( xExpectedIdl
+ 119:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 120:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 121:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 122:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* Architecture specific optimisations. */
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 12
+
+
+ 123:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
+ 124:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
+ 125:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 126:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 127:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #if configUSE_PORT_OPTIMISED_TASK_SELECTION == 1
+ 128:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 129:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Generic helper function. */
+ 130:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__attribute__( ( always_inline ) ) static inline uint8_t ucPortCountLeadingZeros( uint32_t ulBitma
+ 131:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 132:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	uint8_t ucReturn;
+ 133:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 134:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		__asm volatile ( "clz %0, %1" : "=r" ( ucReturn ) : "r" ( ulBitmap ) : "memory" );
+ 135:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		return ucReturn;
+ 136:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 137:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 138:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Check the configuration. */
+ 139:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#if( configMAX_PRIORITIES > 32 )
+ 140:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		#error configUSE_PORT_OPTIMISED_TASK_SELECTION can only be set to 1 when configMAX_PRIORITIES is 
+ 141:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#endif
+ 142:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 143:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Store/clear the ready priorities in a bit map. */
+ 144:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portRECORD_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) |= ( 1UL 
+ 145:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portRESET_READY_PRIORITY( uxPriority, uxReadyPriorities ) ( uxReadyPriorities ) &= ~( 1UL 
+ 146:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 147:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/*-----------------------------------------------------------*/
+ 148:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 149:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portGET_HIGHEST_PRIORITY( uxTopPriority, uxReadyPriorities ) uxTopPriority = ( 31UL - ( ui
+ 150:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 151:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif /* configUSE_PORT_OPTIMISED_TASK_SELECTION */
+ 152:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 153:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 154:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 155:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifdef configASSERT
+ 156:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	void vPortValidateInterruptPriority( void );
+ 157:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portASSERT_IF_INTERRUPT_PRIORITY_INVALID() 	vPortValidateInterruptPriority()
+ 158:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 159:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 160:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /* portNOP() is not required by this port. */
+ 161:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portNOP()
+ 162:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 163:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #define portINLINE	__inline
+ 164:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 165:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #ifndef portFORCE_INLINE
+ 166:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	#define portFORCE_INLINE inline __attribute__(( always_inline))
+ 167:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** #endif
+ 168:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 169:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static BaseType_t xPortIsInsideInterrupt( void )
+ 170:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 171:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** uint32_t ulCurrentInterrupt;
+ 172:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** BaseType_t xReturn;
+ 173:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 174:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* Obtain the number of the currently executing interrupt. */
+ 175:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile( "mrs %0, ipsr" : "=r"( ulCurrentInterrupt ) :: "memory" );
+ 176:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 177:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	if( ulCurrentInterrupt == 0 )
+ 178:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 179:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		xReturn = pdFALSE;
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 13
+
+
+ 180:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 181:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	else
+ 182:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	{
+ 183:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		xReturn = pdTRUE;
+ 184:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	}
+ 185:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 186:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	return xReturn;
+ 187:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+ 188:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 189:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 190:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 191:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static void vPortRaiseBASEPRI( void )
+ 192:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 193:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** uint32_t ulNewBASEPRI;
+ 194:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 195:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile
+ 196:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	(
+ 197:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	mov %0, %1												\n" \
+ 198:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	msr basepri, %0											\n" \
+ 199:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	isb														\n" \
+ 200:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	dsb														\n" \
+ 201:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		:"=r" (ulNewBASEPRI) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
+ 202:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	);
+ 203:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+ 204:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 205:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 206:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 207:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static uint32_t ulPortRaiseBASEPRI( void )
+ 208:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 209:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** uint32_t ulOriginalBASEPRI, ulNewBASEPRI;
+ 210:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 211:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile
+ 364              		.loc 2 211 0
+ 365              	@ 211 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 366 0034 EFF31182 			mrs r2, basepri											
+ 367 0038 4FF0A003 		mov r3, #160												
+ 368 003c 83F31188 		msr basepri, r3											
+ 369 0040 BFF36F8F 		isb														
+ 370 0044 BFF34F8F 		dsb														
+ 371              	
+ 372              	@ 0 "" 2
+ 373              		.thumb
+ 374 0048 3A61     		str	r2, [r7, #16]
+ 375 004a FB60     		str	r3, [r7, #12]
+ 212:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	(
+ 213:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	mrs %0, basepri											\n" \
+ 214:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	mov %1, %2												\n" \
+ 215:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	msr basepri, %1											\n" \
+ 216:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	isb														\n" \
+ 217:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		"	dsb														\n" \
+ 218:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 		:"=r" (ulOriginalBASEPRI), "=r" (ulNewBASEPRI) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "
+ 219:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	);
+ 220:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 221:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	/* This return will not be reached but is necessary to prevent compiler
+ 222:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	warnings. */
+ 223:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	return ulOriginalBASEPRI;
+ 376              		.loc 2 223 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 14
+
+
+ 377 004c 3B69     		ldr	r3, [r7, #16]
+ 378              	.LBE11:
+ 379              	.LBE10:
+ 141:Serial.c      **** 		
+ 142:Serial.c      **** 		/* Mask off the other RTOS interrupts to interact with the queue. */
+ 143:Serial.c      **** 		ulMask = portSET_INTERRUPT_MASK_FROM_ISR();
+ 380              		.loc 1 143 0
+ 381 004e 7B61     		str	r3, [r7, #20]
+ 144:Serial.c      **** 		{
+ 145:Serial.c      **** 			/* Try to deliver the character. */
+ 146:Serial.c      **** 			if( pdTRUE != xQueueSendFromISR( xSerialRxQueue, &cInChar, &xHigherPriorityTaskWoken ) )
+ 382              		.loc 1 146 0
+ 383 0050 0E4B     		ldr	r3, .L27
+ 384 0052 1968     		ldr	r1, [r3]
+ 385 0054 BA1C     		adds	r2, r7, #2
+ 386 0056 3B1D     		adds	r3, r7, #4
+ 387 0058 0846     		mov	r0, r1
+ 388 005a 1146     		mov	r1, r2
+ 389 005c 1A46     		mov	r2, r3
+ 390 005e 0023     		movs	r3, #0
+ 391 0060 FFF7FEFF 		bl	xQueueGenericSendFromISR
+ 392 0064 7B69     		ldr	r3, [r7, #20]
+ 393 0066 BB60     		str	r3, [r7, #8]
+ 394              	.LBB12:
+ 395              	.LBB13:
+ 224:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+ 225:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** /*-----------------------------------------------------------*/
+ 226:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 
+ 227:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** portFORCE_INLINE static void vPortSetBASEPRI( uint32_t ulNewMaskValue )
+ 228:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** {
+ 229:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	__asm volatile
+ 396              		.loc 2 229 0
+ 397 0068 BB68     		ldr	r3, [r7, #8]
+ 398              	@ 229 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 399 006a 83F31188 			msr basepri, r3	
+ 400              	@ 0 "" 2
+ 401              		.thumb
+ 402              	.L24:
+ 403              	.LBE13:
+ 404              	.LBE12:
+ 147:Serial.c      **** 			{
+ 148:Serial.c      **** 				/* Run out of space. */
+ 149:Serial.c      **** 			}
+ 150:Serial.c      **** 		}
+ 151:Serial.c      **** 		portCLEAR_INTERRUPT_MASK_FROM_ISR( ulMask );
+ 152:Serial.c      **** 	}
+ 153:Serial.c      **** 
+ 154:Serial.c      **** 	/* If we delivered the character then a context switch might be required.
+ 155:Serial.c      **** 	xHigherPriorityTaskWoken was set to pdFALSE on interrupt entry.  If calling 
+ 156:Serial.c      **** 	xQueueSendFromISR() caused a task to unblock, and the unblocked task has
+ 157:Serial.c      **** 	a priority equal to or higher than the currently running task (the task this
+ 158:Serial.c      **** 	ISR interrupted), then xHigherPriorityTaskWoken will have been set to pdTRUE and
+ 159:Serial.c      **** 	portEND_SWITCHING_ISR() will request a context switch to the newly unblocked
+ 160:Serial.c      **** 	task. */
+ 161:Serial.c      **** 	portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+ 405              		.loc 1 161 0
+ 406 006e 7B68     		ldr	r3, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 15
+
+
+ 407 0070 002B     		cmp	r3, #0
+ 408 0072 07D0     		beq	.L23
+ 409              		.loc 1 161 0 is_stmt 0 discriminator 1
+ 410 0074 064B     		ldr	r3, .L27+4
+ 411 0076 4FF08052 		mov	r2, #268435456
+ 412 007a 1A60     		str	r2, [r3]
+ 413              	@ 161 "Serial.c" 1
+ 414 007c BFF34F8F 		dsb
+ 415              	@ 0 "" 2
+ 416              	@ 161 "Serial.c" 1
+ 417 0080 BFF36F8F 		isb
+ 418              	@ 0 "" 2
+ 419              		.thumb
+ 420              	.L23:
+ 162:Serial.c      **** }
+ 421              		.loc 1 162 0 is_stmt 1
+ 422 0084 1837     		adds	r7, r7, #24
+ 423              		.cfi_def_cfa_offset 8
+ 424 0086 BD46     		mov	sp, r7
+ 425              		.cfi_def_cfa_register 13
+ 426              		@ sp needed
+ 427 0088 80BD     		pop	{r7, pc}
+ 428              	.L28:
+ 429 008a 00BF     		.align	2
+ 430              	.L27:
+ 431 008c 04000000 		.word	xSerialRxQueue
+ 432 0090 04ED00E0 		.word	-536810236
+ 433              		.cfi_endproc
+ 434              	.LFE72:
+ 435              		.size	vUartRxISR, .-vUartRxISR
+ 436              		.section	.text.vUartTxISR,"ax",%progbits
+ 437              		.align	2
+ 438              		.global	vUartTxISR
+ 439              		.thumb
+ 440              		.thumb_func
+ 441              		.type	vUartTxISR, %function
+ 442              	vUartTxISR:
+ 443              	.LFB73:
+ 163:Serial.c      **** /*---------------------------------------------------------------------------*/
+ 164:Serial.c      **** 
+ 165:Serial.c      **** CY_ISR(vUartTxISR)
+ 166:Serial.c      **** {
+ 444              		.loc 1 166 0
+ 445              		.cfi_startproc
+ 446              		@ args = 0, pretend = 0, frame = 24
+ 447              		@ frame_needed = 1, uses_anonymous_args = 0
+ 448 0000 80B5     		push	{r7, lr}
+ 449              		.cfi_def_cfa_offset 8
+ 450              		.cfi_offset 7, -8
+ 451              		.cfi_offset 14, -4
+ 452 0002 86B0     		sub	sp, sp, #24
+ 453              		.cfi_def_cfa_offset 32
+ 454 0004 00AF     		add	r7, sp, #0
+ 455              		.cfi_def_cfa_register 7
+ 167:Serial.c      **** portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+ 456              		.loc 1 167 0
+ 457 0006 0023     		movs	r3, #0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 16
+
+
+ 458 0008 7B60     		str	r3, [r7, #4]
+ 168:Serial.c      **** volatile unsigned char ucStatus = 0;
+ 459              		.loc 1 168 0
+ 460 000a 0023     		movs	r3, #0
+ 461 000c FB70     		strb	r3, [r7, #3]
+ 169:Serial.c      **** signed char cOutChar = 0;
+ 462              		.loc 1 169 0
+ 463 000e 0023     		movs	r3, #0
+ 464 0010 BB70     		strb	r3, [r7, #2]
+ 170:Serial.c      **** unsigned long ulMask = 0;
+ 465              		.loc 1 170 0
+ 466 0012 0023     		movs	r3, #0
+ 467 0014 7B61     		str	r3, [r7, #20]
+ 171:Serial.c      **** 
+ 172:Serial.c      **** 	/* Read the status to acknowledge. */
+ 173:Serial.c      **** 	ucStatus = UART_1_ReadTxStatus();
+ 468              		.loc 1 173 0
+ 469 0016 FFF7FEFF 		bl	UART_1_ReadTxStatus
+ 470 001a 0346     		mov	r3, r0
+ 471 001c FB70     		strb	r3, [r7, #3]
+ 174:Serial.c      **** 	
+ 175:Serial.c      **** 	/* Check to see whether this is a genuine interrupt. */
+ 176:Serial.c      **** 	if( ( 0 != ( ucStatus & UART_1_TX_STS_COMPLETE ) ) || ( 0 != ( ucStatus & UART_1_TX_STS_FIFO_EMPTY
+ 472              		.loc 1 176 0
+ 473 001e FB78     		ldrb	r3, [r7, #3]
+ 474 0020 DBB2     		uxtb	r3, r3
+ 475 0022 03F00103 		and	r3, r3, #1
+ 476 0026 002B     		cmp	r3, #0
+ 477 0028 05D1     		bne	.L30
+ 478              		.loc 1 176 0 is_stmt 0 discriminator 1
+ 479 002a FB78     		ldrb	r3, [r7, #3]
+ 480 002c DBB2     		uxtb	r3, r3
+ 481 002e 03F00203 		and	r3, r3, #2
+ 482 0032 002B     		cmp	r3, #0
+ 483 0034 2AD0     		beq	.L31
+ 484              	.L30:
+ 485              	.LBB14:
+ 486              	.LBB15:
+ 211:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** 	(
+ 487              		.loc 2 211 0 is_stmt 1
+ 488              	@ 211 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 489 0036 EFF31182 			mrs r2, basepri											
+ 490 003a 4FF0A003 		mov r3, #160												
+ 491 003e 83F31188 		msr basepri, r3											
+ 492 0042 BFF36F8F 		isb														
+ 493 0046 BFF34F8F 		dsb														
+ 494              	
+ 495              	@ 0 "" 2
+ 496              		.thumb
+ 497 004a 3A61     		str	r2, [r7, #16]
+ 498 004c FB60     		str	r3, [r7, #12]
+ 223:..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h **** }
+ 499              		.loc 2 223 0
+ 500 004e 3B69     		ldr	r3, [r7, #16]
+ 501              	.LBE15:
+ 502              	.LBE14:
+ 177:Serial.c      **** 	{	
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 17
+
+
+ 178:Serial.c      **** 		/* Mask off the other RTOS interrupts to interact with the queue. */
+ 179:Serial.c      **** 		ulMask = portSET_INTERRUPT_MASK_FROM_ISR();
+ 503              		.loc 1 179 0
+ 504 0050 7B61     		str	r3, [r7, #20]
+ 180:Serial.c      **** 		{
+ 181:Serial.c      **** 			if( pdTRUE == xQueueReceiveFromISR( xSerialTxQueue, &cOutChar, &xHigherPriorityTaskWoken ) )
+ 505              		.loc 1 181 0
+ 506 0052 154B     		ldr	r3, .L36
+ 507 0054 1968     		ldr	r1, [r3]
+ 508 0056 BA1C     		adds	r2, r7, #2
+ 509 0058 3B1D     		adds	r3, r7, #4
+ 510 005a 0846     		mov	r0, r1
+ 511 005c 1146     		mov	r1, r2
+ 512 005e 1A46     		mov	r2, r3
+ 513 0060 FFF7FEFF 		bl	xQueueReceiveFromISR
+ 514 0064 0346     		mov	r3, r0
+ 515 0066 012B     		cmp	r3, #1
+ 516 0068 08D1     		bne	.L33
+ 182:Serial.c      **** 			{
+ 183:Serial.c      **** 				/* Send the next character. */
+ 184:Serial.c      **** 				UART_1_PutChar( cOutChar );			
+ 517              		.loc 1 184 0
+ 518 006a BB78     		ldrb	r3, [r7, #2]	@ zero_extendqisi2
+ 519 006c DBB2     		uxtb	r3, r3
+ 520 006e 1846     		mov	r0, r3
+ 521 0070 FFF7FEFF 		bl	UART_1_PutChar
+ 185:Serial.c      **** 
+ 186:Serial.c      **** 				/* If we are firing, then the only interrupt we are interested in
+ 187:Serial.c      **** 				is the Complete. The application code will add the Empty interrupt
+ 188:Serial.c      **** 				when there is something else to be done. */
+ 189:Serial.c      **** 				UART_1_SetTxInterruptMode( UART_1_TX_STS_COMPLETE );
+ 522              		.loc 1 189 0
+ 523 0074 0120     		movs	r0, #1
+ 524 0076 FFF7FEFF 		bl	UART_1_SetTxInterruptMode
+ 525 007a 02E0     		b	.L34
+ 526              	.L33:
+ 190:Serial.c      **** 			}
+ 191:Serial.c      **** 			else
+ 192:Serial.c      **** 			{
+ 193:Serial.c      **** 				/* There is no work left so disable the interrupt until the application 
+ 194:Serial.c      **** 				puts more into the queue. */
+ 195:Serial.c      **** 				UART_1_SetTxInterruptMode( 0 );
+ 527              		.loc 1 195 0
+ 528 007c 0020     		movs	r0, #0
+ 529 007e FFF7FEFF 		bl	UART_1_SetTxInterruptMode
+ 530              	.L34:
+ 531 0082 7B69     		ldr	r3, [r7, #20]
+ 532 0084 BB60     		str	r3, [r7, #8]
+ 533              	.LBB16:
+ 534              	.LBB17:
+ 535              		.loc 2 229 0
+ 536 0086 BB68     		ldr	r3, [r7, #8]
+ 537              	@ 229 "..\..\FreeRTOS_Source\portable\GCC\ARM_CM3/portmacro.h" 1
+ 538 0088 83F31188 			msr basepri, r3	
+ 539              	@ 0 "" 2
+ 540              		.thumb
+ 541              	.L31:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 18
+
+
+ 542              	.LBE17:
+ 543              	.LBE16:
+ 196:Serial.c      **** 			}
+ 197:Serial.c      **** 		}
+ 198:Serial.c      **** 		portCLEAR_INTERRUPT_MASK_FROM_ISR( ulMask );
+ 199:Serial.c      **** 	}
+ 200:Serial.c      **** 
+ 201:Serial.c      **** 	/* If we delivered the character then a context switch might be required.
+ 202:Serial.c      **** 	xHigherPriorityTaskWoken was set to pdFALSE on interrupt entry.  If calling 
+ 203:Serial.c      **** 	xQueueSendFromISR() caused a task to unblock, and the unblocked task has
+ 204:Serial.c      **** 	a priority equal to or higher than the currently running task (the task this
+ 205:Serial.c      **** 	ISR interrupted), then xHigherPriorityTaskWoken will have been set to pdTRUE and
+ 206:Serial.c      **** 	portEND_SWITCHING_ISR() will request a context switch to the newly unblocked
+ 207:Serial.c      **** 	task. */
+ 208:Serial.c      **** 	portEND_SWITCHING_ISR( xHigherPriorityTaskWoken );
+ 544              		.loc 1 208 0
+ 545 008c 7B68     		ldr	r3, [r7, #4]
+ 546 008e 002B     		cmp	r3, #0
+ 547 0090 07D0     		beq	.L29
+ 548              		.loc 1 208 0 is_stmt 0 discriminator 1
+ 549 0092 064B     		ldr	r3, .L36+4
+ 550 0094 4FF08052 		mov	r2, #268435456
+ 551 0098 1A60     		str	r2, [r3]
+ 552              	@ 208 "Serial.c" 1
+ 553 009a BFF34F8F 		dsb
+ 554              	@ 0 "" 2
+ 555              	@ 208 "Serial.c" 1
+ 556 009e BFF36F8F 		isb
+ 557              	@ 0 "" 2
+ 558              		.thumb
+ 559              	.L29:
+ 209:Serial.c      **** }
+ 560              		.loc 1 209 0 is_stmt 1
+ 561 00a2 1837     		adds	r7, r7, #24
+ 562              		.cfi_def_cfa_offset 8
+ 563 00a4 BD46     		mov	sp, r7
+ 564              		.cfi_def_cfa_register 13
+ 565              		@ sp needed
+ 566 00a6 80BD     		pop	{r7, pc}
+ 567              	.L37:
+ 568              		.align	2
+ 569              	.L36:
+ 570 00a8 00000000 		.word	xSerialTxQueue
+ 571 00ac 04ED00E0 		.word	-536810236
+ 572              		.cfi_endproc
+ 573              	.LFE73:
+ 574              		.size	vUartTxISR, .-vUartTxISR
+ 575              		.text
+ 576              	.Letext0:
+ 577              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 578              		.file 4 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 579              		.file 5 "Generated_Source\\PSoC5/cytypes.h"
+ 580              		.file 6 "..\\..\\FreeRTOS_Source\\include/queue.h"
+ 581              		.file 7 "..\\..\\FreeRTOS_Source\\include/serial.h"
+ 582              		.file 8 "Generated_Source\\PSoC5/core_cm3.h"
+ 583              		.section	.debug_info,"",%progbits
+ 584              	.Ldebug_info0:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 19
+
+
+ 585 0000 DD030000 		.4byte	0x3dd
+ 586 0004 0400     		.2byte	0x4
+ 587 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 588 000a 04       		.byte	0x4
+ 589 000b 01       		.uleb128 0x1
+ 590 000c 6E000000 		.4byte	.LASF48
+ 591 0010 01       		.byte	0x1
+ 592 0011 CF010000 		.4byte	.LASF49
+ 593 0015 02020000 		.4byte	.LASF50
+ 594 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 595 001d 00000000 		.4byte	0
+ 596 0021 00000000 		.4byte	.Ldebug_line0
+ 597 0025 02       		.uleb128 0x2
+ 598 0026 01       		.byte	0x1
+ 599 0027 06       		.byte	0x6
+ 600 0028 4E030000 		.4byte	.LASF0
+ 601 002c 03       		.uleb128 0x3
+ 602 002d 40000000 		.4byte	.LASF4
+ 603 0031 03       		.byte	0x3
+ 604 0032 1D       		.byte	0x1d
+ 605 0033 37000000 		.4byte	0x37
+ 606 0037 02       		.uleb128 0x2
+ 607 0038 01       		.byte	0x1
+ 608 0039 08       		.byte	0x8
+ 609 003a 4C010000 		.4byte	.LASF1
+ 610 003e 02       		.uleb128 0x2
+ 611 003f 02       		.byte	0x2
+ 612 0040 05       		.byte	0x5
+ 613 0041 F8020000 		.4byte	.LASF2
+ 614 0045 02       		.uleb128 0x2
+ 615 0046 02       		.byte	0x2
+ 616 0047 07       		.byte	0x7
+ 617 0048 7E010000 		.4byte	.LASF3
+ 618 004c 03       		.uleb128 0x3
+ 619 004d 64000000 		.4byte	.LASF5
+ 620 0051 03       		.byte	0x3
+ 621 0052 3F       		.byte	0x3f
+ 622 0053 57000000 		.4byte	0x57
+ 623 0057 02       		.uleb128 0x2
+ 624 0058 04       		.byte	0x4
+ 625 0059 05       		.byte	0x5
+ 626 005a 91010000 		.4byte	.LASF6
+ 627 005e 03       		.uleb128 0x3
+ 628 005f 61010000 		.4byte	.LASF7
+ 629 0063 03       		.byte	0x3
+ 630 0064 41       		.byte	0x41
+ 631 0065 69000000 		.4byte	0x69
+ 632 0069 02       		.uleb128 0x2
+ 633 006a 04       		.byte	0x4
+ 634 006b 07       		.byte	0x7
+ 635 006c 6C010000 		.4byte	.LASF8
+ 636 0070 02       		.uleb128 0x2
+ 637 0071 08       		.byte	0x8
+ 638 0072 05       		.byte	0x5
+ 639 0073 AA020000 		.4byte	.LASF9
+ 640 0077 02       		.uleb128 0x2
+ 641 0078 08       		.byte	0x8
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 20
+
+
+ 642 0079 07       		.byte	0x7
+ 643 007a 4E020000 		.4byte	.LASF10
+ 644 007e 04       		.uleb128 0x4
+ 645 007f 04       		.byte	0x4
+ 646 0080 05       		.byte	0x5
+ 647 0081 696E7400 		.ascii	"int\000"
+ 648 0085 02       		.uleb128 0x2
+ 649 0086 04       		.byte	0x4
+ 650 0087 07       		.byte	0x7
+ 651 0088 F5010000 		.4byte	.LASF11
+ 652 008c 03       		.uleb128 0x3
+ 653 008d 65020000 		.4byte	.LASF12
+ 654 0091 04       		.byte	0x4
+ 655 0092 15       		.byte	0x15
+ 656 0093 2C000000 		.4byte	0x2c
+ 657 0097 03       		.uleb128 0x3
+ 658 0098 D7020000 		.4byte	.LASF13
+ 659 009c 04       		.byte	0x4
+ 660 009d 2C       		.byte	0x2c
+ 661 009e 4C000000 		.4byte	0x4c
+ 662 00a2 03       		.uleb128 0x3
+ 663 00a3 27030000 		.4byte	.LASF14
+ 664 00a7 04       		.byte	0x4
+ 665 00a8 2D       		.byte	0x2d
+ 666 00a9 5E000000 		.4byte	0x5e
+ 667 00ad 05       		.uleb128 0x5
+ 668 00ae 02030000 		.4byte	.LASF15
+ 669 00b2 05       		.byte	0x5
+ 670 00b3 9201     		.2byte	0x192
+ 671 00b5 37000000 		.4byte	0x37
+ 672 00b9 02       		.uleb128 0x2
+ 673 00ba 04       		.byte	0x4
+ 674 00bb 04       		.byte	0x4
+ 675 00bc 46010000 		.4byte	.LASF16
+ 676 00c0 02       		.uleb128 0x2
+ 677 00c1 08       		.byte	0x8
+ 678 00c2 04       		.byte	0x4
+ 679 00c3 BB010000 		.4byte	.LASF17
+ 680 00c7 02       		.uleb128 0x2
+ 681 00c8 01       		.byte	0x1
+ 682 00c9 08       		.byte	0x8
+ 683 00ca B8020000 		.4byte	.LASF18
+ 684 00ce 02       		.uleb128 0x2
+ 685 00cf 04       		.byte	0x4
+ 686 00d0 07       		.byte	0x7
+ 687 00d1 A1020000 		.4byte	.LASF19
+ 688 00d5 06       		.uleb128 0x6
+ 689 00d6 04       		.byte	0x4
+ 690 00d7 03       		.uleb128 0x3
+ 691 00d8 5A030000 		.4byte	.LASF20
+ 692 00dc 02       		.byte	0x2
+ 693 00dd 38       		.byte	0x38
+ 694 00de 57000000 		.4byte	0x57
+ 695 00e2 03       		.uleb128 0x3
+ 696 00e3 35000000 		.4byte	.LASF21
+ 697 00e7 02       		.byte	0x2
+ 698 00e8 3F       		.byte	0x3f
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 21
+
+
+ 699 00e9 A2000000 		.4byte	0xa2
+ 700 00ed 03       		.uleb128 0x3
+ 701 00ee FC000000 		.4byte	.LASF22
+ 702 00f2 06       		.byte	0x6
+ 703 00f3 2E       		.byte	0x2e
+ 704 00f4 D5000000 		.4byte	0xd5
+ 705 00f8 03       		.uleb128 0x3
+ 706 00f9 55000000 		.4byte	.LASF23
+ 707 00fd 07       		.byte	0x7
+ 708 00fe 1F       		.byte	0x1f
+ 709 00ff D5000000 		.4byte	0xd5
+ 710 0103 07       		.uleb128 0x7
+ 711 0104 22000000 		.4byte	.LASF51
+ 712 0108 02       		.byte	0x2
+ 713 0109 CF       		.byte	0xcf
+ 714 010a A2000000 		.4byte	0xa2
+ 715 010e 03       		.byte	0x3
+ 716 010f 2A010000 		.4byte	0x12a
+ 717 0113 08       		.uleb128 0x8
+ 718 0114 C5020000 		.4byte	.LASF24
+ 719 0118 02       		.byte	0x2
+ 720 0119 D1       		.byte	0xd1
+ 721 011a A2000000 		.4byte	0xa2
+ 722 011e 08       		.uleb128 0x8
+ 723 011f C2010000 		.4byte	.LASF25
+ 724 0123 02       		.byte	0x2
+ 725 0124 D1       		.byte	0xd1
+ 726 0125 A2000000 		.4byte	0xa2
+ 727 0129 00       		.byte	0
+ 728 012a 09       		.uleb128 0x9
+ 729 012b E5010000 		.4byte	.LASF52
+ 730 012f 02       		.byte	0x2
+ 731 0130 E3       		.byte	0xe3
+ 732 0131 03       		.byte	0x3
+ 733 0132 42010000 		.4byte	0x142
+ 734 0136 0A       		.uleb128 0xa
+ 735 0137 30030000 		.4byte	.LASF53
+ 736 013b 02       		.byte	0x2
+ 737 013c E3       		.byte	0xe3
+ 738 013d A2000000 		.4byte	0xa2
+ 739 0141 00       		.byte	0
+ 740 0142 0B       		.uleb128 0xb
+ 741 0143 0B000000 		.4byte	.LASF31
+ 742 0147 01       		.byte	0x1
+ 743 0148 2E       		.byte	0x2e
+ 744 0149 F8000000 		.4byte	0xf8
+ 745 014d 00000000 		.4byte	.LFB68
+ 746 0151 74000000 		.4byte	.LFE68-.LFB68
+ 747 0155 01       		.uleb128 0x1
+ 748 0156 9C       		.byte	0x9c
+ 749 0157 78010000 		.4byte	0x178
+ 750 015b 0C       		.uleb128 0xc
+ 751 015c 19010000 		.4byte	.LASF26
+ 752 0160 01       		.byte	0x1
+ 753 0161 2E       		.byte	0x2e
+ 754 0162 69000000 		.4byte	0x69
+ 755 0166 02       		.uleb128 0x2
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 22
+
+
+ 756 0167 91       		.byte	0x91
+ 757 0168 74       		.sleb128 -12
+ 758 0169 0C       		.uleb128 0xc
+ 759 016a 08030000 		.4byte	.LASF27
+ 760 016e 01       		.byte	0x1
+ 761 016f 2E       		.byte	0x2e
+ 762 0170 69000000 		.4byte	0x69
+ 763 0174 02       		.uleb128 0x2
+ 764 0175 91       		.byte	0x91
+ 765 0176 70       		.sleb128 -16
+ 766 0177 00       		.byte	0
+ 767 0178 0D       		.uleb128 0xd
+ 768 0179 26010000 		.4byte	.LASF39
+ 769 017d 01       		.byte	0x1
+ 770 017e 42       		.byte	0x42
+ 771 017f 00000000 		.4byte	.LFB69
+ 772 0183 50000000 		.4byte	.LFE69-.LFB69
+ 773 0187 01       		.uleb128 0x1
+ 774 0188 9C       		.byte	0x9c
+ 775 0189 C6010000 		.4byte	0x1c6
+ 776 018d 0C       		.uleb128 0xc
+ 777 018e 5A010000 		.4byte	.LASF28
+ 778 0192 01       		.byte	0x1
+ 779 0193 42       		.byte	0x42
+ 780 0194 F8000000 		.4byte	0xf8
+ 781 0198 02       		.uleb128 0x2
+ 782 0199 91       		.byte	0x91
+ 783 019a 6C       		.sleb128 -20
+ 784 019b 0C       		.uleb128 0xc
+ 785 019c B2010000 		.4byte	.LASF29
+ 786 01a0 01       		.byte	0x1
+ 787 01a1 42       		.byte	0x42
+ 788 01a2 C6010000 		.4byte	0x1c6
+ 789 01a6 02       		.uleb128 0x2
+ 790 01a7 91       		.byte	0x91
+ 791 01a8 68       		.sleb128 -24
+ 792 01a9 0C       		.uleb128 0xc
+ 793 01aa 78020000 		.4byte	.LASF30
+ 794 01ae 01       		.byte	0x1
+ 795 01af 42       		.byte	0x42
+ 796 01b0 45000000 		.4byte	0x45
+ 797 01b4 02       		.uleb128 0x2
+ 798 01b5 91       		.byte	0x91
+ 799 01b6 66       		.sleb128 -26
+ 800 01b7 0E       		.uleb128 0xe
+ 801 01b8 16030000 		.4byte	.LASF35
+ 802 01bc 01       		.byte	0x1
+ 803 01bd 44       		.byte	0x44
+ 804 01be 45000000 		.4byte	0x45
+ 805 01c2 02       		.uleb128 0x2
+ 806 01c3 91       		.byte	0x91
+ 807 01c4 76       		.sleb128 -10
+ 808 01c5 00       		.byte	0
+ 809 01c6 0F       		.uleb128 0xf
+ 810 01c7 CB010000 		.4byte	0x1cb
+ 811 01cb 10       		.uleb128 0x10
+ 812 01cc 04       		.byte	0x4
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 23
+
+
+ 813 01cd D1010000 		.4byte	0x1d1
+ 814 01d1 0F       		.uleb128 0xf
+ 815 01d2 25000000 		.4byte	0x25
+ 816 01d6 0B       		.uleb128 0xb
+ 817 01d7 87020000 		.4byte	.LASF32
+ 818 01db 01       		.byte	0x1
+ 819 01dc 57       		.byte	0x57
+ 820 01dd 57000000 		.4byte	0x57
+ 821 01e1 00000000 		.4byte	.LFB70
+ 822 01e5 38000000 		.4byte	.LFE70-.LFB70
+ 823 01e9 01       		.uleb128 0x1
+ 824 01ea 9C       		.byte	0x9c
+ 825 01eb 28020000 		.4byte	0x228
+ 826 01ef 0C       		.uleb128 0xc
+ 827 01f0 5A010000 		.4byte	.LASF28
+ 828 01f4 01       		.byte	0x1
+ 829 01f5 57       		.byte	0x57
+ 830 01f6 F8000000 		.4byte	0xf8
+ 831 01fa 02       		.uleb128 0x2
+ 832 01fb 91       		.byte	0x91
+ 833 01fc 6C       		.sleb128 -20
+ 834 01fd 0C       		.uleb128 0xc
+ 835 01fe 00000000 		.4byte	.LASF33
+ 836 0202 01       		.byte	0x1
+ 837 0203 57       		.byte	0x57
+ 838 0204 28020000 		.4byte	0x228
+ 839 0208 02       		.uleb128 0x2
+ 840 0209 91       		.byte	0x91
+ 841 020a 68       		.sleb128 -24
+ 842 020b 0C       		.uleb128 0xc
+ 843 020c 96020000 		.4byte	.LASF34
+ 844 0210 01       		.byte	0x1
+ 845 0211 57       		.byte	0x57
+ 846 0212 E2000000 		.4byte	0xe2
+ 847 0216 02       		.uleb128 0x2
+ 848 0217 91       		.byte	0x91
+ 849 0218 64       		.sleb128 -28
+ 850 0219 0E       		.uleb128 0xe
+ 851 021a 46030000 		.4byte	.LASF36
+ 852 021e 01       		.byte	0x1
+ 853 021f 59       		.byte	0x59
+ 854 0220 57000000 		.4byte	0x57
+ 855 0224 02       		.uleb128 0x2
+ 856 0225 91       		.byte	0x91
+ 857 0226 74       		.sleb128 -12
+ 858 0227 00       		.byte	0
+ 859 0228 10       		.uleb128 0x10
+ 860 0229 04       		.byte	0x4
+ 861 022a 25000000 		.4byte	0x25
+ 862 022e 0B       		.uleb128 0xb
+ 863 022f A3010000 		.4byte	.LASF37
+ 864 0233 01       		.byte	0x1
+ 865 0234 64       		.byte	0x64
+ 866 0235 57000000 		.4byte	0x57
+ 867 0239 00000000 		.4byte	.LFB71
+ 868 023d 54000000 		.4byte	.LFE71-.LFB71
+ 869 0241 01       		.uleb128 0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 24
+
+
+ 870 0242 9C       		.byte	0x9c
+ 871 0243 80020000 		.4byte	0x280
+ 872 0247 0C       		.uleb128 0xc
+ 873 0248 5A010000 		.4byte	.LASF28
+ 874 024c 01       		.byte	0x1
+ 875 024d 64       		.byte	0x64
+ 876 024e F8000000 		.4byte	0xf8
+ 877 0252 02       		.uleb128 0x2
+ 878 0253 91       		.byte	0x91
+ 879 0254 6C       		.sleb128 -20
+ 880 0255 0C       		.uleb128 0xc
+ 881 0256 9A010000 		.4byte	.LASF38
+ 882 025a 01       		.byte	0x1
+ 883 025b 64       		.byte	0x64
+ 884 025c 25000000 		.4byte	0x25
+ 885 0260 02       		.uleb128 0x2
+ 886 0261 91       		.byte	0x91
+ 887 0262 6B       		.sleb128 -21
+ 888 0263 0C       		.uleb128 0xc
+ 889 0264 96020000 		.4byte	.LASF34
+ 890 0268 01       		.byte	0x1
+ 891 0269 64       		.byte	0x64
+ 892 026a E2000000 		.4byte	0xe2
+ 893 026e 02       		.uleb128 0x2
+ 894 026f 91       		.byte	0x91
+ 895 0270 64       		.sleb128 -28
+ 896 0271 0E       		.uleb128 0xe
+ 897 0272 46030000 		.4byte	.LASF36
+ 898 0276 01       		.byte	0x1
+ 899 0277 66       		.byte	0x66
+ 900 0278 57000000 		.4byte	0x57
+ 901 027c 02       		.uleb128 0x2
+ 902 027d 91       		.byte	0x91
+ 903 027e 74       		.sleb128 -12
+ 904 027f 00       		.byte	0
+ 905 0280 0D       		.uleb128 0xd
+ 906 0281 6D020000 		.4byte	.LASF40
+ 907 0285 01       		.byte	0x1
+ 908 0286 7E       		.byte	0x7e
+ 909 0287 00000000 		.4byte	.LFB72
+ 910 028b 94000000 		.4byte	.LFE72-.LFB72
+ 911 028f 01       		.uleb128 0x1
+ 912 0290 9C       		.byte	0x9c
+ 913 0291 14030000 		.4byte	0x314
+ 914 0295 0E       		.uleb128 0xe
+ 915 0296 DF020000 		.4byte	.LASF41
+ 916 029a 01       		.byte	0x1
+ 917 029b 80       		.byte	0x80
+ 918 029c 57000000 		.4byte	0x57
+ 919 02a0 02       		.uleb128 0x2
+ 920 02a1 91       		.byte	0x91
+ 921 02a2 64       		.sleb128 -28
+ 922 02a3 0E       		.uleb128 0xe
+ 923 02a4 1E030000 		.4byte	.LASF42
+ 924 02a8 01       		.byte	0x1
+ 925 02a9 81       		.byte	0x81
+ 926 02aa 14030000 		.4byte	0x314
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 25
+
+
+ 927 02ae 02       		.uleb128 0x2
+ 928 02af 91       		.byte	0x91
+ 929 02b0 63       		.sleb128 -29
+ 930 02b1 0E       		.uleb128 0xe
+ 931 02b2 BD020000 		.4byte	.LASF43
+ 932 02b6 01       		.byte	0x1
+ 933 02b7 82       		.byte	0x82
+ 934 02b8 25000000 		.4byte	0x25
+ 935 02bc 02       		.uleb128 0x2
+ 936 02bd 91       		.byte	0x91
+ 937 02be 62       		.sleb128 -30
+ 938 02bf 0E       		.uleb128 0xe
+ 939 02c0 3F030000 		.4byte	.LASF44
+ 940 02c4 01       		.byte	0x1
+ 941 02c5 83       		.byte	0x83
+ 942 02c6 69000000 		.4byte	0x69
+ 943 02ca 02       		.uleb128 0x2
+ 944 02cb 91       		.byte	0x91
+ 945 02cc 74       		.sleb128 -12
+ 946 02cd 11       		.uleb128 0x11
+ 947 02ce 03010000 		.4byte	0x103
+ 948 02d2 34000000 		.4byte	.LBB10
+ 949 02d6 1A000000 		.4byte	.LBE10-.LBB10
+ 950 02da 01       		.byte	0x1
+ 951 02db 8F       		.byte	0x8f
+ 952 02dc FB020000 		.4byte	0x2fb
+ 953 02e0 12       		.uleb128 0x12
+ 954 02e1 34000000 		.4byte	.LBB11
+ 955 02e5 1A000000 		.4byte	.LBE11-.LBB11
+ 956 02e9 13       		.uleb128 0x13
+ 957 02ea 13010000 		.4byte	0x113
+ 958 02ee 02       		.uleb128 0x2
+ 959 02ef 91       		.byte	0x91
+ 960 02f0 70       		.sleb128 -16
+ 961 02f1 13       		.uleb128 0x13
+ 962 02f2 1E010000 		.4byte	0x11e
+ 963 02f6 02       		.uleb128 0x2
+ 964 02f7 91       		.byte	0x91
+ 965 02f8 6C       		.sleb128 -20
+ 966 02f9 00       		.byte	0
+ 967 02fa 00       		.byte	0
+ 968 02fb 14       		.uleb128 0x14
+ 969 02fc 2A010000 		.4byte	0x12a
+ 970 0300 68000000 		.4byte	.LBB12
+ 971 0304 06000000 		.4byte	.LBE12-.LBB12
+ 972 0308 01       		.byte	0x1
+ 973 0309 97       		.byte	0x97
+ 974 030a 15       		.uleb128 0x15
+ 975 030b 36010000 		.4byte	0x136
+ 976 030f 02       		.uleb128 0x2
+ 977 0310 91       		.byte	0x91
+ 978 0311 68       		.sleb128 -24
+ 979 0312 00       		.byte	0
+ 980 0313 00       		.byte	0
+ 981 0314 16       		.uleb128 0x16
+ 982 0315 37000000 		.4byte	0x37
+ 983 0319 0D       		.uleb128 0xd
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 26
+
+
+ 984 031a 4A000000 		.4byte	.LASF45
+ 985 031e 01       		.byte	0x1
+ 986 031f A5       		.byte	0xa5
+ 987 0320 00000000 		.4byte	.LFB73
+ 988 0324 B0000000 		.4byte	.LFE73-.LFB73
+ 989 0328 01       		.uleb128 0x1
+ 990 0329 9C       		.byte	0x9c
+ 991 032a AD030000 		.4byte	0x3ad
+ 992 032e 0E       		.uleb128 0xe
+ 993 032f DF020000 		.4byte	.LASF41
+ 994 0333 01       		.byte	0x1
+ 995 0334 A7       		.byte	0xa7
+ 996 0335 57000000 		.4byte	0x57
+ 997 0339 02       		.uleb128 0x2
+ 998 033a 91       		.byte	0x91
+ 999 033b 64       		.sleb128 -28
+ 1000 033c 0E       		.uleb128 0xe
+ 1001 033d 1E030000 		.4byte	.LASF42
+ 1002 0341 01       		.byte	0x1
+ 1003 0342 A8       		.byte	0xa8
+ 1004 0343 14030000 		.4byte	0x314
+ 1005 0347 02       		.uleb128 0x2
+ 1006 0348 91       		.byte	0x91
+ 1007 0349 63       		.sleb128 -29
+ 1008 034a 0E       		.uleb128 0xe
+ 1009 034b 9A010000 		.4byte	.LASF38
+ 1010 034f 01       		.byte	0x1
+ 1011 0350 A9       		.byte	0xa9
+ 1012 0351 25000000 		.4byte	0x25
+ 1013 0355 02       		.uleb128 0x2
+ 1014 0356 91       		.byte	0x91
+ 1015 0357 62       		.sleb128 -30
+ 1016 0358 0E       		.uleb128 0xe
+ 1017 0359 3F030000 		.4byte	.LASF44
+ 1018 035d 01       		.byte	0x1
+ 1019 035e AA       		.byte	0xaa
+ 1020 035f 69000000 		.4byte	0x69
+ 1021 0363 02       		.uleb128 0x2
+ 1022 0364 91       		.byte	0x91
+ 1023 0365 74       		.sleb128 -12
+ 1024 0366 11       		.uleb128 0x11
+ 1025 0367 03010000 		.4byte	0x103
+ 1026 036b 36000000 		.4byte	.LBB14
+ 1027 036f 1A000000 		.4byte	.LBE14-.LBB14
+ 1028 0373 01       		.byte	0x1
+ 1029 0374 B3       		.byte	0xb3
+ 1030 0375 94030000 		.4byte	0x394
+ 1031 0379 12       		.uleb128 0x12
+ 1032 037a 36000000 		.4byte	.LBB15
+ 1033 037e 1A000000 		.4byte	.LBE15-.LBB15
+ 1034 0382 13       		.uleb128 0x13
+ 1035 0383 13010000 		.4byte	0x113
+ 1036 0387 02       		.uleb128 0x2
+ 1037 0388 91       		.byte	0x91
+ 1038 0389 70       		.sleb128 -16
+ 1039 038a 13       		.uleb128 0x13
+ 1040 038b 1E010000 		.4byte	0x11e
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 27
+
+
+ 1041 038f 02       		.uleb128 0x2
+ 1042 0390 91       		.byte	0x91
+ 1043 0391 6C       		.sleb128 -20
+ 1044 0392 00       		.byte	0
+ 1045 0393 00       		.byte	0
+ 1046 0394 14       		.uleb128 0x14
+ 1047 0395 2A010000 		.4byte	0x12a
+ 1048 0399 86000000 		.4byte	.LBB16
+ 1049 039d 06000000 		.4byte	.LBE16-.LBB16
+ 1050 03a1 01       		.byte	0x1
+ 1051 03a2 C6       		.byte	0xc6
+ 1052 03a3 15       		.uleb128 0x15
+ 1053 03a4 36010000 		.4byte	0x136
+ 1054 03a8 02       		.uleb128 0x2
+ 1055 03a9 91       		.byte	0x91
+ 1056 03aa 68       		.sleb128 -24
+ 1057 03ab 00       		.byte	0
+ 1058 03ac 00       		.byte	0
+ 1059 03ad 0E       		.uleb128 0xe
+ 1060 03ae 37010000 		.4byte	.LASF46
+ 1061 03b2 01       		.byte	0x1
+ 1062 03b3 2A       		.byte	0x2a
+ 1063 03b4 ED000000 		.4byte	0xed
+ 1064 03b8 05       		.uleb128 0x5
+ 1065 03b9 03       		.byte	0x3
+ 1066 03ba 00000000 		.4byte	xSerialTxQueue
+ 1067 03be 0E       		.uleb128 0xe
+ 1068 03bf 0A010000 		.4byte	.LASF47
+ 1069 03c3 01       		.byte	0x1
+ 1070 03c4 2B       		.byte	0x2b
+ 1071 03c5 ED000000 		.4byte	0xed
+ 1072 03c9 05       		.uleb128 0x5
+ 1073 03ca 03       		.byte	0x3
+ 1074 03cb 04000000 		.4byte	xSerialRxQueue
+ 1075 03cf 17       		.uleb128 0x17
+ 1076 03d0 D8010000 		.4byte	.LASF54
+ 1077 03d4 08       		.byte	0x8
+ 1078 03d5 9606     		.2byte	0x696
+ 1079 03d7 DB030000 		.4byte	0x3db
+ 1080 03db 16       		.uleb128 0x16
+ 1081 03dc 97000000 		.4byte	0x97
+ 1082 03e0 00       		.byte	0
+ 1083              		.section	.debug_abbrev,"",%progbits
+ 1084              	.Ldebug_abbrev0:
+ 1085 0000 01       		.uleb128 0x1
+ 1086 0001 11       		.uleb128 0x11
+ 1087 0002 01       		.byte	0x1
+ 1088 0003 25       		.uleb128 0x25
+ 1089 0004 0E       		.uleb128 0xe
+ 1090 0005 13       		.uleb128 0x13
+ 1091 0006 0B       		.uleb128 0xb
+ 1092 0007 03       		.uleb128 0x3
+ 1093 0008 0E       		.uleb128 0xe
+ 1094 0009 1B       		.uleb128 0x1b
+ 1095 000a 0E       		.uleb128 0xe
+ 1096 000b 55       		.uleb128 0x55
+ 1097 000c 17       		.uleb128 0x17
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 28
+
+
+ 1098 000d 11       		.uleb128 0x11
+ 1099 000e 01       		.uleb128 0x1
+ 1100 000f 10       		.uleb128 0x10
+ 1101 0010 17       		.uleb128 0x17
+ 1102 0011 00       		.byte	0
+ 1103 0012 00       		.byte	0
+ 1104 0013 02       		.uleb128 0x2
+ 1105 0014 24       		.uleb128 0x24
+ 1106 0015 00       		.byte	0
+ 1107 0016 0B       		.uleb128 0xb
+ 1108 0017 0B       		.uleb128 0xb
+ 1109 0018 3E       		.uleb128 0x3e
+ 1110 0019 0B       		.uleb128 0xb
+ 1111 001a 03       		.uleb128 0x3
+ 1112 001b 0E       		.uleb128 0xe
+ 1113 001c 00       		.byte	0
+ 1114 001d 00       		.byte	0
+ 1115 001e 03       		.uleb128 0x3
+ 1116 001f 16       		.uleb128 0x16
+ 1117 0020 00       		.byte	0
+ 1118 0021 03       		.uleb128 0x3
+ 1119 0022 0E       		.uleb128 0xe
+ 1120 0023 3A       		.uleb128 0x3a
+ 1121 0024 0B       		.uleb128 0xb
+ 1122 0025 3B       		.uleb128 0x3b
+ 1123 0026 0B       		.uleb128 0xb
+ 1124 0027 49       		.uleb128 0x49
+ 1125 0028 13       		.uleb128 0x13
+ 1126 0029 00       		.byte	0
+ 1127 002a 00       		.byte	0
+ 1128 002b 04       		.uleb128 0x4
+ 1129 002c 24       		.uleb128 0x24
+ 1130 002d 00       		.byte	0
+ 1131 002e 0B       		.uleb128 0xb
+ 1132 002f 0B       		.uleb128 0xb
+ 1133 0030 3E       		.uleb128 0x3e
+ 1134 0031 0B       		.uleb128 0xb
+ 1135 0032 03       		.uleb128 0x3
+ 1136 0033 08       		.uleb128 0x8
+ 1137 0034 00       		.byte	0
+ 1138 0035 00       		.byte	0
+ 1139 0036 05       		.uleb128 0x5
+ 1140 0037 16       		.uleb128 0x16
+ 1141 0038 00       		.byte	0
+ 1142 0039 03       		.uleb128 0x3
+ 1143 003a 0E       		.uleb128 0xe
+ 1144 003b 3A       		.uleb128 0x3a
+ 1145 003c 0B       		.uleb128 0xb
+ 1146 003d 3B       		.uleb128 0x3b
+ 1147 003e 05       		.uleb128 0x5
+ 1148 003f 49       		.uleb128 0x49
+ 1149 0040 13       		.uleb128 0x13
+ 1150 0041 00       		.byte	0
+ 1151 0042 00       		.byte	0
+ 1152 0043 06       		.uleb128 0x6
+ 1153 0044 0F       		.uleb128 0xf
+ 1154 0045 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 29
+
+
+ 1155 0046 0B       		.uleb128 0xb
+ 1156 0047 0B       		.uleb128 0xb
+ 1157 0048 00       		.byte	0
+ 1158 0049 00       		.byte	0
+ 1159 004a 07       		.uleb128 0x7
+ 1160 004b 2E       		.uleb128 0x2e
+ 1161 004c 01       		.byte	0x1
+ 1162 004d 03       		.uleb128 0x3
+ 1163 004e 0E       		.uleb128 0xe
+ 1164 004f 3A       		.uleb128 0x3a
+ 1165 0050 0B       		.uleb128 0xb
+ 1166 0051 3B       		.uleb128 0x3b
+ 1167 0052 0B       		.uleb128 0xb
+ 1168 0053 27       		.uleb128 0x27
+ 1169 0054 19       		.uleb128 0x19
+ 1170 0055 49       		.uleb128 0x49
+ 1171 0056 13       		.uleb128 0x13
+ 1172 0057 20       		.uleb128 0x20
+ 1173 0058 0B       		.uleb128 0xb
+ 1174 0059 01       		.uleb128 0x1
+ 1175 005a 13       		.uleb128 0x13
+ 1176 005b 00       		.byte	0
+ 1177 005c 00       		.byte	0
+ 1178 005d 08       		.uleb128 0x8
+ 1179 005e 34       		.uleb128 0x34
+ 1180 005f 00       		.byte	0
+ 1181 0060 03       		.uleb128 0x3
+ 1182 0061 0E       		.uleb128 0xe
+ 1183 0062 3A       		.uleb128 0x3a
+ 1184 0063 0B       		.uleb128 0xb
+ 1185 0064 3B       		.uleb128 0x3b
+ 1186 0065 0B       		.uleb128 0xb
+ 1187 0066 49       		.uleb128 0x49
+ 1188 0067 13       		.uleb128 0x13
+ 1189 0068 00       		.byte	0
+ 1190 0069 00       		.byte	0
+ 1191 006a 09       		.uleb128 0x9
+ 1192 006b 2E       		.uleb128 0x2e
+ 1193 006c 01       		.byte	0x1
+ 1194 006d 03       		.uleb128 0x3
+ 1195 006e 0E       		.uleb128 0xe
+ 1196 006f 3A       		.uleb128 0x3a
+ 1197 0070 0B       		.uleb128 0xb
+ 1198 0071 3B       		.uleb128 0x3b
+ 1199 0072 0B       		.uleb128 0xb
+ 1200 0073 27       		.uleb128 0x27
+ 1201 0074 19       		.uleb128 0x19
+ 1202 0075 20       		.uleb128 0x20
+ 1203 0076 0B       		.uleb128 0xb
+ 1204 0077 01       		.uleb128 0x1
+ 1205 0078 13       		.uleb128 0x13
+ 1206 0079 00       		.byte	0
+ 1207 007a 00       		.byte	0
+ 1208 007b 0A       		.uleb128 0xa
+ 1209 007c 05       		.uleb128 0x5
+ 1210 007d 00       		.byte	0
+ 1211 007e 03       		.uleb128 0x3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 30
+
+
+ 1212 007f 0E       		.uleb128 0xe
+ 1213 0080 3A       		.uleb128 0x3a
+ 1214 0081 0B       		.uleb128 0xb
+ 1215 0082 3B       		.uleb128 0x3b
+ 1216 0083 0B       		.uleb128 0xb
+ 1217 0084 49       		.uleb128 0x49
+ 1218 0085 13       		.uleb128 0x13
+ 1219 0086 00       		.byte	0
+ 1220 0087 00       		.byte	0
+ 1221 0088 0B       		.uleb128 0xb
+ 1222 0089 2E       		.uleb128 0x2e
+ 1223 008a 01       		.byte	0x1
+ 1224 008b 3F       		.uleb128 0x3f
+ 1225 008c 19       		.uleb128 0x19
+ 1226 008d 03       		.uleb128 0x3
+ 1227 008e 0E       		.uleb128 0xe
+ 1228 008f 3A       		.uleb128 0x3a
+ 1229 0090 0B       		.uleb128 0xb
+ 1230 0091 3B       		.uleb128 0x3b
+ 1231 0092 0B       		.uleb128 0xb
+ 1232 0093 27       		.uleb128 0x27
+ 1233 0094 19       		.uleb128 0x19
+ 1234 0095 49       		.uleb128 0x49
+ 1235 0096 13       		.uleb128 0x13
+ 1236 0097 11       		.uleb128 0x11
+ 1237 0098 01       		.uleb128 0x1
+ 1238 0099 12       		.uleb128 0x12
+ 1239 009a 06       		.uleb128 0x6
+ 1240 009b 40       		.uleb128 0x40
+ 1241 009c 18       		.uleb128 0x18
+ 1242 009d 9642     		.uleb128 0x2116
+ 1243 009f 19       		.uleb128 0x19
+ 1244 00a0 01       		.uleb128 0x1
+ 1245 00a1 13       		.uleb128 0x13
+ 1246 00a2 00       		.byte	0
+ 1247 00a3 00       		.byte	0
+ 1248 00a4 0C       		.uleb128 0xc
+ 1249 00a5 05       		.uleb128 0x5
+ 1250 00a6 00       		.byte	0
+ 1251 00a7 03       		.uleb128 0x3
+ 1252 00a8 0E       		.uleb128 0xe
+ 1253 00a9 3A       		.uleb128 0x3a
+ 1254 00aa 0B       		.uleb128 0xb
+ 1255 00ab 3B       		.uleb128 0x3b
+ 1256 00ac 0B       		.uleb128 0xb
+ 1257 00ad 49       		.uleb128 0x49
+ 1258 00ae 13       		.uleb128 0x13
+ 1259 00af 02       		.uleb128 0x2
+ 1260 00b0 18       		.uleb128 0x18
+ 1261 00b1 00       		.byte	0
+ 1262 00b2 00       		.byte	0
+ 1263 00b3 0D       		.uleb128 0xd
+ 1264 00b4 2E       		.uleb128 0x2e
+ 1265 00b5 01       		.byte	0x1
+ 1266 00b6 3F       		.uleb128 0x3f
+ 1267 00b7 19       		.uleb128 0x19
+ 1268 00b8 03       		.uleb128 0x3
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 31
+
+
+ 1269 00b9 0E       		.uleb128 0xe
+ 1270 00ba 3A       		.uleb128 0x3a
+ 1271 00bb 0B       		.uleb128 0xb
+ 1272 00bc 3B       		.uleb128 0x3b
+ 1273 00bd 0B       		.uleb128 0xb
+ 1274 00be 27       		.uleb128 0x27
+ 1275 00bf 19       		.uleb128 0x19
+ 1276 00c0 11       		.uleb128 0x11
+ 1277 00c1 01       		.uleb128 0x1
+ 1278 00c2 12       		.uleb128 0x12
+ 1279 00c3 06       		.uleb128 0x6
+ 1280 00c4 40       		.uleb128 0x40
+ 1281 00c5 18       		.uleb128 0x18
+ 1282 00c6 9642     		.uleb128 0x2116
+ 1283 00c8 19       		.uleb128 0x19
+ 1284 00c9 01       		.uleb128 0x1
+ 1285 00ca 13       		.uleb128 0x13
+ 1286 00cb 00       		.byte	0
+ 1287 00cc 00       		.byte	0
+ 1288 00cd 0E       		.uleb128 0xe
+ 1289 00ce 34       		.uleb128 0x34
+ 1290 00cf 00       		.byte	0
+ 1291 00d0 03       		.uleb128 0x3
+ 1292 00d1 0E       		.uleb128 0xe
+ 1293 00d2 3A       		.uleb128 0x3a
+ 1294 00d3 0B       		.uleb128 0xb
+ 1295 00d4 3B       		.uleb128 0x3b
+ 1296 00d5 0B       		.uleb128 0xb
+ 1297 00d6 49       		.uleb128 0x49
+ 1298 00d7 13       		.uleb128 0x13
+ 1299 00d8 02       		.uleb128 0x2
+ 1300 00d9 18       		.uleb128 0x18
+ 1301 00da 00       		.byte	0
+ 1302 00db 00       		.byte	0
+ 1303 00dc 0F       		.uleb128 0xf
+ 1304 00dd 26       		.uleb128 0x26
+ 1305 00de 00       		.byte	0
+ 1306 00df 49       		.uleb128 0x49
+ 1307 00e0 13       		.uleb128 0x13
+ 1308 00e1 00       		.byte	0
+ 1309 00e2 00       		.byte	0
+ 1310 00e3 10       		.uleb128 0x10
+ 1311 00e4 0F       		.uleb128 0xf
+ 1312 00e5 00       		.byte	0
+ 1313 00e6 0B       		.uleb128 0xb
+ 1314 00e7 0B       		.uleb128 0xb
+ 1315 00e8 49       		.uleb128 0x49
+ 1316 00e9 13       		.uleb128 0x13
+ 1317 00ea 00       		.byte	0
+ 1318 00eb 00       		.byte	0
+ 1319 00ec 11       		.uleb128 0x11
+ 1320 00ed 1D       		.uleb128 0x1d
+ 1321 00ee 01       		.byte	0x1
+ 1322 00ef 31       		.uleb128 0x31
+ 1323 00f0 13       		.uleb128 0x13
+ 1324 00f1 11       		.uleb128 0x11
+ 1325 00f2 01       		.uleb128 0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 32
+
+
+ 1326 00f3 12       		.uleb128 0x12
+ 1327 00f4 06       		.uleb128 0x6
+ 1328 00f5 58       		.uleb128 0x58
+ 1329 00f6 0B       		.uleb128 0xb
+ 1330 00f7 59       		.uleb128 0x59
+ 1331 00f8 0B       		.uleb128 0xb
+ 1332 00f9 01       		.uleb128 0x1
+ 1333 00fa 13       		.uleb128 0x13
+ 1334 00fb 00       		.byte	0
+ 1335 00fc 00       		.byte	0
+ 1336 00fd 12       		.uleb128 0x12
+ 1337 00fe 0B       		.uleb128 0xb
+ 1338 00ff 01       		.byte	0x1
+ 1339 0100 11       		.uleb128 0x11
+ 1340 0101 01       		.uleb128 0x1
+ 1341 0102 12       		.uleb128 0x12
+ 1342 0103 06       		.uleb128 0x6
+ 1343 0104 00       		.byte	0
+ 1344 0105 00       		.byte	0
+ 1345 0106 13       		.uleb128 0x13
+ 1346 0107 34       		.uleb128 0x34
+ 1347 0108 00       		.byte	0
+ 1348 0109 31       		.uleb128 0x31
+ 1349 010a 13       		.uleb128 0x13
+ 1350 010b 02       		.uleb128 0x2
+ 1351 010c 18       		.uleb128 0x18
+ 1352 010d 00       		.byte	0
+ 1353 010e 00       		.byte	0
+ 1354 010f 14       		.uleb128 0x14
+ 1355 0110 1D       		.uleb128 0x1d
+ 1356 0111 01       		.byte	0x1
+ 1357 0112 31       		.uleb128 0x31
+ 1358 0113 13       		.uleb128 0x13
+ 1359 0114 11       		.uleb128 0x11
+ 1360 0115 01       		.uleb128 0x1
+ 1361 0116 12       		.uleb128 0x12
+ 1362 0117 06       		.uleb128 0x6
+ 1363 0118 58       		.uleb128 0x58
+ 1364 0119 0B       		.uleb128 0xb
+ 1365 011a 59       		.uleb128 0x59
+ 1366 011b 0B       		.uleb128 0xb
+ 1367 011c 00       		.byte	0
+ 1368 011d 00       		.byte	0
+ 1369 011e 15       		.uleb128 0x15
+ 1370 011f 05       		.uleb128 0x5
+ 1371 0120 00       		.byte	0
+ 1372 0121 31       		.uleb128 0x31
+ 1373 0122 13       		.uleb128 0x13
+ 1374 0123 02       		.uleb128 0x2
+ 1375 0124 18       		.uleb128 0x18
+ 1376 0125 00       		.byte	0
+ 1377 0126 00       		.byte	0
+ 1378 0127 16       		.uleb128 0x16
+ 1379 0128 35       		.uleb128 0x35
+ 1380 0129 00       		.byte	0
+ 1381 012a 49       		.uleb128 0x49
+ 1382 012b 13       		.uleb128 0x13
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 33
+
+
+ 1383 012c 00       		.byte	0
+ 1384 012d 00       		.byte	0
+ 1385 012e 17       		.uleb128 0x17
+ 1386 012f 34       		.uleb128 0x34
+ 1387 0130 00       		.byte	0
+ 1388 0131 03       		.uleb128 0x3
+ 1389 0132 0E       		.uleb128 0xe
+ 1390 0133 3A       		.uleb128 0x3a
+ 1391 0134 0B       		.uleb128 0xb
+ 1392 0135 3B       		.uleb128 0x3b
+ 1393 0136 05       		.uleb128 0x5
+ 1394 0137 49       		.uleb128 0x49
+ 1395 0138 13       		.uleb128 0x13
+ 1396 0139 3F       		.uleb128 0x3f
+ 1397 013a 19       		.uleb128 0x19
+ 1398 013b 3C       		.uleb128 0x3c
+ 1399 013c 19       		.uleb128 0x19
+ 1400 013d 00       		.byte	0
+ 1401 013e 00       		.byte	0
+ 1402 013f 00       		.byte	0
+ 1403              		.section	.debug_aranges,"",%progbits
+ 1404 0000 44000000 		.4byte	0x44
+ 1405 0004 0200     		.2byte	0x2
+ 1406 0006 00000000 		.4byte	.Ldebug_info0
+ 1407 000a 04       		.byte	0x4
+ 1408 000b 00       		.byte	0
+ 1409 000c 0000     		.2byte	0
+ 1410 000e 0000     		.2byte	0
+ 1411 0010 00000000 		.4byte	.LFB68
+ 1412 0014 74000000 		.4byte	.LFE68-.LFB68
+ 1413 0018 00000000 		.4byte	.LFB69
+ 1414 001c 50000000 		.4byte	.LFE69-.LFB69
+ 1415 0020 00000000 		.4byte	.LFB70
+ 1416 0024 38000000 		.4byte	.LFE70-.LFB70
+ 1417 0028 00000000 		.4byte	.LFB71
+ 1418 002c 54000000 		.4byte	.LFE71-.LFB71
+ 1419 0030 00000000 		.4byte	.LFB72
+ 1420 0034 94000000 		.4byte	.LFE72-.LFB72
+ 1421 0038 00000000 		.4byte	.LFB73
+ 1422 003c B0000000 		.4byte	.LFE73-.LFB73
+ 1423 0040 00000000 		.4byte	0
+ 1424 0044 00000000 		.4byte	0
+ 1425              		.section	.debug_ranges,"",%progbits
+ 1426              	.Ldebug_ranges0:
+ 1427 0000 00000000 		.4byte	.LFB68
+ 1428 0004 74000000 		.4byte	.LFE68
+ 1429 0008 00000000 		.4byte	.LFB69
+ 1430 000c 50000000 		.4byte	.LFE69
+ 1431 0010 00000000 		.4byte	.LFB70
+ 1432 0014 38000000 		.4byte	.LFE70
+ 1433 0018 00000000 		.4byte	.LFB71
+ 1434 001c 54000000 		.4byte	.LFE71
+ 1435 0020 00000000 		.4byte	.LFB72
+ 1436 0024 94000000 		.4byte	.LFE72
+ 1437 0028 00000000 		.4byte	.LFB73
+ 1438 002c B0000000 		.4byte	.LFE73
+ 1439 0030 00000000 		.4byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 34
+
+
+ 1440 0034 00000000 		.4byte	0
+ 1441              		.section	.debug_line,"",%progbits
+ 1442              	.Ldebug_line0:
+ 1443 0000 B6020000 		.section	.debug_str,"MS",%progbits,1
+ 1443      0200B801 
+ 1443      00000201 
+ 1443      FB0E0D00 
+ 1443      01010101 
+ 1444              	.LASF33:
+ 1445 0000 70635278 		.ascii	"pcRxedChar\000"
+ 1445      65644368 
+ 1445      617200
+ 1446              	.LASF31:
+ 1447 000b 78536572 		.ascii	"xSerialPortInitMinimal\000"
+ 1447      69616C50 
+ 1447      6F727449 
+ 1447      6E69744D 
+ 1447      696E696D 
+ 1448              	.LASF51:
+ 1449 0022 756C506F 		.ascii	"ulPortRaiseBASEPRI\000"
+ 1449      72745261 
+ 1449      69736542 
+ 1449      41534550 
+ 1449      524900
+ 1450              	.LASF21:
+ 1451 0035 5469636B 		.ascii	"TickType_t\000"
+ 1451      54797065 
+ 1451      5F7400
+ 1452              	.LASF4:
+ 1453 0040 5F5F7569 		.ascii	"__uint8_t\000"
+ 1453      6E74385F 
+ 1453      7400
+ 1454              	.LASF45:
+ 1455 004a 76556172 		.ascii	"vUartTxISR\000"
+ 1455      74547849 
+ 1455      535200
+ 1456              	.LASF23:
+ 1457 0055 78436F6D 		.ascii	"xComPortHandle\000"
+ 1457      506F7274 
+ 1457      48616E64 
+ 1457      6C6500
+ 1458              	.LASF5:
+ 1459 0064 5F5F696E 		.ascii	"__int32_t\000"
+ 1459      7433325F 
+ 1459      7400
+ 1460              	.LASF48:
+ 1461 006e 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1461      4320342E 
+ 1461      392E3320 
+ 1461      32303135 
+ 1461      30333033 
+ 1462 00a1 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1462      20726576 
+ 1462      6973696F 
+ 1462      6E203232 
+ 1462      31323230 
+ 1463 00d4 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 35
+
+
+ 1463      66756E63 
+ 1463      74696F6E 
+ 1463      2D736563 
+ 1463      74696F6E 
+ 1464              	.LASF22:
+ 1465 00fc 51756575 		.ascii	"QueueHandle_t\000"
+ 1465      6548616E 
+ 1465      646C655F 
+ 1465      7400
+ 1466              	.LASF47:
+ 1467 010a 78536572 		.ascii	"xSerialRxQueue\000"
+ 1467      69616C52 
+ 1467      78517565 
+ 1467      756500
+ 1468              	.LASF26:
+ 1469 0119 756C5761 		.ascii	"ulWantedBaud\000"
+ 1469      6E746564 
+ 1469      42617564 
+ 1469      00
+ 1470              	.LASF39:
+ 1471 0126 76536572 		.ascii	"vSerialPutString\000"
+ 1471      69616C50 
+ 1471      75745374 
+ 1471      72696E67 
+ 1471      00
+ 1472              	.LASF46:
+ 1473 0137 78536572 		.ascii	"xSerialTxQueue\000"
+ 1473      69616C54 
+ 1473      78517565 
+ 1473      756500
+ 1474              	.LASF16:
+ 1475 0146 666C6F61 		.ascii	"float\000"
+ 1475      7400
+ 1476              	.LASF1:
+ 1477 014c 756E7369 		.ascii	"unsigned char\000"
+ 1477      676E6564 
+ 1477      20636861 
+ 1477      7200
+ 1478              	.LASF28:
+ 1479 015a 7078506F 		.ascii	"pxPort\000"
+ 1479      727400
+ 1480              	.LASF7:
+ 1481 0161 5F5F7569 		.ascii	"__uint32_t\000"
+ 1481      6E743332 
+ 1481      5F7400
+ 1482              	.LASF8:
+ 1483 016c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1483      20756E73 
+ 1483      69676E65 
+ 1483      6420696E 
+ 1483      7400
+ 1484              	.LASF3:
+ 1485 017e 73686F72 		.ascii	"short unsigned int\000"
+ 1485      7420756E 
+ 1485      7369676E 
+ 1485      65642069 
+ 1485      6E7400
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 36
+
+
+ 1486              	.LASF6:
+ 1487 0191 6C6F6E67 		.ascii	"long int\000"
+ 1487      20696E74 
+ 1487      00
+ 1488              	.LASF38:
+ 1489 019a 634F7574 		.ascii	"cOutChar\000"
+ 1489      43686172 
+ 1489      00
+ 1490              	.LASF37:
+ 1491 01a3 78536572 		.ascii	"xSerialPutChar\000"
+ 1491      69616C50 
+ 1491      75744368 
+ 1491      617200
+ 1492              	.LASF29:
+ 1493 01b2 70635374 		.ascii	"pcString\000"
+ 1493      72696E67 
+ 1493      00
+ 1494              	.LASF17:
+ 1495 01bb 646F7562 		.ascii	"double\000"
+ 1495      6C6500
+ 1496              	.LASF25:
+ 1497 01c2 756C4E65 		.ascii	"ulNewBASEPRI\000"
+ 1497      77424153 
+ 1497      45505249 
+ 1497      00
+ 1498              	.LASF49:
+ 1499 01cf 53657269 		.ascii	"Serial.c\000"
+ 1499      616C2E63 
+ 1499      00
+ 1500              	.LASF54:
+ 1501 01d8 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1501      52784275 
+ 1501      66666572 
+ 1501      00
+ 1502              	.LASF52:
+ 1503 01e5 76506F72 		.ascii	"vPortSetBASEPRI\000"
+ 1503      74536574 
+ 1503      42415345 
+ 1503      50524900 
+ 1504              	.LASF11:
+ 1505 01f5 756E7369 		.ascii	"unsigned int\000"
+ 1505      676E6564 
+ 1505      20696E74 
+ 1505      00
+ 1506              	.LASF50:
+ 1507 0202 453A5C47 		.ascii	"E:\\GitHub\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 1507      69744875 
+ 1507      625C4659 
+ 1507      505F4E65 
+ 1507      775F5465 
+ 1508 0232 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1508      4743435C 
+ 1508      46726565 
+ 1508      52544F53 
+ 1508      5F44656D 
+ 1509              	.LASF10:
+ 1510 024e 6C6F6E67 		.ascii	"long long unsigned int\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 37
+
+
+ 1510      206C6F6E 
+ 1510      6720756E 
+ 1510      7369676E 
+ 1510      65642069 
+ 1511              	.LASF12:
+ 1512 0265 75696E74 		.ascii	"uint8_t\000"
+ 1512      385F7400 
+ 1513              	.LASF40:
+ 1514 026d 76556172 		.ascii	"vUartRxISR\000"
+ 1514      74527849 
+ 1514      535200
+ 1515              	.LASF30:
+ 1516 0278 75735374 		.ascii	"usStringLength\000"
+ 1516      72696E67 
+ 1516      4C656E67 
+ 1516      746800
+ 1517              	.LASF32:
+ 1518 0287 78536572 		.ascii	"xSerialGetChar\000"
+ 1518      69616C47 
+ 1518      65744368 
+ 1518      617200
+ 1519              	.LASF34:
+ 1520 0296 78426C6F 		.ascii	"xBlockTime\000"
+ 1520      636B5469 
+ 1520      6D6500
+ 1521              	.LASF19:
+ 1522 02a1 73697A65 		.ascii	"sizetype\000"
+ 1522      74797065 
+ 1522      00
+ 1523              	.LASF9:
+ 1524 02aa 6C6F6E67 		.ascii	"long long int\000"
+ 1524      206C6F6E 
+ 1524      6720696E 
+ 1524      7400
+ 1525              	.LASF18:
+ 1526 02b8 63686172 		.ascii	"char\000"
+ 1526      00
+ 1527              	.LASF43:
+ 1528 02bd 63496E43 		.ascii	"cInChar\000"
+ 1528      68617200 
+ 1529              	.LASF24:
+ 1530 02c5 756C4F72 		.ascii	"ulOriginalBASEPRI\000"
+ 1530      6967696E 
+ 1530      616C4241 
+ 1530      53455052 
+ 1530      4900
+ 1531              	.LASF13:
+ 1532 02d7 696E7433 		.ascii	"int32_t\000"
+ 1532      325F7400 
+ 1533              	.LASF41:
+ 1534 02df 78486967 		.ascii	"xHigherPriorityTaskWoken\000"
+ 1534      68657250 
+ 1534      72696F72 
+ 1534      69747954 
+ 1534      61736B57 
+ 1535              	.LASF2:
+ 1536 02f8 73686F72 		.ascii	"short int\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc8PLKyX.s 			page 38
+
+
+ 1536      7420696E 
+ 1536      7400
+ 1537              	.LASF15:
+ 1538 0302 75696E74 		.ascii	"uint8\000"
+ 1538      3800
+ 1539              	.LASF27:
+ 1540 0308 75785175 		.ascii	"uxQueueLength\000"
+ 1540      6575654C 
+ 1540      656E6774 
+ 1540      6800
+ 1541              	.LASF35:
+ 1542 0316 7573496E 		.ascii	"usIndex\000"
+ 1542      64657800 
+ 1543              	.LASF42:
+ 1544 031e 75635374 		.ascii	"ucStatus\000"
+ 1544      61747573 
+ 1544      00
+ 1545              	.LASF14:
+ 1546 0327 75696E74 		.ascii	"uint32_t\000"
+ 1546      33325F74 
+ 1546      00
+ 1547              	.LASF53:
+ 1548 0330 756C4E65 		.ascii	"ulNewMaskValue\000"
+ 1548      774D6173 
+ 1548      6B56616C 
+ 1548      756500
+ 1549              	.LASF44:
+ 1550 033f 756C4D61 		.ascii	"ulMask\000"
+ 1550      736B00
+ 1551              	.LASF36:
+ 1552 0346 78526574 		.ascii	"xReturn\000"
+ 1552      75726E00 
+ 1553              	.LASF0:
+ 1554 034e 7369676E 		.ascii	"signed char\000"
+ 1554      65642063 
+ 1554      68617200 
+ 1555              	.LASF20:
+ 1556 035a 42617365 		.ascii	"BaseType_t\000"
+ 1556      54797065 
+ 1556      5F7400
+ 1557              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

@@ -1,0 +1,1788 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"countsem.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	xErrorDetected:
+  21 0000 00000000 		.space	4
+  22              		.align	2
+  23              	xParameters:
+  24 0004 00000000 		.space	24
+  24      00000000 
+  24      00000000 
+  24      00000000 
+  24      00000000 
+  25              		.section	.rodata
+  26              		.align	2
+  27              	.LC0:
+  28 0000 436F756E 		.ascii	"Counting_Sem_1\000"
+  28      74696E67 
+  28      5F53656D 
+  28      5F3100
+  29 000f 00       		.align	2
+  30              	.LC1:
+  31 0010 436F756E 		.ascii	"Counting_Sem_2\000"
+  31      74696E67 
+  31      5F53656D 
+  31      5F3200
+  32 001f 00       		.align	2
+  33              	.LC2:
+  34 0020 434E5431 		.ascii	"CNT1\000"
+  34      00
+  35 0025 000000   		.align	2
+  36              	.LC3:
+  37 0028 434E5432 		.ascii	"CNT2\000"
+  37      00
+  38 002d 000000   		.section	.text.vStartCountingSemaphoreTasks,"ax",%progbits
+  39              		.align	2
+  40              		.global	vStartCountingSemaphoreTasks
+  41              		.thumb
+  42              		.thumb_func
+  43              		.type	vStartCountingSemaphoreTasks, %function
+  44              	vStartCountingSemaphoreTasks:
+  45              	.LFB68:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 2
+
+
+  46              		.file 1 "..\\..\\Common\\Minimal\\countsem.c"
+   1:..\..\Common\Minimal/countsem.c **** /*
+   2:..\..\Common\Minimal/countsem.c ****  * FreeRTOS Kernel V10.0.1
+   3:..\..\Common\Minimal/countsem.c ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:..\..\Common\Minimal/countsem.c ****  *
+   5:..\..\Common\Minimal/countsem.c ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:..\..\Common\Minimal/countsem.c ****  * this software and associated documentation files (the "Software"), to deal in
+   7:..\..\Common\Minimal/countsem.c ****  * the Software without restriction, including without limitation the rights to
+   8:..\..\Common\Minimal/countsem.c ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:..\..\Common\Minimal/countsem.c ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:..\..\Common\Minimal/countsem.c ****  * subject to the following conditions:
+  11:..\..\Common\Minimal/countsem.c ****  *
+  12:..\..\Common\Minimal/countsem.c ****  * The above copyright notice and this permission notice shall be included in all
+  13:..\..\Common\Minimal/countsem.c ****  * copies or substantial portions of the Software.
+  14:..\..\Common\Minimal/countsem.c ****  *
+  15:..\..\Common\Minimal/countsem.c ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:..\..\Common\Minimal/countsem.c ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:..\..\Common\Minimal/countsem.c ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:..\..\Common\Minimal/countsem.c ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:..\..\Common\Minimal/countsem.c ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:..\..\Common\Minimal/countsem.c ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:..\..\Common\Minimal/countsem.c ****  *
+  22:..\..\Common\Minimal/countsem.c ****  * http://www.FreeRTOS.org
+  23:..\..\Common\Minimal/countsem.c ****  * http://aws.amazon.com/freertos
+  24:..\..\Common\Minimal/countsem.c ****  *
+  25:..\..\Common\Minimal/countsem.c ****  * 1 tab == 4 spaces!
+  26:..\..\Common\Minimal/countsem.c ****  */
+  27:..\..\Common\Minimal/countsem.c **** 
+  28:..\..\Common\Minimal/countsem.c **** 
+  29:..\..\Common\Minimal/countsem.c **** /*
+  30:..\..\Common\Minimal/countsem.c ****  * Simple demonstration of the usage of counting semaphore.
+  31:..\..\Common\Minimal/countsem.c ****  */
+  32:..\..\Common\Minimal/countsem.c **** 
+  33:..\..\Common\Minimal/countsem.c **** /* Scheduler include files. */
+  34:..\..\Common\Minimal/countsem.c **** #include "FreeRTOS.h"
+  35:..\..\Common\Minimal/countsem.c **** #include "task.h"
+  36:..\..\Common\Minimal/countsem.c **** #include "semphr.h"
+  37:..\..\Common\Minimal/countsem.c **** 
+  38:..\..\Common\Minimal/countsem.c **** /* Demo program include files. */
+  39:..\..\Common\Minimal/countsem.c **** #include "countsem.h"
+  40:..\..\Common\Minimal/countsem.c **** 
+  41:..\..\Common\Minimal/countsem.c **** /* The maximum count value that the semaphore used for the demo can hold. */
+  42:..\..\Common\Minimal/countsem.c **** #define countMAX_COUNT_VALUE	( 200 )
+  43:..\..\Common\Minimal/countsem.c **** 
+  44:..\..\Common\Minimal/countsem.c **** /* Constants used to indicate whether or not the semaphore should have been
+  45:..\..\Common\Minimal/countsem.c **** created with its maximum count value, or its minimum count value.  These
+  46:..\..\Common\Minimal/countsem.c **** numbers are used to ensure that the pointers passed in as the task parameters
+  47:..\..\Common\Minimal/countsem.c **** are valid. */
+  48:..\..\Common\Minimal/countsem.c **** #define countSTART_AT_MAX_COUNT	( 0xaa )
+  49:..\..\Common\Minimal/countsem.c **** #define countSTART_AT_ZERO		( 0x55 )
+  50:..\..\Common\Minimal/countsem.c **** 
+  51:..\..\Common\Minimal/countsem.c **** /* Two tasks are created for the test.  One uses a semaphore created with its
+  52:..\..\Common\Minimal/countsem.c **** count value set to the maximum, and one with the count value set to zero. */
+  53:..\..\Common\Minimal/countsem.c **** #define countNUM_TEST_TASKS		( 2 )
+  54:..\..\Common\Minimal/countsem.c **** #define countDONT_BLOCK			( 0 )
+  55:..\..\Common\Minimal/countsem.c **** 
+  56:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 3
+
+
+  57:..\..\Common\Minimal/countsem.c **** 
+  58:..\..\Common\Minimal/countsem.c **** /* Flag that will be latched to pdTRUE should any unexpected behaviour be
+  59:..\..\Common\Minimal/countsem.c **** detected in any of the tasks. */
+  60:..\..\Common\Minimal/countsem.c **** static volatile BaseType_t xErrorDetected = pdFALSE;
+  61:..\..\Common\Minimal/countsem.c **** 
+  62:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+  63:..\..\Common\Minimal/countsem.c **** 
+  64:..\..\Common\Minimal/countsem.c **** /*
+  65:..\..\Common\Minimal/countsem.c ****  * The demo task.  This simply counts the semaphore up to its maximum value,
+  66:..\..\Common\Minimal/countsem.c ****  * the counts it back down again.  The result of each semaphore 'give' and
+  67:..\..\Common\Minimal/countsem.c ****  * 'take' is inspected, with an error being flagged if it is found not to be
+  68:..\..\Common\Minimal/countsem.c ****  * the expected result.
+  69:..\..\Common\Minimal/countsem.c ****  */
+  70:..\..\Common\Minimal/countsem.c **** static void prvCountingSemaphoreTask( void *pvParameters );
+  71:..\..\Common\Minimal/countsem.c **** 
+  72:..\..\Common\Minimal/countsem.c **** /*
+  73:..\..\Common\Minimal/countsem.c ****  * Utility function to increment the semaphore count value up from zero to
+  74:..\..\Common\Minimal/countsem.c ****  * countMAX_COUNT_VALUE.
+  75:..\..\Common\Minimal/countsem.c ****  */
+  76:..\..\Common\Minimal/countsem.c **** static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore, volatile UBaseType_t *puxLoop
+  77:..\..\Common\Minimal/countsem.c **** 
+  78:..\..\Common\Minimal/countsem.c **** /*
+  79:..\..\Common\Minimal/countsem.c ****  * Utility function to decrement the semaphore count value up from
+  80:..\..\Common\Minimal/countsem.c ****  * countMAX_COUNT_VALUE to zero.
+  81:..\..\Common\Minimal/countsem.c ****  */
+  82:..\..\Common\Minimal/countsem.c **** static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore, volatile UBaseType_t *puxLoop
+  83:..\..\Common\Minimal/countsem.c **** 
+  84:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+  85:..\..\Common\Minimal/countsem.c **** 
+  86:..\..\Common\Minimal/countsem.c **** /* The structure that is passed into the task as the task parameter. */
+  87:..\..\Common\Minimal/countsem.c **** typedef struct COUNT_SEM_STRUCT
+  88:..\..\Common\Minimal/countsem.c **** {
+  89:..\..\Common\Minimal/countsem.c **** 	/* The semaphore to be used for the demo. */
+  90:..\..\Common\Minimal/countsem.c **** 	SemaphoreHandle_t xSemaphore;
+  91:..\..\Common\Minimal/countsem.c **** 
+  92:..\..\Common\Minimal/countsem.c **** 	/* Set to countSTART_AT_MAX_COUNT if the semaphore should be created with
+  93:..\..\Common\Minimal/countsem.c **** 	its count value set to its max count value, or countSTART_AT_ZERO if it
+  94:..\..\Common\Minimal/countsem.c **** 	should have been created with its count value set to 0. */
+  95:..\..\Common\Minimal/countsem.c **** 	UBaseType_t uxExpectedStartCount;
+  96:..\..\Common\Minimal/countsem.c **** 
+  97:..\..\Common\Minimal/countsem.c **** 	/* Incremented on each cycle of the demo task.  Used to detect a stalled
+  98:..\..\Common\Minimal/countsem.c **** 	task. */
+  99:..\..\Common\Minimal/countsem.c **** 	volatile UBaseType_t uxLoopCounter;
+ 100:..\..\Common\Minimal/countsem.c **** } xCountSemStruct;
+ 101:..\..\Common\Minimal/countsem.c **** 
+ 102:..\..\Common\Minimal/countsem.c **** /* Two structures are defined, one is passed to each test task. */
+ 103:..\..\Common\Minimal/countsem.c **** static xCountSemStruct xParameters[ countNUM_TEST_TASKS ];
+ 104:..\..\Common\Minimal/countsem.c **** 
+ 105:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ 106:..\..\Common\Minimal/countsem.c **** 
+ 107:..\..\Common\Minimal/countsem.c **** void vStartCountingSemaphoreTasks( void )
+ 108:..\..\Common\Minimal/countsem.c **** {
+  47              		.loc 1 108 0
+  48              		.cfi_startproc
+  49              		@ args = 0, pretend = 0, frame = 0
+  50              		@ frame_needed = 1, uses_anonymous_args = 0
+  51 0000 80B5     		push	{r7, lr}
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 4
+
+
+  52              		.cfi_def_cfa_offset 8
+  53              		.cfi_offset 7, -8
+  54              		.cfi_offset 14, -4
+  55 0002 82B0     		sub	sp, sp, #8
+  56              		.cfi_def_cfa_offset 16
+  57 0004 02AF     		add	r7, sp, #8
+  58              		.cfi_def_cfa 7, 8
+ 109:..\..\Common\Minimal/countsem.c **** 	/* Create the semaphores that we are going to use for the test/demo.  The
+ 110:..\..\Common\Minimal/countsem.c **** 	first should be created such that it starts at its maximum count value,
+ 111:..\..\Common\Minimal/countsem.c **** 	the second should be created such that it starts with a count value of zero. */
+ 112:..\..\Common\Minimal/countsem.c **** 	xParameters[ 0 ].xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, countMAX_COUNT_VALUE
+  59              		.loc 1 112 0
+  60 0006 C820     		movs	r0, #200
+  61 0008 C821     		movs	r1, #200
+  62 000a FFF7FEFF 		bl	xQueueCreateCountingSemaphore
+  63 000e 0246     		mov	r2, r0
+  64 0010 1F4B     		ldr	r3, .L4
+  65 0012 1A60     		str	r2, [r3]
+ 113:..\..\Common\Minimal/countsem.c **** 	xParameters[ 0 ].uxExpectedStartCount = countSTART_AT_MAX_COUNT;
+  66              		.loc 1 113 0
+  67 0014 1E4B     		ldr	r3, .L4
+  68 0016 AA22     		movs	r2, #170
+  69 0018 5A60     		str	r2, [r3, #4]
+ 114:..\..\Common\Minimal/countsem.c **** 	xParameters[ 0 ].uxLoopCounter = 0;
+  70              		.loc 1 114 0
+  71 001a 1D4B     		ldr	r3, .L4
+  72 001c 0022     		movs	r2, #0
+  73 001e 9A60     		str	r2, [r3, #8]
+ 115:..\..\Common\Minimal/countsem.c **** 
+ 116:..\..\Common\Minimal/countsem.c **** 	xParameters[ 1 ].xSemaphore = xSemaphoreCreateCounting( countMAX_COUNT_VALUE, 0 );
+  74              		.loc 1 116 0
+  75 0020 C820     		movs	r0, #200
+  76 0022 0021     		movs	r1, #0
+  77 0024 FFF7FEFF 		bl	xQueueCreateCountingSemaphore
+  78 0028 0246     		mov	r2, r0
+  79 002a 194B     		ldr	r3, .L4
+  80 002c DA60     		str	r2, [r3, #12]
+ 117:..\..\Common\Minimal/countsem.c **** 	xParameters[ 1 ].uxExpectedStartCount = 0;
+  81              		.loc 1 117 0
+  82 002e 184B     		ldr	r3, .L4
+  83 0030 0022     		movs	r2, #0
+  84 0032 1A61     		str	r2, [r3, #16]
+ 118:..\..\Common\Minimal/countsem.c **** 	xParameters[ 1 ].uxLoopCounter = 0;
+  85              		.loc 1 118 0
+  86 0034 164B     		ldr	r3, .L4
+  87 0036 0022     		movs	r2, #0
+  88 0038 5A61     		str	r2, [r3, #20]
+ 119:..\..\Common\Minimal/countsem.c **** 
+ 120:..\..\Common\Minimal/countsem.c **** 	/* Were the semaphores created? */
+ 121:..\..\Common\Minimal/countsem.c **** 	if( ( xParameters[ 0 ].xSemaphore != NULL ) || ( xParameters[ 1 ].xSemaphore != NULL ) )
+  89              		.loc 1 121 0
+  90 003a 154B     		ldr	r3, .L4
+  91 003c 1B68     		ldr	r3, [r3]
+  92 003e 002B     		cmp	r3, #0
+  93 0040 03D1     		bne	.L2
+  94              		.loc 1 121 0 is_stmt 0 discriminator 1
+  95 0042 134B     		ldr	r3, .L4
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 5
+
+
+  96 0044 DB68     		ldr	r3, [r3, #12]
+  97 0046 002B     		cmp	r3, #0
+  98 0048 1FD0     		beq	.L1
+  99              	.L2:
+ 122:..\..\Common\Minimal/countsem.c **** 	{
+ 123:..\..\Common\Minimal/countsem.c **** 		/* vQueueAddToRegistry() adds the semaphore to the registry, if one is
+ 124:..\..\Common\Minimal/countsem.c **** 		in use.  The registry is provided as a means for kernel aware
+ 125:..\..\Common\Minimal/countsem.c **** 		debuggers to locate semaphores and has no purpose if a kernel aware
+ 126:..\..\Common\Minimal/countsem.c **** 		debugger is not being used.  The call to vQueueAddToRegistry() will be
+ 127:..\..\Common\Minimal/countsem.c **** 		removed by the pre-processor if configQUEUE_REGISTRY_SIZE is not
+ 128:..\..\Common\Minimal/countsem.c **** 		defined or is defined to be less than 1. */
+ 129:..\..\Common\Minimal/countsem.c **** 		vQueueAddToRegistry( ( QueueHandle_t ) xParameters[ 0 ].xSemaphore, "Counting_Sem_1" );
+ 100              		.loc 1 129 0 is_stmt 1
+ 101 004a 114B     		ldr	r3, .L4
+ 102 004c 1B68     		ldr	r3, [r3]
+ 103 004e 1846     		mov	r0, r3
+ 104 0050 1049     		ldr	r1, .L4+4
+ 105 0052 FFF7FEFF 		bl	vQueueAddToRegistry
+ 130:..\..\Common\Minimal/countsem.c **** 		vQueueAddToRegistry( ( QueueHandle_t ) xParameters[ 1 ].xSemaphore, "Counting_Sem_2" );
+ 106              		.loc 1 130 0
+ 107 0056 0E4B     		ldr	r3, .L4
+ 108 0058 DB68     		ldr	r3, [r3, #12]
+ 109 005a 1846     		mov	r0, r3
+ 110 005c 0E49     		ldr	r1, .L4+8
+ 111 005e FFF7FEFF 		bl	vQueueAddToRegistry
+ 131:..\..\Common\Minimal/countsem.c **** 
+ 132:..\..\Common\Minimal/countsem.c **** 		/* Create the demo tasks, passing in the semaphore to use as the parameter. */
+ 133:..\..\Common\Minimal/countsem.c **** 		xTaskCreate( prvCountingSemaphoreTask, "CNT1", configMINIMAL_STACK_SIZE, ( void * ) &( xParameter
+ 112              		.loc 1 133 0
+ 113 0062 0023     		movs	r3, #0
+ 114 0064 0093     		str	r3, [sp]
+ 115 0066 0023     		movs	r3, #0
+ 116 0068 0193     		str	r3, [sp, #4]
+ 117 006a 0C48     		ldr	r0, .L4+12
+ 118 006c 0C49     		ldr	r1, .L4+16
+ 119 006e 6422     		movs	r2, #100
+ 120 0070 074B     		ldr	r3, .L4
+ 121 0072 FFF7FEFF 		bl	xTaskCreate
+ 134:..\..\Common\Minimal/countsem.c **** 		xTaskCreate( prvCountingSemaphoreTask, "CNT2", configMINIMAL_STACK_SIZE, ( void * ) &( xParameter
+ 122              		.loc 1 134 0
+ 123 0076 0023     		movs	r3, #0
+ 124 0078 0093     		str	r3, [sp]
+ 125 007a 0023     		movs	r3, #0
+ 126 007c 0193     		str	r3, [sp, #4]
+ 127 007e 0748     		ldr	r0, .L4+12
+ 128 0080 0849     		ldr	r1, .L4+20
+ 129 0082 6422     		movs	r2, #100
+ 130 0084 084B     		ldr	r3, .L4+24
+ 131 0086 FFF7FEFF 		bl	xTaskCreate
+ 132              	.L1:
+ 135:..\..\Common\Minimal/countsem.c **** 	}
+ 136:..\..\Common\Minimal/countsem.c **** }
+ 133              		.loc 1 136 0
+ 134 008a BD46     		mov	sp, r7
+ 135              		.cfi_def_cfa_register 13
+ 136              		@ sp needed
+ 137 008c 80BD     		pop	{r7, pc}
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 6
+
+
+ 138              	.L5:
+ 139 008e 00BF     		.align	2
+ 140              	.L4:
+ 141 0090 04000000 		.word	xParameters
+ 142 0094 00000000 		.word	.LC0
+ 143 0098 10000000 		.word	.LC1
+ 144 009c 00000000 		.word	prvCountingSemaphoreTask
+ 145 00a0 20000000 		.word	.LC2
+ 146 00a4 28000000 		.word	.LC3
+ 147 00a8 10000000 		.word	xParameters+12
+ 148              		.cfi_endproc
+ 149              	.LFE68:
+ 150              		.size	vStartCountingSemaphoreTasks, .-vStartCountingSemaphoreTasks
+ 151              		.section	.text.prvDecrementSemaphoreCount,"ax",%progbits
+ 152              		.align	2
+ 153              		.thumb
+ 154              		.thumb_func
+ 155              		.type	prvDecrementSemaphoreCount, %function
+ 156              	prvDecrementSemaphoreCount:
+ 157              	.LFB69:
+ 137:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ 138:..\..\Common\Minimal/countsem.c **** 
+ 139:..\..\Common\Minimal/countsem.c **** static void prvDecrementSemaphoreCount( SemaphoreHandle_t xSemaphore, volatile UBaseType_t *puxLoop
+ 140:..\..\Common\Minimal/countsem.c **** {
+ 158              		.loc 1 140 0
+ 159              		.cfi_startproc
+ 160              		@ args = 0, pretend = 0, frame = 16
+ 161              		@ frame_needed = 1, uses_anonymous_args = 0
+ 162 0000 80B5     		push	{r7, lr}
+ 163              		.cfi_def_cfa_offset 8
+ 164              		.cfi_offset 7, -8
+ 165              		.cfi_offset 14, -4
+ 166 0002 84B0     		sub	sp, sp, #16
+ 167              		.cfi_def_cfa_offset 24
+ 168 0004 00AF     		add	r7, sp, #0
+ 169              		.cfi_def_cfa_register 7
+ 170 0006 7860     		str	r0, [r7, #4]
+ 171 0008 3960     		str	r1, [r7]
+ 141:..\..\Common\Minimal/countsem.c **** UBaseType_t ux;
+ 142:..\..\Common\Minimal/countsem.c **** 
+ 143:..\..\Common\Minimal/countsem.c **** 	/* If the semaphore count is at its maximum then we should not be able to
+ 144:..\..\Common\Minimal/countsem.c **** 	'give' the semaphore. */
+ 145:..\..\Common\Minimal/countsem.c **** 	if( xSemaphoreGive( xSemaphore ) == pdPASS )
+ 172              		.loc 1 145 0
+ 173 000a 7868     		ldr	r0, [r7, #4]
+ 174 000c 0021     		movs	r1, #0
+ 175 000e 0022     		movs	r2, #0
+ 176 0010 0023     		movs	r3, #0
+ 177 0012 FFF7FEFF 		bl	xQueueGenericSend
+ 178 0016 0346     		mov	r3, r0
+ 179 0018 012B     		cmp	r3, #1
+ 180 001a 02D1     		bne	.L7
+ 146:..\..\Common\Minimal/countsem.c **** 	{
+ 147:..\..\Common\Minimal/countsem.c **** 		xErrorDetected = pdTRUE;
+ 181              		.loc 1 147 0
+ 182 001c 134B     		ldr	r3, .L12
+ 183 001e 0122     		movs	r2, #1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 7
+
+
+ 184 0020 1A60     		str	r2, [r3]
+ 185              	.L7:
+ 148:..\..\Common\Minimal/countsem.c **** 	}
+ 149:..\..\Common\Minimal/countsem.c **** 
+ 150:..\..\Common\Minimal/countsem.c **** 	/* We should be able to 'take' the semaphore countMAX_COUNT_VALUE times. */
+ 151:..\..\Common\Minimal/countsem.c **** 	for( ux = 0; ux < countMAX_COUNT_VALUE; ux++ )
+ 186              		.loc 1 151 0
+ 187 0022 0023     		movs	r3, #0
+ 188 0024 FB60     		str	r3, [r7, #12]
+ 189 0026 11E0     		b	.L8
+ 190              	.L10:
+ 152:..\..\Common\Minimal/countsem.c **** 	{
+ 153:..\..\Common\Minimal/countsem.c **** 		configASSERT( uxSemaphoreGetCount( xSemaphore ) == ( countMAX_COUNT_VALUE - ux ) );
+ 154:..\..\Common\Minimal/countsem.c **** 
+ 155:..\..\Common\Minimal/countsem.c **** 		if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) != pdPASS )
+ 191              		.loc 1 155 0
+ 192 0028 7868     		ldr	r0, [r7, #4]
+ 193 002a 0021     		movs	r1, #0
+ 194 002c FFF7FEFF 		bl	xQueueSemaphoreTake
+ 195 0030 0346     		mov	r3, r0
+ 196 0032 012B     		cmp	r3, #1
+ 197 0034 02D0     		beq	.L9
+ 156:..\..\Common\Minimal/countsem.c **** 		{
+ 157:..\..\Common\Minimal/countsem.c **** 			/* We expected to be able to take the semaphore. */
+ 158:..\..\Common\Minimal/countsem.c **** 			xErrorDetected = pdTRUE;
+ 198              		.loc 1 158 0
+ 199 0036 0D4B     		ldr	r3, .L12
+ 200 0038 0122     		movs	r2, #1
+ 201 003a 1A60     		str	r2, [r3]
+ 202              	.L9:
+ 159:..\..\Common\Minimal/countsem.c **** 		}
+ 160:..\..\Common\Minimal/countsem.c **** 
+ 161:..\..\Common\Minimal/countsem.c **** 		( *puxLoopCounter )++;
+ 203              		.loc 1 161 0 discriminator 2
+ 204 003c 3B68     		ldr	r3, [r7]
+ 205 003e 1B68     		ldr	r3, [r3]
+ 206 0040 5A1C     		adds	r2, r3, #1
+ 207 0042 3B68     		ldr	r3, [r7]
+ 208 0044 1A60     		str	r2, [r3]
+ 151:..\..\Common\Minimal/countsem.c **** 	{
+ 209              		.loc 1 151 0 discriminator 2
+ 210 0046 FB68     		ldr	r3, [r7, #12]
+ 211 0048 0133     		adds	r3, r3, #1
+ 212 004a FB60     		str	r3, [r7, #12]
+ 213              	.L8:
+ 151:..\..\Common\Minimal/countsem.c **** 	{
+ 214              		.loc 1 151 0 is_stmt 0 discriminator 1
+ 215 004c FB68     		ldr	r3, [r7, #12]
+ 216 004e C72B     		cmp	r3, #199
+ 217 0050 EAD9     		bls	.L10
+ 162:..\..\Common\Minimal/countsem.c **** 	}
+ 163:..\..\Common\Minimal/countsem.c **** 
+ 164:..\..\Common\Minimal/countsem.c **** 	#if configUSE_PREEMPTION == 0
+ 165:..\..\Common\Minimal/countsem.c **** 		taskYIELD();
+ 166:..\..\Common\Minimal/countsem.c **** 	#endif
+ 167:..\..\Common\Minimal/countsem.c **** 
+ 168:..\..\Common\Minimal/countsem.c **** 	/* If the semaphore count is zero then we should not be able to	'take'
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 8
+
+
+ 169:..\..\Common\Minimal/countsem.c **** 	the semaphore. */
+ 170:..\..\Common\Minimal/countsem.c **** 	configASSERT( uxSemaphoreGetCount( xSemaphore ) == 0 );
+ 171:..\..\Common\Minimal/countsem.c **** 	if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) == pdPASS )
+ 218              		.loc 1 171 0 is_stmt 1
+ 219 0052 7868     		ldr	r0, [r7, #4]
+ 220 0054 0021     		movs	r1, #0
+ 221 0056 FFF7FEFF 		bl	xQueueSemaphoreTake
+ 222 005a 0346     		mov	r3, r0
+ 223 005c 012B     		cmp	r3, #1
+ 224 005e 02D1     		bne	.L6
+ 172:..\..\Common\Minimal/countsem.c **** 	{
+ 173:..\..\Common\Minimal/countsem.c **** 		xErrorDetected = pdTRUE;
+ 225              		.loc 1 173 0
+ 226 0060 024B     		ldr	r3, .L12
+ 227 0062 0122     		movs	r2, #1
+ 228 0064 1A60     		str	r2, [r3]
+ 229              	.L6:
+ 174:..\..\Common\Minimal/countsem.c **** 	}
+ 175:..\..\Common\Minimal/countsem.c **** }
+ 230              		.loc 1 175 0
+ 231 0066 1037     		adds	r7, r7, #16
+ 232              		.cfi_def_cfa_offset 8
+ 233 0068 BD46     		mov	sp, r7
+ 234              		.cfi_def_cfa_register 13
+ 235              		@ sp needed
+ 236 006a 80BD     		pop	{r7, pc}
+ 237              	.L13:
+ 238              		.align	2
+ 239              	.L12:
+ 240 006c 00000000 		.word	xErrorDetected
+ 241              		.cfi_endproc
+ 242              	.LFE69:
+ 243              		.size	prvDecrementSemaphoreCount, .-prvDecrementSemaphoreCount
+ 244              		.section	.text.prvIncrementSemaphoreCount,"ax",%progbits
+ 245              		.align	2
+ 246              		.thumb
+ 247              		.thumb_func
+ 248              		.type	prvIncrementSemaphoreCount, %function
+ 249              	prvIncrementSemaphoreCount:
+ 250              	.LFB70:
+ 176:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ 177:..\..\Common\Minimal/countsem.c **** 
+ 178:..\..\Common\Minimal/countsem.c **** static void prvIncrementSemaphoreCount( SemaphoreHandle_t xSemaphore, volatile UBaseType_t *puxLoop
+ 179:..\..\Common\Minimal/countsem.c **** {
+ 251              		.loc 1 179 0
+ 252              		.cfi_startproc
+ 253              		@ args = 0, pretend = 0, frame = 16
+ 254              		@ frame_needed = 1, uses_anonymous_args = 0
+ 255 0000 80B5     		push	{r7, lr}
+ 256              		.cfi_def_cfa_offset 8
+ 257              		.cfi_offset 7, -8
+ 258              		.cfi_offset 14, -4
+ 259 0002 84B0     		sub	sp, sp, #16
+ 260              		.cfi_def_cfa_offset 24
+ 261 0004 00AF     		add	r7, sp, #0
+ 262              		.cfi_def_cfa_register 7
+ 263 0006 7860     		str	r0, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 9
+
+
+ 264 0008 3960     		str	r1, [r7]
+ 180:..\..\Common\Minimal/countsem.c **** UBaseType_t ux;
+ 181:..\..\Common\Minimal/countsem.c **** 
+ 182:..\..\Common\Minimal/countsem.c **** 	/* If the semaphore count is zero then we should not be able to	'take'
+ 183:..\..\Common\Minimal/countsem.c **** 	the semaphore. */
+ 184:..\..\Common\Minimal/countsem.c **** 	if( xSemaphoreTake( xSemaphore, countDONT_BLOCK ) == pdPASS )
+ 265              		.loc 1 184 0
+ 266 000a 7868     		ldr	r0, [r7, #4]
+ 267 000c 0021     		movs	r1, #0
+ 268 000e FFF7FEFF 		bl	xQueueSemaphoreTake
+ 269 0012 0346     		mov	r3, r0
+ 270 0014 012B     		cmp	r3, #1
+ 271 0016 02D1     		bne	.L15
+ 185:..\..\Common\Minimal/countsem.c **** 	{
+ 186:..\..\Common\Minimal/countsem.c **** 		xErrorDetected = pdTRUE;
+ 272              		.loc 1 186 0
+ 273 0018 154B     		ldr	r3, .L20
+ 274 001a 0122     		movs	r2, #1
+ 275 001c 1A60     		str	r2, [r3]
+ 276              	.L15:
+ 187:..\..\Common\Minimal/countsem.c **** 	}
+ 188:..\..\Common\Minimal/countsem.c **** 
+ 189:..\..\Common\Minimal/countsem.c **** 	/* We should be able to 'give' the semaphore countMAX_COUNT_VALUE times. */
+ 190:..\..\Common\Minimal/countsem.c **** 	for( ux = 0; ux < countMAX_COUNT_VALUE; ux++ )
+ 277              		.loc 1 190 0
+ 278 001e 0023     		movs	r3, #0
+ 279 0020 FB60     		str	r3, [r7, #12]
+ 280 0022 13E0     		b	.L16
+ 281              	.L18:
+ 191:..\..\Common\Minimal/countsem.c **** 	{
+ 192:..\..\Common\Minimal/countsem.c **** 		configASSERT( uxSemaphoreGetCount( xSemaphore ) == ux );
+ 193:..\..\Common\Minimal/countsem.c **** 
+ 194:..\..\Common\Minimal/countsem.c **** 		if( xSemaphoreGive( xSemaphore ) != pdPASS )
+ 282              		.loc 1 194 0
+ 283 0024 7868     		ldr	r0, [r7, #4]
+ 284 0026 0021     		movs	r1, #0
+ 285 0028 0022     		movs	r2, #0
+ 286 002a 0023     		movs	r3, #0
+ 287 002c FFF7FEFF 		bl	xQueueGenericSend
+ 288 0030 0346     		mov	r3, r0
+ 289 0032 012B     		cmp	r3, #1
+ 290 0034 02D0     		beq	.L17
+ 195:..\..\Common\Minimal/countsem.c **** 		{
+ 196:..\..\Common\Minimal/countsem.c **** 			/* We expected to be able to take the semaphore. */
+ 197:..\..\Common\Minimal/countsem.c **** 			xErrorDetected = pdTRUE;
+ 291              		.loc 1 197 0
+ 292 0036 0E4B     		ldr	r3, .L20
+ 293 0038 0122     		movs	r2, #1
+ 294 003a 1A60     		str	r2, [r3]
+ 295              	.L17:
+ 198:..\..\Common\Minimal/countsem.c **** 		}
+ 199:..\..\Common\Minimal/countsem.c **** 
+ 200:..\..\Common\Minimal/countsem.c **** 		( *puxLoopCounter )++;
+ 296              		.loc 1 200 0 discriminator 2
+ 297 003c 3B68     		ldr	r3, [r7]
+ 298 003e 1B68     		ldr	r3, [r3]
+ 299 0040 5A1C     		adds	r2, r3, #1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 10
+
+
+ 300 0042 3B68     		ldr	r3, [r7]
+ 301 0044 1A60     		str	r2, [r3]
+ 190:..\..\Common\Minimal/countsem.c **** 	{
+ 302              		.loc 1 190 0 discriminator 2
+ 303 0046 FB68     		ldr	r3, [r7, #12]
+ 304 0048 0133     		adds	r3, r3, #1
+ 305 004a FB60     		str	r3, [r7, #12]
+ 306              	.L16:
+ 190:..\..\Common\Minimal/countsem.c **** 	{
+ 307              		.loc 1 190 0 is_stmt 0 discriminator 1
+ 308 004c FB68     		ldr	r3, [r7, #12]
+ 309 004e C72B     		cmp	r3, #199
+ 310 0050 E8D9     		bls	.L18
+ 201:..\..\Common\Minimal/countsem.c **** 	}
+ 202:..\..\Common\Minimal/countsem.c **** 
+ 203:..\..\Common\Minimal/countsem.c **** 	#if configUSE_PREEMPTION == 0
+ 204:..\..\Common\Minimal/countsem.c **** 		taskYIELD();
+ 205:..\..\Common\Minimal/countsem.c **** 	#endif
+ 206:..\..\Common\Minimal/countsem.c **** 
+ 207:..\..\Common\Minimal/countsem.c **** 	/* If the semaphore count is at its maximum then we should not be able to
+ 208:..\..\Common\Minimal/countsem.c **** 	'give' the semaphore. */
+ 209:..\..\Common\Minimal/countsem.c **** 	if( xSemaphoreGive( xSemaphore ) == pdPASS )
+ 311              		.loc 1 209 0 is_stmt 1
+ 312 0052 7868     		ldr	r0, [r7, #4]
+ 313 0054 0021     		movs	r1, #0
+ 314 0056 0022     		movs	r2, #0
+ 315 0058 0023     		movs	r3, #0
+ 316 005a FFF7FEFF 		bl	xQueueGenericSend
+ 317 005e 0346     		mov	r3, r0
+ 318 0060 012B     		cmp	r3, #1
+ 319 0062 02D1     		bne	.L14
+ 210:..\..\Common\Minimal/countsem.c **** 	{
+ 211:..\..\Common\Minimal/countsem.c **** 		xErrorDetected = pdTRUE;
+ 320              		.loc 1 211 0
+ 321 0064 024B     		ldr	r3, .L20
+ 322 0066 0122     		movs	r2, #1
+ 323 0068 1A60     		str	r2, [r3]
+ 324              	.L14:
+ 212:..\..\Common\Minimal/countsem.c **** 	}
+ 213:..\..\Common\Minimal/countsem.c **** }
+ 325              		.loc 1 213 0
+ 326 006a 1037     		adds	r7, r7, #16
+ 327              		.cfi_def_cfa_offset 8
+ 328 006c BD46     		mov	sp, r7
+ 329              		.cfi_def_cfa_register 13
+ 330              		@ sp needed
+ 331 006e 80BD     		pop	{r7, pc}
+ 332              	.L21:
+ 333              		.align	2
+ 334              	.L20:
+ 335 0070 00000000 		.word	xErrorDetected
+ 336              		.cfi_endproc
+ 337              	.LFE70:
+ 338              		.size	prvIncrementSemaphoreCount, .-prvIncrementSemaphoreCount
+ 339              		.section	.text.prvCountingSemaphoreTask,"ax",%progbits
+ 340              		.align	2
+ 341              		.thumb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 11
+
+
+ 342              		.thumb_func
+ 343              		.type	prvCountingSemaphoreTask, %function
+ 344              	prvCountingSemaphoreTask:
+ 345              	.LFB71:
+ 214:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ 215:..\..\Common\Minimal/countsem.c **** 
+ 216:..\..\Common\Minimal/countsem.c **** static void prvCountingSemaphoreTask( void *pvParameters )
+ 217:..\..\Common\Minimal/countsem.c **** {
+ 346              		.loc 1 217 0
+ 347              		.cfi_startproc
+ 348              		@ args = 0, pretend = 0, frame = 16
+ 349              		@ frame_needed = 1, uses_anonymous_args = 0
+ 350 0000 80B5     		push	{r7, lr}
+ 351              		.cfi_def_cfa_offset 8
+ 352              		.cfi_offset 7, -8
+ 353              		.cfi_offset 14, -4
+ 354 0002 84B0     		sub	sp, sp, #16
+ 355              		.cfi_def_cfa_offset 24
+ 356 0004 00AF     		add	r7, sp, #0
+ 357              		.cfi_def_cfa_register 7
+ 358 0006 7860     		str	r0, [r7, #4]
+ 218:..\..\Common\Minimal/countsem.c **** xCountSemStruct *pxParameter;
+ 219:..\..\Common\Minimal/countsem.c **** 
+ 220:..\..\Common\Minimal/countsem.c **** 	#ifdef USE_STDIO
+ 221:..\..\Common\Minimal/countsem.c **** 	void vPrintDisplayMessage( const char * const * ppcMessageToSend );
+ 222:..\..\Common\Minimal/countsem.c **** 
+ 223:..\..\Common\Minimal/countsem.c **** 		const char * const pcTaskStartMsg = "Counting semaphore demo started.\r\n";
+ 224:..\..\Common\Minimal/countsem.c **** 
+ 225:..\..\Common\Minimal/countsem.c **** 		/* Queue a message for printing to say the task has started. */
+ 226:..\..\Common\Minimal/countsem.c **** 		vPrintDisplayMessage( &pcTaskStartMsg );
+ 227:..\..\Common\Minimal/countsem.c **** 	#endif
+ 228:..\..\Common\Minimal/countsem.c **** 
+ 229:..\..\Common\Minimal/countsem.c **** 	/* The semaphore to be used was passed as the parameter. */
+ 230:..\..\Common\Minimal/countsem.c **** 	pxParameter = ( xCountSemStruct * ) pvParameters;
+ 359              		.loc 1 230 0
+ 360 0008 7B68     		ldr	r3, [r7, #4]
+ 361 000a FB60     		str	r3, [r7, #12]
+ 231:..\..\Common\Minimal/countsem.c **** 
+ 232:..\..\Common\Minimal/countsem.c **** 	/* Did we expect to find the semaphore already at its max count value, or
+ 233:..\..\Common\Minimal/countsem.c **** 	at zero? */
+ 234:..\..\Common\Minimal/countsem.c **** 	if( pxParameter->uxExpectedStartCount == countSTART_AT_MAX_COUNT )
+ 362              		.loc 1 234 0
+ 363 000c FB68     		ldr	r3, [r7, #12]
+ 364 000e 5B68     		ldr	r3, [r3, #4]
+ 365 0010 AA2B     		cmp	r3, #170
+ 366 0012 07D1     		bne	.L23
+ 235:..\..\Common\Minimal/countsem.c **** 	{
+ 236:..\..\Common\Minimal/countsem.c **** 		prvDecrementSemaphoreCount( pxParameter->xSemaphore, &( pxParameter->uxLoopCounter ) );
+ 367              		.loc 1 236 0
+ 368 0014 FB68     		ldr	r3, [r7, #12]
+ 369 0016 1A68     		ldr	r2, [r3]
+ 370 0018 FB68     		ldr	r3, [r7, #12]
+ 371 001a 0833     		adds	r3, r3, #8
+ 372 001c 1046     		mov	r0, r2
+ 373 001e 1946     		mov	r1, r3
+ 374 0020 FFF7FEFF 		bl	prvDecrementSemaphoreCount
+ 375              	.L23:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 12
+
+
+ 237:..\..\Common\Minimal/countsem.c **** 	}
+ 238:..\..\Common\Minimal/countsem.c **** 
+ 239:..\..\Common\Minimal/countsem.c **** 	/* Now we expect the semaphore count to be 0, so this time there is an
+ 240:..\..\Common\Minimal/countsem.c **** 	error if we can take the semaphore. */
+ 241:..\..\Common\Minimal/countsem.c **** 	if( xSemaphoreTake( pxParameter->xSemaphore, 0 ) == pdPASS )
+ 376              		.loc 1 241 0
+ 377 0024 FB68     		ldr	r3, [r7, #12]
+ 378 0026 1B68     		ldr	r3, [r3]
+ 379 0028 1846     		mov	r0, r3
+ 380 002a 0021     		movs	r1, #0
+ 381 002c FFF7FEFF 		bl	xQueueSemaphoreTake
+ 382 0030 0346     		mov	r3, r0
+ 383 0032 012B     		cmp	r3, #1
+ 384 0034 02D1     		bne	.L24
+ 242:..\..\Common\Minimal/countsem.c **** 	{
+ 243:..\..\Common\Minimal/countsem.c **** 		xErrorDetected = pdTRUE;
+ 385              		.loc 1 243 0
+ 386 0036 0A4B     		ldr	r3, .L25
+ 387 0038 0122     		movs	r2, #1
+ 388 003a 1A60     		str	r2, [r3]
+ 389              	.L24:
+ 244:..\..\Common\Minimal/countsem.c **** 	}
+ 245:..\..\Common\Minimal/countsem.c **** 
+ 246:..\..\Common\Minimal/countsem.c **** 	for( ;; )
+ 247:..\..\Common\Minimal/countsem.c **** 	{
+ 248:..\..\Common\Minimal/countsem.c **** 		prvIncrementSemaphoreCount( pxParameter->xSemaphore, &( pxParameter->uxLoopCounter ) );
+ 390              		.loc 1 248 0 discriminator 1
+ 391 003c FB68     		ldr	r3, [r7, #12]
+ 392 003e 1A68     		ldr	r2, [r3]
+ 393 0040 FB68     		ldr	r3, [r7, #12]
+ 394 0042 0833     		adds	r3, r3, #8
+ 395 0044 1046     		mov	r0, r2
+ 396 0046 1946     		mov	r1, r3
+ 397 0048 FFF7FEFF 		bl	prvIncrementSemaphoreCount
+ 249:..\..\Common\Minimal/countsem.c **** 		prvDecrementSemaphoreCount( pxParameter->xSemaphore, &( pxParameter->uxLoopCounter ) );
+ 398              		.loc 1 249 0 discriminator 1
+ 399 004c FB68     		ldr	r3, [r7, #12]
+ 400 004e 1A68     		ldr	r2, [r3]
+ 401 0050 FB68     		ldr	r3, [r7, #12]
+ 402 0052 0833     		adds	r3, r3, #8
+ 403 0054 1046     		mov	r0, r2
+ 404 0056 1946     		mov	r1, r3
+ 405 0058 FFF7FEFF 		bl	prvDecrementSemaphoreCount
+ 250:..\..\Common\Minimal/countsem.c **** 	}
+ 406              		.loc 1 250 0 discriminator 1
+ 407 005c EEE7     		b	.L24
+ 408              	.L26:
+ 409 005e 00BF     		.align	2
+ 410              	.L25:
+ 411 0060 00000000 		.word	xErrorDetected
+ 412              		.cfi_endproc
+ 413              	.LFE71:
+ 414              		.size	prvCountingSemaphoreTask, .-prvCountingSemaphoreTask
+ 415              		.section	.text.xAreCountingSemaphoreTasksStillRunning,"ax",%progbits
+ 416              		.align	2
+ 417              		.global	xAreCountingSemaphoreTasksStillRunning
+ 418              		.thumb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 13
+
+
+ 419              		.thumb_func
+ 420              		.type	xAreCountingSemaphoreTasksStillRunning, %function
+ 421              	xAreCountingSemaphoreTasksStillRunning:
+ 422              	.LFB72:
+ 251:..\..\Common\Minimal/countsem.c **** }
+ 252:..\..\Common\Minimal/countsem.c **** /*-----------------------------------------------------------*/
+ 253:..\..\Common\Minimal/countsem.c **** 
+ 254:..\..\Common\Minimal/countsem.c **** BaseType_t xAreCountingSemaphoreTasksStillRunning( void )
+ 255:..\..\Common\Minimal/countsem.c **** {
+ 423              		.loc 1 255 0
+ 424              		.cfi_startproc
+ 425              		@ args = 0, pretend = 0, frame = 8
+ 426              		@ frame_needed = 1, uses_anonymous_args = 0
+ 427              		@ link register save eliminated.
+ 428 0000 80B4     		push	{r7}
+ 429              		.cfi_def_cfa_offset 4
+ 430              		.cfi_offset 7, -4
+ 431 0002 83B0     		sub	sp, sp, #12
+ 432              		.cfi_def_cfa_offset 16
+ 433 0004 00AF     		add	r7, sp, #0
+ 434              		.cfi_def_cfa_register 7
+ 256:..\..\Common\Minimal/countsem.c **** static UBaseType_t uxLastCount0 = 0, uxLastCount1 = 0;
+ 257:..\..\Common\Minimal/countsem.c **** BaseType_t xReturn = pdPASS;
+ 435              		.loc 1 257 0
+ 436 0006 0123     		movs	r3, #1
+ 437 0008 7B60     		str	r3, [r7, #4]
+ 258:..\..\Common\Minimal/countsem.c **** 
+ 259:..\..\Common\Minimal/countsem.c **** 	/* Return fail if any 'give' or 'take' did not result in the expected
+ 260:..\..\Common\Minimal/countsem.c **** 	behaviour. */
+ 261:..\..\Common\Minimal/countsem.c **** 	if( xErrorDetected != pdFALSE )
+ 438              		.loc 1 261 0
+ 439 000a 134B     		ldr	r3, .L34
+ 440 000c 1B68     		ldr	r3, [r3]
+ 441 000e 002B     		cmp	r3, #0
+ 442 0010 01D0     		beq	.L28
+ 262:..\..\Common\Minimal/countsem.c **** 	{
+ 263:..\..\Common\Minimal/countsem.c **** 		xReturn = pdFAIL;
+ 443              		.loc 1 263 0
+ 444 0012 0023     		movs	r3, #0
+ 445 0014 7B60     		str	r3, [r7, #4]
+ 446              	.L28:
+ 264:..\..\Common\Minimal/countsem.c **** 	}
+ 265:..\..\Common\Minimal/countsem.c **** 
+ 266:..\..\Common\Minimal/countsem.c **** 	/* Return fail if either task is not still incrementing its loop counter. */
+ 267:..\..\Common\Minimal/countsem.c **** 	if( uxLastCount0 == xParameters[ 0 ].uxLoopCounter )
+ 447              		.loc 1 267 0
+ 448 0016 114B     		ldr	r3, .L34+4
+ 449 0018 9A68     		ldr	r2, [r3, #8]
+ 450 001a 114B     		ldr	r3, .L34+8
+ 451 001c 1B68     		ldr	r3, [r3]
+ 452 001e 9A42     		cmp	r2, r3
+ 453 0020 02D1     		bne	.L29
+ 268:..\..\Common\Minimal/countsem.c **** 	{
+ 269:..\..\Common\Minimal/countsem.c **** 		xReturn = pdFAIL;
+ 454              		.loc 1 269 0
+ 455 0022 0023     		movs	r3, #0
+ 456 0024 7B60     		str	r3, [r7, #4]
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 14
+
+
+ 457 0026 03E0     		b	.L30
+ 458              	.L29:
+ 270:..\..\Common\Minimal/countsem.c **** 	}
+ 271:..\..\Common\Minimal/countsem.c **** 	else
+ 272:..\..\Common\Minimal/countsem.c **** 	{
+ 273:..\..\Common\Minimal/countsem.c **** 		uxLastCount0 = xParameters[ 0 ].uxLoopCounter;
+ 459              		.loc 1 273 0
+ 460 0028 0C4B     		ldr	r3, .L34+4
+ 461 002a 9B68     		ldr	r3, [r3, #8]
+ 462 002c 0C4A     		ldr	r2, .L34+8
+ 463 002e 1360     		str	r3, [r2]
+ 464              	.L30:
+ 274:..\..\Common\Minimal/countsem.c **** 	}
+ 275:..\..\Common\Minimal/countsem.c **** 
+ 276:..\..\Common\Minimal/countsem.c **** 	if( uxLastCount1 == xParameters[ 1 ].uxLoopCounter )
+ 465              		.loc 1 276 0
+ 466 0030 0A4B     		ldr	r3, .L34+4
+ 467 0032 5A69     		ldr	r2, [r3, #20]
+ 468 0034 0B4B     		ldr	r3, .L34+12
+ 469 0036 1B68     		ldr	r3, [r3]
+ 470 0038 9A42     		cmp	r2, r3
+ 471 003a 02D1     		bne	.L31
+ 277:..\..\Common\Minimal/countsem.c **** 	{
+ 278:..\..\Common\Minimal/countsem.c **** 		xReturn = pdFAIL;
+ 472              		.loc 1 278 0
+ 473 003c 0023     		movs	r3, #0
+ 474 003e 7B60     		str	r3, [r7, #4]
+ 475 0040 03E0     		b	.L32
+ 476              	.L31:
+ 279:..\..\Common\Minimal/countsem.c **** 	}
+ 280:..\..\Common\Minimal/countsem.c **** 	else
+ 281:..\..\Common\Minimal/countsem.c **** 	{
+ 282:..\..\Common\Minimal/countsem.c **** 		uxLastCount1 = xParameters[ 1 ].uxLoopCounter;
+ 477              		.loc 1 282 0
+ 478 0042 064B     		ldr	r3, .L34+4
+ 479 0044 5B69     		ldr	r3, [r3, #20]
+ 480 0046 074A     		ldr	r2, .L34+12
+ 481 0048 1360     		str	r3, [r2]
+ 482              	.L32:
+ 283:..\..\Common\Minimal/countsem.c **** 	}
+ 284:..\..\Common\Minimal/countsem.c **** 
+ 285:..\..\Common\Minimal/countsem.c **** 	return xReturn;
+ 483              		.loc 1 285 0
+ 484 004a 7B68     		ldr	r3, [r7, #4]
+ 286:..\..\Common\Minimal/countsem.c **** }
+ 485              		.loc 1 286 0
+ 486 004c 1846     		mov	r0, r3
+ 487 004e 0C37     		adds	r7, r7, #12
+ 488              		.cfi_def_cfa_offset 4
+ 489 0050 BD46     		mov	sp, r7
+ 490              		.cfi_def_cfa_register 13
+ 491              		@ sp needed
+ 492 0052 5DF8047B 		ldr	r7, [sp], #4
+ 493              		.cfi_restore 7
+ 494              		.cfi_def_cfa_offset 0
+ 495 0056 7047     		bx	lr
+ 496              	.L35:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 15
+
+
+ 497              		.align	2
+ 498              	.L34:
+ 499 0058 00000000 		.word	xErrorDetected
+ 500 005c 04000000 		.word	xParameters
+ 501 0060 1C000000 		.word	uxLastCount0.6388
+ 502 0064 20000000 		.word	uxLastCount1.6389
+ 503              		.cfi_endproc
+ 504              	.LFE72:
+ 505              		.size	xAreCountingSemaphoreTasksStillRunning, .-xAreCountingSemaphoreTasksStillRunning
+ 506              		.bss
+ 507              		.align	2
+ 508              	uxLastCount0.6388:
+ 509 001c 00000000 		.space	4
+ 510              		.align	2
+ 511              	uxLastCount1.6389:
+ 512 0020 00000000 		.space	4
+ 513              		.text
+ 514              	.Letext0:
+ 515              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 516              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 517              		.file 4 "../../../Source/portable/GCC/ARM_CM3/portmacro.h"
+ 518              		.file 5 "../../../Source/include/queue.h"
+ 519              		.file 6 "../../../Source/include/semphr.h"
+ 520              		.file 7 "Generated_Source\\PSoC5/core_cm3.h"
+ 521              		.section	.debug_info,"",%progbits
+ 522              	.Ldebug_info0:
+ 523 0000 8C020000 		.4byte	0x28c
+ 524 0004 0400     		.2byte	0x4
+ 525 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 526 000a 04       		.byte	0x4
+ 527 000b 01       		.uleb128 0x1
+ 528 000c 7C000000 		.4byte	.LASF37
+ 529 0010 01       		.byte	0x1
+ 530 0011 1D020000 		.4byte	.LASF38
+ 531 0015 71020000 		.4byte	.LASF39
+ 532 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 533 001d 00000000 		.4byte	0
+ 534 0021 00000000 		.4byte	.Ldebug_line0
+ 535 0025 02       		.uleb128 0x2
+ 536 0026 04       		.byte	0x4
+ 537 0027 05       		.byte	0x5
+ 538 0028 696E7400 		.ascii	"int\000"
+ 539 002c 03       		.uleb128 0x3
+ 540 002d 04       		.byte	0x4
+ 541 002e 07       		.byte	0x7
+ 542 002f 10020000 		.4byte	.LASF0
+ 543 0033 03       		.uleb128 0x3
+ 544 0034 01       		.byte	0x1
+ 545 0035 06       		.byte	0x6
+ 546 0036 50010000 		.4byte	.LASF1
+ 547 003a 03       		.uleb128 0x3
+ 548 003b 01       		.byte	0x1
+ 549 003c 08       		.byte	0x8
+ 550 003d 5C010000 		.4byte	.LASF2
+ 551 0041 03       		.uleb128 0x3
+ 552 0042 02       		.byte	0x2
+ 553 0043 05       		.byte	0x5
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 16
+
+
+ 554 0044 43030000 		.4byte	.LASF3
+ 555 0048 03       		.uleb128 0x3
+ 556 0049 02       		.byte	0x2
+ 557 004a 07       		.byte	0x7
+ 558 004b 8A010000 		.4byte	.LASF4
+ 559 004f 04       		.uleb128 0x4
+ 560 0050 72000000 		.4byte	.LASF6
+ 561 0054 02       		.byte	0x2
+ 562 0055 3F       		.byte	0x3f
+ 563 0056 5A000000 		.4byte	0x5a
+ 564 005a 03       		.uleb128 0x3
+ 565 005b 04       		.byte	0x4
+ 566 005c 05       		.byte	0x5
+ 567 005d 56030000 		.4byte	.LASF5
+ 568 0061 04       		.uleb128 0x4
+ 569 0062 D6010000 		.4byte	.LASF7
+ 570 0066 02       		.byte	0x2
+ 571 0067 41       		.byte	0x41
+ 572 0068 6C000000 		.4byte	0x6c
+ 573 006c 03       		.uleb128 0x3
+ 574 006d 04       		.byte	0x4
+ 575 006e 07       		.byte	0x7
+ 576 006f 78010000 		.4byte	.LASF8
+ 577 0073 03       		.uleb128 0x3
+ 578 0074 08       		.byte	0x8
+ 579 0075 05       		.byte	0x5
+ 580 0076 23030000 		.4byte	.LASF9
+ 581 007a 03       		.uleb128 0x3
+ 582 007b 08       		.byte	0x8
+ 583 007c 07       		.byte	0x7
+ 584 007d 3D020000 		.4byte	.LASF10
+ 585 0081 04       		.uleb128 0x4
+ 586 0082 12030000 		.4byte	.LASF11
+ 587 0086 03       		.byte	0x3
+ 588 0087 2C       		.byte	0x2c
+ 589 0088 4F000000 		.4byte	0x4f
+ 590 008c 04       		.uleb128 0x4
+ 591 008d 4D030000 		.4byte	.LASF12
+ 592 0091 03       		.byte	0x3
+ 593 0092 2D       		.byte	0x2d
+ 594 0093 61000000 		.4byte	0x61
+ 595 0097 03       		.uleb128 0x3
+ 596 0098 04       		.byte	0x4
+ 597 0099 04       		.byte	0x4
+ 598 009a 4A010000 		.4byte	.LASF13
+ 599 009e 03       		.uleb128 0x3
+ 600 009f 08       		.byte	0x8
+ 601 00a0 04       		.byte	0x4
+ 602 00a1 18010000 		.4byte	.LASF14
+ 603 00a5 03       		.uleb128 0x3
+ 604 00a6 01       		.byte	0x1
+ 605 00a7 08       		.byte	0x8
+ 606 00a8 31030000 		.4byte	.LASF15
+ 607 00ac 03       		.uleb128 0x3
+ 608 00ad 04       		.byte	0x4
+ 609 00ae 07       		.byte	0x7
+ 610 00af 1A030000 		.4byte	.LASF16
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 17
+
+
+ 611 00b3 05       		.uleb128 0x5
+ 612 00b4 04       		.byte	0x4
+ 613 00b5 04       		.uleb128 0x4
+ 614 00b6 86030000 		.4byte	.LASF17
+ 615 00ba 04       		.byte	0x4
+ 616 00bb 38       		.byte	0x38
+ 617 00bc 5A000000 		.4byte	0x5a
+ 618 00c0 04       		.uleb128 0x4
+ 619 00c1 7A030000 		.4byte	.LASF18
+ 620 00c5 04       		.byte	0x4
+ 621 00c6 39       		.byte	0x39
+ 622 00c7 6C000000 		.4byte	0x6c
+ 623 00cb 04       		.uleb128 0x4
+ 624 00cc 56000000 		.4byte	.LASF19
+ 625 00d0 04       		.byte	0x4
+ 626 00d1 3F       		.byte	0x3f
+ 627 00d2 8C000000 		.4byte	0x8c
+ 628 00d6 06       		.uleb128 0x6
+ 629 00d7 C0000000 		.4byte	0xc0
+ 630 00db 04       		.uleb128 0x4
+ 631 00dc 0A010000 		.4byte	.LASF20
+ 632 00e0 05       		.byte	0x5
+ 633 00e1 2E       		.byte	0x2e
+ 634 00e2 B3000000 		.4byte	0xb3
+ 635 00e6 04       		.uleb128 0x4
+ 636 00e7 C4010000 		.4byte	.LASF21
+ 637 00eb 06       		.byte	0x6
+ 638 00ec 25       		.byte	0x25
+ 639 00ed DB000000 		.4byte	0xdb
+ 640 00f1 07       		.uleb128 0x7
+ 641 00f2 61000000 		.4byte	.LASF40
+ 642 00f6 0C       		.byte	0xc
+ 643 00f7 01       		.byte	0x1
+ 644 00f8 57       		.byte	0x57
+ 645 00f9 22010000 		.4byte	0x122
+ 646 00fd 08       		.uleb128 0x8
+ 647 00fe 00000000 		.4byte	.LASF22
+ 648 0102 01       		.byte	0x1
+ 649 0103 5A       		.byte	0x5a
+ 650 0104 E6000000 		.4byte	0xe6
+ 651 0108 00       		.byte	0
+ 652 0109 08       		.uleb128 0x8
+ 653 010a 41000000 		.4byte	.LASF23
+ 654 010e 01       		.byte	0x1
+ 655 010f 5F       		.byte	0x5f
+ 656 0110 C0000000 		.4byte	0xc0
+ 657 0114 04       		.byte	0x4
+ 658 0115 08       		.uleb128 0x8
+ 659 0116 6A010000 		.4byte	.LASF24
+ 660 011a 01       		.byte	0x1
+ 661 011b 63       		.byte	0x63
+ 662 011c D6000000 		.4byte	0xd6
+ 663 0120 08       		.byte	0x8
+ 664 0121 00       		.byte	0
+ 665 0122 04       		.uleb128 0x4
+ 666 0123 2B010000 		.4byte	.LASF25
+ 667 0127 01       		.byte	0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 18
+
+
+ 668 0128 64       		.byte	0x64
+ 669 0129 F1000000 		.4byte	0xf1
+ 670 012d 09       		.uleb128 0x9
+ 671 012e 54020000 		.4byte	.LASF41
+ 672 0132 01       		.byte	0x1
+ 673 0133 6B       		.byte	0x6b
+ 674 0134 00000000 		.4byte	.LFB68
+ 675 0138 AC000000 		.4byte	.LFE68-.LFB68
+ 676 013c 01       		.uleb128 0x1
+ 677 013d 9C       		.byte	0x9c
+ 678 013e 0A       		.uleb128 0xa
+ 679 013f 0B000000 		.4byte	.LASF27
+ 680 0143 01       		.byte	0x1
+ 681 0144 8B       		.byte	0x8b
+ 682 0145 00000000 		.4byte	.LFB69
+ 683 0149 70000000 		.4byte	.LFE69-.LFB69
+ 684 014d 01       		.uleb128 0x1
+ 685 014e 9C       		.byte	0x9c
+ 686 014f 7D010000 		.4byte	0x17d
+ 687 0153 0B       		.uleb128 0xb
+ 688 0154 00000000 		.4byte	.LASF22
+ 689 0158 01       		.byte	0x1
+ 690 0159 8B       		.byte	0x8b
+ 691 015a E6000000 		.4byte	0xe6
+ 692 015e 02       		.uleb128 0x2
+ 693 015f 91       		.byte	0x91
+ 694 0160 6C       		.sleb128 -20
+ 695 0161 0B       		.uleb128 0xb
+ 696 0162 3B010000 		.4byte	.LASF26
+ 697 0166 01       		.byte	0x1
+ 698 0167 8B       		.byte	0x8b
+ 699 0168 7D010000 		.4byte	0x17d
+ 700 016c 02       		.uleb128 0x2
+ 701 016d 91       		.byte	0x91
+ 702 016e 68       		.sleb128 -24
+ 703 016f 0C       		.uleb128 0xc
+ 704 0170 757800   		.ascii	"ux\000"
+ 705 0173 01       		.byte	0x1
+ 706 0174 8D       		.byte	0x8d
+ 707 0175 C0000000 		.4byte	0xc0
+ 708 0179 02       		.uleb128 0x2
+ 709 017a 91       		.byte	0x91
+ 710 017b 74       		.sleb128 -12
+ 711 017c 00       		.byte	0
+ 712 017d 0D       		.uleb128 0xd
+ 713 017e 04       		.byte	0x4
+ 714 017f D6000000 		.4byte	0xd6
+ 715 0183 0A       		.uleb128 0xa
+ 716 0184 26000000 		.4byte	.LASF28
+ 717 0188 01       		.byte	0x1
+ 718 0189 B2       		.byte	0xb2
+ 719 018a 00000000 		.4byte	.LFB70
+ 720 018e 74000000 		.4byte	.LFE70-.LFB70
+ 721 0192 01       		.uleb128 0x1
+ 722 0193 9C       		.byte	0x9c
+ 723 0194 C2010000 		.4byte	0x1c2
+ 724 0198 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 19
+
+
+ 725 0199 00000000 		.4byte	.LASF22
+ 726 019d 01       		.byte	0x1
+ 727 019e B2       		.byte	0xb2
+ 728 019f E6000000 		.4byte	0xe6
+ 729 01a3 02       		.uleb128 0x2
+ 730 01a4 91       		.byte	0x91
+ 731 01a5 6C       		.sleb128 -20
+ 732 01a6 0B       		.uleb128 0xb
+ 733 01a7 3B010000 		.4byte	.LASF26
+ 734 01ab 01       		.byte	0x1
+ 735 01ac B2       		.byte	0xb2
+ 736 01ad 7D010000 		.4byte	0x17d
+ 737 01b1 02       		.uleb128 0x2
+ 738 01b2 91       		.byte	0x91
+ 739 01b3 68       		.sleb128 -24
+ 740 01b4 0C       		.uleb128 0xc
+ 741 01b5 757800   		.ascii	"ux\000"
+ 742 01b8 01       		.byte	0x1
+ 743 01b9 B4       		.byte	0xb4
+ 744 01ba C0000000 		.4byte	0xc0
+ 745 01be 02       		.uleb128 0x2
+ 746 01bf 91       		.byte	0x91
+ 747 01c0 74       		.sleb128 -12
+ 748 01c1 00       		.byte	0
+ 749 01c2 0A       		.uleb128 0xa
+ 750 01c3 F9020000 		.4byte	.LASF29
+ 751 01c7 01       		.byte	0x1
+ 752 01c8 D8       		.byte	0xd8
+ 753 01c9 00000000 		.4byte	.LFB71
+ 754 01cd 64000000 		.4byte	.LFE71-.LFB71
+ 755 01d1 01       		.uleb128 0x1
+ 756 01d2 9C       		.byte	0x9c
+ 757 01d3 F4010000 		.4byte	0x1f4
+ 758 01d7 0B       		.uleb128 0xb
+ 759 01d8 36030000 		.4byte	.LASF30
+ 760 01dc 01       		.byte	0x1
+ 761 01dd D8       		.byte	0xd8
+ 762 01de B3000000 		.4byte	0xb3
+ 763 01e2 02       		.uleb128 0x2
+ 764 01e3 91       		.byte	0x91
+ 765 01e4 6C       		.sleb128 -20
+ 766 01e5 0E       		.uleb128 0xe
+ 767 01e6 5F030000 		.4byte	.LASF31
+ 768 01ea 01       		.byte	0x1
+ 769 01eb DA       		.byte	0xda
+ 770 01ec F4010000 		.4byte	0x1f4
+ 771 01f0 02       		.uleb128 0x2
+ 772 01f1 91       		.byte	0x91
+ 773 01f2 74       		.sleb128 -12
+ 774 01f3 00       		.byte	0
+ 775 01f4 0D       		.uleb128 0xd
+ 776 01f5 04       		.byte	0x4
+ 777 01f6 22010000 		.4byte	0x122
+ 778 01fa 0F       		.uleb128 0xf
+ 779 01fb E1010000 		.4byte	.LASF42
+ 780 01ff 01       		.byte	0x1
+ 781 0200 FE       		.byte	0xfe
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 20
+
+
+ 782 0201 B5000000 		.4byte	0xb5
+ 783 0205 00000000 		.4byte	.LFB72
+ 784 0209 68000000 		.4byte	.LFE72-.LFB72
+ 785 020d 01       		.uleb128 0x1
+ 786 020e 9C       		.byte	0x9c
+ 787 020f 47020000 		.4byte	0x247
+ 788 0213 10       		.uleb128 0x10
+ 789 0214 AA010000 		.4byte	.LASF32
+ 790 0218 01       		.byte	0x1
+ 791 0219 0001     		.2byte	0x100
+ 792 021b C0000000 		.4byte	0xc0
+ 793 021f 05       		.uleb128 0x5
+ 794 0220 03       		.byte	0x3
+ 795 0221 1C000000 		.4byte	uxLastCount0.6388
+ 796 0225 10       		.uleb128 0x10
+ 797 0226 B7010000 		.4byte	.LASF33
+ 798 022a 01       		.byte	0x1
+ 799 022b 0001     		.2byte	0x100
+ 800 022d C0000000 		.4byte	0xc0
+ 801 0231 05       		.uleb128 0x5
+ 802 0232 03       		.byte	0x3
+ 803 0233 20000000 		.4byte	uxLastCount1.6389
+ 804 0237 10       		.uleb128 0x10
+ 805 0238 08020000 		.4byte	.LASF34
+ 806 023c 01       		.byte	0x1
+ 807 023d 0101     		.2byte	0x101
+ 808 023f B5000000 		.4byte	0xb5
+ 809 0243 02       		.uleb128 0x2
+ 810 0244 91       		.byte	0x91
+ 811 0245 74       		.sleb128 -12
+ 812 0246 00       		.byte	0
+ 813 0247 0E       		.uleb128 0xe
+ 814 0248 6B030000 		.4byte	.LASF35
+ 815 024c 01       		.byte	0x1
+ 816 024d 3C       		.byte	0x3c
+ 817 024e 58020000 		.4byte	0x258
+ 818 0252 05       		.uleb128 0x5
+ 819 0253 03       		.byte	0x3
+ 820 0254 00000000 		.4byte	xErrorDetected
+ 821 0258 06       		.uleb128 0x6
+ 822 0259 B5000000 		.4byte	0xb5
+ 823 025d 11       		.uleb128 0x11
+ 824 025e 22010000 		.4byte	0x122
+ 825 0262 6D020000 		.4byte	0x26d
+ 826 0266 12       		.uleb128 0x12
+ 827 0267 AC000000 		.4byte	0xac
+ 828 026b 01       		.byte	0x1
+ 829 026c 00       		.byte	0
+ 830 026d 0E       		.uleb128 0xe
+ 831 026e 1F010000 		.4byte	.LASF36
+ 832 0272 01       		.byte	0x1
+ 833 0273 67       		.byte	0x67
+ 834 0274 5D020000 		.4byte	0x25d
+ 835 0278 05       		.uleb128 0x5
+ 836 0279 03       		.byte	0x3
+ 837 027a 04000000 		.4byte	xParameters
+ 838 027e 13       		.uleb128 0x13
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 21
+
+
+ 839 027f 9D010000 		.4byte	.LASF43
+ 840 0283 07       		.byte	0x7
+ 841 0284 9606     		.2byte	0x696
+ 842 0286 8A020000 		.4byte	0x28a
+ 843 028a 06       		.uleb128 0x6
+ 844 028b 81000000 		.4byte	0x81
+ 845 028f 00       		.byte	0
+ 846              		.section	.debug_abbrev,"",%progbits
+ 847              	.Ldebug_abbrev0:
+ 848 0000 01       		.uleb128 0x1
+ 849 0001 11       		.uleb128 0x11
+ 850 0002 01       		.byte	0x1
+ 851 0003 25       		.uleb128 0x25
+ 852 0004 0E       		.uleb128 0xe
+ 853 0005 13       		.uleb128 0x13
+ 854 0006 0B       		.uleb128 0xb
+ 855 0007 03       		.uleb128 0x3
+ 856 0008 0E       		.uleb128 0xe
+ 857 0009 1B       		.uleb128 0x1b
+ 858 000a 0E       		.uleb128 0xe
+ 859 000b 55       		.uleb128 0x55
+ 860 000c 17       		.uleb128 0x17
+ 861 000d 11       		.uleb128 0x11
+ 862 000e 01       		.uleb128 0x1
+ 863 000f 10       		.uleb128 0x10
+ 864 0010 17       		.uleb128 0x17
+ 865 0011 00       		.byte	0
+ 866 0012 00       		.byte	0
+ 867 0013 02       		.uleb128 0x2
+ 868 0014 24       		.uleb128 0x24
+ 869 0015 00       		.byte	0
+ 870 0016 0B       		.uleb128 0xb
+ 871 0017 0B       		.uleb128 0xb
+ 872 0018 3E       		.uleb128 0x3e
+ 873 0019 0B       		.uleb128 0xb
+ 874 001a 03       		.uleb128 0x3
+ 875 001b 08       		.uleb128 0x8
+ 876 001c 00       		.byte	0
+ 877 001d 00       		.byte	0
+ 878 001e 03       		.uleb128 0x3
+ 879 001f 24       		.uleb128 0x24
+ 880 0020 00       		.byte	0
+ 881 0021 0B       		.uleb128 0xb
+ 882 0022 0B       		.uleb128 0xb
+ 883 0023 3E       		.uleb128 0x3e
+ 884 0024 0B       		.uleb128 0xb
+ 885 0025 03       		.uleb128 0x3
+ 886 0026 0E       		.uleb128 0xe
+ 887 0027 00       		.byte	0
+ 888 0028 00       		.byte	0
+ 889 0029 04       		.uleb128 0x4
+ 890 002a 16       		.uleb128 0x16
+ 891 002b 00       		.byte	0
+ 892 002c 03       		.uleb128 0x3
+ 893 002d 0E       		.uleb128 0xe
+ 894 002e 3A       		.uleb128 0x3a
+ 895 002f 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 22
+
+
+ 896 0030 3B       		.uleb128 0x3b
+ 897 0031 0B       		.uleb128 0xb
+ 898 0032 49       		.uleb128 0x49
+ 899 0033 13       		.uleb128 0x13
+ 900 0034 00       		.byte	0
+ 901 0035 00       		.byte	0
+ 902 0036 05       		.uleb128 0x5
+ 903 0037 0F       		.uleb128 0xf
+ 904 0038 00       		.byte	0
+ 905 0039 0B       		.uleb128 0xb
+ 906 003a 0B       		.uleb128 0xb
+ 907 003b 00       		.byte	0
+ 908 003c 00       		.byte	0
+ 909 003d 06       		.uleb128 0x6
+ 910 003e 35       		.uleb128 0x35
+ 911 003f 00       		.byte	0
+ 912 0040 49       		.uleb128 0x49
+ 913 0041 13       		.uleb128 0x13
+ 914 0042 00       		.byte	0
+ 915 0043 00       		.byte	0
+ 916 0044 07       		.uleb128 0x7
+ 917 0045 13       		.uleb128 0x13
+ 918 0046 01       		.byte	0x1
+ 919 0047 03       		.uleb128 0x3
+ 920 0048 0E       		.uleb128 0xe
+ 921 0049 0B       		.uleb128 0xb
+ 922 004a 0B       		.uleb128 0xb
+ 923 004b 3A       		.uleb128 0x3a
+ 924 004c 0B       		.uleb128 0xb
+ 925 004d 3B       		.uleb128 0x3b
+ 926 004e 0B       		.uleb128 0xb
+ 927 004f 01       		.uleb128 0x1
+ 928 0050 13       		.uleb128 0x13
+ 929 0051 00       		.byte	0
+ 930 0052 00       		.byte	0
+ 931 0053 08       		.uleb128 0x8
+ 932 0054 0D       		.uleb128 0xd
+ 933 0055 00       		.byte	0
+ 934 0056 03       		.uleb128 0x3
+ 935 0057 0E       		.uleb128 0xe
+ 936 0058 3A       		.uleb128 0x3a
+ 937 0059 0B       		.uleb128 0xb
+ 938 005a 3B       		.uleb128 0x3b
+ 939 005b 0B       		.uleb128 0xb
+ 940 005c 49       		.uleb128 0x49
+ 941 005d 13       		.uleb128 0x13
+ 942 005e 38       		.uleb128 0x38
+ 943 005f 0B       		.uleb128 0xb
+ 944 0060 00       		.byte	0
+ 945 0061 00       		.byte	0
+ 946 0062 09       		.uleb128 0x9
+ 947 0063 2E       		.uleb128 0x2e
+ 948 0064 00       		.byte	0
+ 949 0065 3F       		.uleb128 0x3f
+ 950 0066 19       		.uleb128 0x19
+ 951 0067 03       		.uleb128 0x3
+ 952 0068 0E       		.uleb128 0xe
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 23
+
+
+ 953 0069 3A       		.uleb128 0x3a
+ 954 006a 0B       		.uleb128 0xb
+ 955 006b 3B       		.uleb128 0x3b
+ 956 006c 0B       		.uleb128 0xb
+ 957 006d 27       		.uleb128 0x27
+ 958 006e 19       		.uleb128 0x19
+ 959 006f 11       		.uleb128 0x11
+ 960 0070 01       		.uleb128 0x1
+ 961 0071 12       		.uleb128 0x12
+ 962 0072 06       		.uleb128 0x6
+ 963 0073 40       		.uleb128 0x40
+ 964 0074 18       		.uleb128 0x18
+ 965 0075 9642     		.uleb128 0x2116
+ 966 0077 19       		.uleb128 0x19
+ 967 0078 00       		.byte	0
+ 968 0079 00       		.byte	0
+ 969 007a 0A       		.uleb128 0xa
+ 970 007b 2E       		.uleb128 0x2e
+ 971 007c 01       		.byte	0x1
+ 972 007d 03       		.uleb128 0x3
+ 973 007e 0E       		.uleb128 0xe
+ 974 007f 3A       		.uleb128 0x3a
+ 975 0080 0B       		.uleb128 0xb
+ 976 0081 3B       		.uleb128 0x3b
+ 977 0082 0B       		.uleb128 0xb
+ 978 0083 27       		.uleb128 0x27
+ 979 0084 19       		.uleb128 0x19
+ 980 0085 11       		.uleb128 0x11
+ 981 0086 01       		.uleb128 0x1
+ 982 0087 12       		.uleb128 0x12
+ 983 0088 06       		.uleb128 0x6
+ 984 0089 40       		.uleb128 0x40
+ 985 008a 18       		.uleb128 0x18
+ 986 008b 9642     		.uleb128 0x2116
+ 987 008d 19       		.uleb128 0x19
+ 988 008e 01       		.uleb128 0x1
+ 989 008f 13       		.uleb128 0x13
+ 990 0090 00       		.byte	0
+ 991 0091 00       		.byte	0
+ 992 0092 0B       		.uleb128 0xb
+ 993 0093 05       		.uleb128 0x5
+ 994 0094 00       		.byte	0
+ 995 0095 03       		.uleb128 0x3
+ 996 0096 0E       		.uleb128 0xe
+ 997 0097 3A       		.uleb128 0x3a
+ 998 0098 0B       		.uleb128 0xb
+ 999 0099 3B       		.uleb128 0x3b
+ 1000 009a 0B       		.uleb128 0xb
+ 1001 009b 49       		.uleb128 0x49
+ 1002 009c 13       		.uleb128 0x13
+ 1003 009d 02       		.uleb128 0x2
+ 1004 009e 18       		.uleb128 0x18
+ 1005 009f 00       		.byte	0
+ 1006 00a0 00       		.byte	0
+ 1007 00a1 0C       		.uleb128 0xc
+ 1008 00a2 34       		.uleb128 0x34
+ 1009 00a3 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 24
+
+
+ 1010 00a4 03       		.uleb128 0x3
+ 1011 00a5 08       		.uleb128 0x8
+ 1012 00a6 3A       		.uleb128 0x3a
+ 1013 00a7 0B       		.uleb128 0xb
+ 1014 00a8 3B       		.uleb128 0x3b
+ 1015 00a9 0B       		.uleb128 0xb
+ 1016 00aa 49       		.uleb128 0x49
+ 1017 00ab 13       		.uleb128 0x13
+ 1018 00ac 02       		.uleb128 0x2
+ 1019 00ad 18       		.uleb128 0x18
+ 1020 00ae 00       		.byte	0
+ 1021 00af 00       		.byte	0
+ 1022 00b0 0D       		.uleb128 0xd
+ 1023 00b1 0F       		.uleb128 0xf
+ 1024 00b2 00       		.byte	0
+ 1025 00b3 0B       		.uleb128 0xb
+ 1026 00b4 0B       		.uleb128 0xb
+ 1027 00b5 49       		.uleb128 0x49
+ 1028 00b6 13       		.uleb128 0x13
+ 1029 00b7 00       		.byte	0
+ 1030 00b8 00       		.byte	0
+ 1031 00b9 0E       		.uleb128 0xe
+ 1032 00ba 34       		.uleb128 0x34
+ 1033 00bb 00       		.byte	0
+ 1034 00bc 03       		.uleb128 0x3
+ 1035 00bd 0E       		.uleb128 0xe
+ 1036 00be 3A       		.uleb128 0x3a
+ 1037 00bf 0B       		.uleb128 0xb
+ 1038 00c0 3B       		.uleb128 0x3b
+ 1039 00c1 0B       		.uleb128 0xb
+ 1040 00c2 49       		.uleb128 0x49
+ 1041 00c3 13       		.uleb128 0x13
+ 1042 00c4 02       		.uleb128 0x2
+ 1043 00c5 18       		.uleb128 0x18
+ 1044 00c6 00       		.byte	0
+ 1045 00c7 00       		.byte	0
+ 1046 00c8 0F       		.uleb128 0xf
+ 1047 00c9 2E       		.uleb128 0x2e
+ 1048 00ca 01       		.byte	0x1
+ 1049 00cb 3F       		.uleb128 0x3f
+ 1050 00cc 19       		.uleb128 0x19
+ 1051 00cd 03       		.uleb128 0x3
+ 1052 00ce 0E       		.uleb128 0xe
+ 1053 00cf 3A       		.uleb128 0x3a
+ 1054 00d0 0B       		.uleb128 0xb
+ 1055 00d1 3B       		.uleb128 0x3b
+ 1056 00d2 0B       		.uleb128 0xb
+ 1057 00d3 27       		.uleb128 0x27
+ 1058 00d4 19       		.uleb128 0x19
+ 1059 00d5 49       		.uleb128 0x49
+ 1060 00d6 13       		.uleb128 0x13
+ 1061 00d7 11       		.uleb128 0x11
+ 1062 00d8 01       		.uleb128 0x1
+ 1063 00d9 12       		.uleb128 0x12
+ 1064 00da 06       		.uleb128 0x6
+ 1065 00db 40       		.uleb128 0x40
+ 1066 00dc 18       		.uleb128 0x18
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 25
+
+
+ 1067 00dd 9742     		.uleb128 0x2117
+ 1068 00df 19       		.uleb128 0x19
+ 1069 00e0 01       		.uleb128 0x1
+ 1070 00e1 13       		.uleb128 0x13
+ 1071 00e2 00       		.byte	0
+ 1072 00e3 00       		.byte	0
+ 1073 00e4 10       		.uleb128 0x10
+ 1074 00e5 34       		.uleb128 0x34
+ 1075 00e6 00       		.byte	0
+ 1076 00e7 03       		.uleb128 0x3
+ 1077 00e8 0E       		.uleb128 0xe
+ 1078 00e9 3A       		.uleb128 0x3a
+ 1079 00ea 0B       		.uleb128 0xb
+ 1080 00eb 3B       		.uleb128 0x3b
+ 1081 00ec 05       		.uleb128 0x5
+ 1082 00ed 49       		.uleb128 0x49
+ 1083 00ee 13       		.uleb128 0x13
+ 1084 00ef 02       		.uleb128 0x2
+ 1085 00f0 18       		.uleb128 0x18
+ 1086 00f1 00       		.byte	0
+ 1087 00f2 00       		.byte	0
+ 1088 00f3 11       		.uleb128 0x11
+ 1089 00f4 01       		.uleb128 0x1
+ 1090 00f5 01       		.byte	0x1
+ 1091 00f6 49       		.uleb128 0x49
+ 1092 00f7 13       		.uleb128 0x13
+ 1093 00f8 01       		.uleb128 0x1
+ 1094 00f9 13       		.uleb128 0x13
+ 1095 00fa 00       		.byte	0
+ 1096 00fb 00       		.byte	0
+ 1097 00fc 12       		.uleb128 0x12
+ 1098 00fd 21       		.uleb128 0x21
+ 1099 00fe 00       		.byte	0
+ 1100 00ff 49       		.uleb128 0x49
+ 1101 0100 13       		.uleb128 0x13
+ 1102 0101 2F       		.uleb128 0x2f
+ 1103 0102 0B       		.uleb128 0xb
+ 1104 0103 00       		.byte	0
+ 1105 0104 00       		.byte	0
+ 1106 0105 13       		.uleb128 0x13
+ 1107 0106 34       		.uleb128 0x34
+ 1108 0107 00       		.byte	0
+ 1109 0108 03       		.uleb128 0x3
+ 1110 0109 0E       		.uleb128 0xe
+ 1111 010a 3A       		.uleb128 0x3a
+ 1112 010b 0B       		.uleb128 0xb
+ 1113 010c 3B       		.uleb128 0x3b
+ 1114 010d 05       		.uleb128 0x5
+ 1115 010e 49       		.uleb128 0x49
+ 1116 010f 13       		.uleb128 0x13
+ 1117 0110 3F       		.uleb128 0x3f
+ 1118 0111 19       		.uleb128 0x19
+ 1119 0112 3C       		.uleb128 0x3c
+ 1120 0113 19       		.uleb128 0x19
+ 1121 0114 00       		.byte	0
+ 1122 0115 00       		.byte	0
+ 1123 0116 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 26
+
+
+ 1124              		.section	.debug_aranges,"",%progbits
+ 1125 0000 3C000000 		.4byte	0x3c
+ 1126 0004 0200     		.2byte	0x2
+ 1127 0006 00000000 		.4byte	.Ldebug_info0
+ 1128 000a 04       		.byte	0x4
+ 1129 000b 00       		.byte	0
+ 1130 000c 0000     		.2byte	0
+ 1131 000e 0000     		.2byte	0
+ 1132 0010 00000000 		.4byte	.LFB68
+ 1133 0014 AC000000 		.4byte	.LFE68-.LFB68
+ 1134 0018 00000000 		.4byte	.LFB69
+ 1135 001c 70000000 		.4byte	.LFE69-.LFB69
+ 1136 0020 00000000 		.4byte	.LFB70
+ 1137 0024 74000000 		.4byte	.LFE70-.LFB70
+ 1138 0028 00000000 		.4byte	.LFB71
+ 1139 002c 64000000 		.4byte	.LFE71-.LFB71
+ 1140 0030 00000000 		.4byte	.LFB72
+ 1141 0034 68000000 		.4byte	.LFE72-.LFB72
+ 1142 0038 00000000 		.4byte	0
+ 1143 003c 00000000 		.4byte	0
+ 1144              		.section	.debug_ranges,"",%progbits
+ 1145              	.Ldebug_ranges0:
+ 1146 0000 00000000 		.4byte	.LFB68
+ 1147 0004 AC000000 		.4byte	.LFE68
+ 1148 0008 00000000 		.4byte	.LFB69
+ 1149 000c 70000000 		.4byte	.LFE69
+ 1150 0010 00000000 		.4byte	.LFB70
+ 1151 0014 74000000 		.4byte	.LFE70
+ 1152 0018 00000000 		.4byte	.LFB71
+ 1153 001c 64000000 		.4byte	.LFE71
+ 1154 0020 00000000 		.4byte	.LFB72
+ 1155 0024 68000000 		.4byte	.LFE72
+ 1156 0028 00000000 		.4byte	0
+ 1157 002c 00000000 		.4byte	0
+ 1158              		.section	.debug_line,"",%progbits
+ 1159              	.Ldebug_line0:
+ 1160 0000 79020000 		.section	.debug_str,"MS",%progbits,1
+ 1160      0200B601 
+ 1160      00000201 
+ 1160      FB0E0D00 
+ 1160      01010101 
+ 1161              	.LASF22:
+ 1162 0000 7853656D 		.ascii	"xSemaphore\000"
+ 1162      6170686F 
+ 1162      726500
+ 1163              	.LASF27:
+ 1164 000b 70727644 		.ascii	"prvDecrementSemaphoreCount\000"
+ 1164      65637265 
+ 1164      6D656E74 
+ 1164      53656D61 
+ 1164      70686F72 
+ 1165              	.LASF28:
+ 1166 0026 70727649 		.ascii	"prvIncrementSemaphoreCount\000"
+ 1166      6E637265 
+ 1166      6D656E74 
+ 1166      53656D61 
+ 1166      70686F72 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 27
+
+
+ 1167              	.LASF23:
+ 1168 0041 75784578 		.ascii	"uxExpectedStartCount\000"
+ 1168      70656374 
+ 1168      65645374 
+ 1168      61727443 
+ 1168      6F756E74 
+ 1169              	.LASF19:
+ 1170 0056 5469636B 		.ascii	"TickType_t\000"
+ 1170      54797065 
+ 1170      5F7400
+ 1171              	.LASF40:
+ 1172 0061 434F554E 		.ascii	"COUNT_SEM_STRUCT\000"
+ 1172      545F5345 
+ 1172      4D5F5354 
+ 1172      52554354 
+ 1172      00
+ 1173              	.LASF6:
+ 1174 0072 5F5F696E 		.ascii	"__int32_t\000"
+ 1174      7433325F 
+ 1174      7400
+ 1175              	.LASF37:
+ 1176 007c 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 1176      4320342E 
+ 1176      392E3320 
+ 1176      32303135 
+ 1176      30333033 
+ 1177 00af 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 1177      20726576 
+ 1177      6973696F 
+ 1177      6E203232 
+ 1177      31323230 
+ 1178 00e2 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 1178      66756E63 
+ 1178      74696F6E 
+ 1178      2D736563 
+ 1178      74696F6E 
+ 1179              	.LASF20:
+ 1180 010a 51756575 		.ascii	"QueueHandle_t\000"
+ 1180      6548616E 
+ 1180      646C655F 
+ 1180      7400
+ 1181              	.LASF14:
+ 1182 0118 646F7562 		.ascii	"double\000"
+ 1182      6C6500
+ 1183              	.LASF36:
+ 1184 011f 78506172 		.ascii	"xParameters\000"
+ 1184      616D6574 
+ 1184      65727300 
+ 1185              	.LASF25:
+ 1186 012b 78436F75 		.ascii	"xCountSemStruct\000"
+ 1186      6E745365 
+ 1186      6D537472 
+ 1186      75637400 
+ 1187              	.LASF26:
+ 1188 013b 7075784C 		.ascii	"puxLoopCounter\000"
+ 1188      6F6F7043 
+ 1188      6F756E74 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 28
+
+
+ 1188      657200
+ 1189              	.LASF13:
+ 1190 014a 666C6F61 		.ascii	"float\000"
+ 1190      7400
+ 1191              	.LASF1:
+ 1192 0150 7369676E 		.ascii	"signed char\000"
+ 1192      65642063 
+ 1192      68617200 
+ 1193              	.LASF2:
+ 1194 015c 756E7369 		.ascii	"unsigned char\000"
+ 1194      676E6564 
+ 1194      20636861 
+ 1194      7200
+ 1195              	.LASF24:
+ 1196 016a 75784C6F 		.ascii	"uxLoopCounter\000"
+ 1196      6F70436F 
+ 1196      756E7465 
+ 1196      7200
+ 1197              	.LASF8:
+ 1198 0178 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1198      20756E73 
+ 1198      69676E65 
+ 1198      6420696E 
+ 1198      7400
+ 1199              	.LASF4:
+ 1200 018a 73686F72 		.ascii	"short unsigned int\000"
+ 1200      7420756E 
+ 1200      7369676E 
+ 1200      65642069 
+ 1200      6E7400
+ 1201              	.LASF43:
+ 1202 019d 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1202      52784275 
+ 1202      66666572 
+ 1202      00
+ 1203              	.LASF32:
+ 1204 01aa 75784C61 		.ascii	"uxLastCount0\000"
+ 1204      7374436F 
+ 1204      756E7430 
+ 1204      00
+ 1205              	.LASF33:
+ 1206 01b7 75784C61 		.ascii	"uxLastCount1\000"
+ 1206      7374436F 
+ 1206      756E7431 
+ 1206      00
+ 1207              	.LASF21:
+ 1208 01c4 53656D61 		.ascii	"SemaphoreHandle_t\000"
+ 1208      70686F72 
+ 1208      6548616E 
+ 1208      646C655F 
+ 1208      7400
+ 1209              	.LASF7:
+ 1210 01d6 5F5F7569 		.ascii	"__uint32_t\000"
+ 1210      6E743332 
+ 1210      5F7400
+ 1211              	.LASF42:
+ 1212 01e1 78417265 		.ascii	"xAreCountingSemaphoreTasksStillRunning\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 29
+
+
+ 1212      436F756E 
+ 1212      74696E67 
+ 1212      53656D61 
+ 1212      70686F72 
+ 1213              	.LASF34:
+ 1214 0208 78526574 		.ascii	"xReturn\000"
+ 1214      75726E00 
+ 1215              	.LASF0:
+ 1216 0210 756E7369 		.ascii	"unsigned int\000"
+ 1216      676E6564 
+ 1216      20696E74 
+ 1216      00
+ 1217              	.LASF38:
+ 1218 021d 2E2E5C2E 		.ascii	"..\\..\\Common\\Minimal\\countsem.c\000"
+ 1218      2E5C436F 
+ 1218      6D6D6F6E 
+ 1218      5C4D696E 
+ 1218      696D616C 
+ 1219              	.LASF10:
+ 1220 023d 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1220      206C6F6E 
+ 1220      6720756E 
+ 1220      7369676E 
+ 1220      65642069 
+ 1221              	.LASF41:
+ 1222 0254 76537461 		.ascii	"vStartCountingSemaphoreTasks\000"
+ 1222      7274436F 
+ 1222      756E7469 
+ 1222      6E675365 
+ 1222      6D617068 
+ 1223              	.LASF39:
+ 1224 0271 453A5C47 		.ascii	"E:\\GitHub\\FreeRTOS\\freertos-code-2543-trunk\\fre"
+ 1224      69744875 
+ 1224      625C4672 
+ 1224      65655254 
+ 1224      4F535C66 
+ 1225 02a0 6572746F 		.ascii	"ertos-code-2543-trunk\\FreeRTOS\\Demo\\CORTEX_CY8C5"
+ 1225      732D636F 
+ 1225      64652D32 
+ 1225      3534332D 
+ 1225      7472756E 
+ 1226 02d0 3538385F 		.ascii	"588_PSoC_Creator_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1226      50536F43 
+ 1226      5F437265 
+ 1226      61746F72 
+ 1226      5F474343 
+ 1227              	.LASF29:
+ 1228 02f9 70727643 		.ascii	"prvCountingSemaphoreTask\000"
+ 1228      6F756E74 
+ 1228      696E6753 
+ 1228      656D6170 
+ 1228      686F7265 
+ 1229              	.LASF11:
+ 1230 0312 696E7433 		.ascii	"int32_t\000"
+ 1230      325F7400 
+ 1231              	.LASF16:
+ 1232 031a 73697A65 		.ascii	"sizetype\000"
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\cc88ul3d.s 			page 30
+
+
+ 1232      74797065 
+ 1232      00
+ 1233              	.LASF9:
+ 1234 0323 6C6F6E67 		.ascii	"long long int\000"
+ 1234      206C6F6E 
+ 1234      6720696E 
+ 1234      7400
+ 1235              	.LASF15:
+ 1236 0331 63686172 		.ascii	"char\000"
+ 1236      00
+ 1237              	.LASF30:
+ 1238 0336 70765061 		.ascii	"pvParameters\000"
+ 1238      72616D65 
+ 1238      74657273 
+ 1238      00
+ 1239              	.LASF3:
+ 1240 0343 73686F72 		.ascii	"short int\000"
+ 1240      7420696E 
+ 1240      7400
+ 1241              	.LASF12:
+ 1242 034d 75696E74 		.ascii	"uint32_t\000"
+ 1242      33325F74 
+ 1242      00
+ 1243              	.LASF5:
+ 1244 0356 6C6F6E67 		.ascii	"long int\000"
+ 1244      20696E74 
+ 1244      00
+ 1245              	.LASF31:
+ 1246 035f 70785061 		.ascii	"pxParameter\000"
+ 1246      72616D65 
+ 1246      74657200 
+ 1247              	.LASF35:
+ 1248 036b 78457272 		.ascii	"xErrorDetected\000"
+ 1248      6F724465 
+ 1248      74656374 
+ 1248      656400
+ 1249              	.LASF18:
+ 1250 037a 55426173 		.ascii	"UBaseType_t\000"
+ 1250      65547970 
+ 1250      655F7400 
+ 1251              	.LASF17:
+ 1252 0386 42617365 		.ascii	"BaseType_t\000"
+ 1252      54797065 
+ 1252      5F7400
+ 1253              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

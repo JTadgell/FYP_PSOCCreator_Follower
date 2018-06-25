@@ -1,0 +1,1468 @@
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 6
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.file	"comtest.c"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.bss
+  19              		.align	2
+  20              	xPort:
+  21 0000 00000000 		.space	4
+  22              		.align	2
+  23              	uxBaseLED:
+  24 0004 00000000 		.space	4
+  25              		.align	2
+  26              	uxRxLoops:
+  27 0008 00000000 		.space	4
+  28              		.section	.rodata
+  29              		.align	2
+  30              	.LC0:
+  31 0000 434F4D54 		.ascii	"COMTx\000"
+  31      7800
+  32 0006 0000     		.align	2
+  33              	.LC1:
+  34 0008 434F4D52 		.ascii	"COMRx\000"
+  34      7800
+  35 000e 0000     		.section	.text.vAltStartComTestTasks,"ax",%progbits
+  36              		.align	2
+  37              		.global	vAltStartComTestTasks
+  38              		.thumb
+  39              		.thumb_func
+  40              		.type	vAltStartComTestTasks, %function
+  41              	vAltStartComTestTasks:
+  42              	.LFB68:
+  43              		.file 1 "comtest.c"
+   1:comtest.c     **** /*
+   2:comtest.c     ****  * FreeRTOS Kernel V10.0.1
+   3:comtest.c     ****  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+   4:comtest.c     ****  *
+   5:comtest.c     ****  * Permission is hereby granted, free of charge, to any person obtaining a copy of
+   6:comtest.c     ****  * this software and associated documentation files (the "Software"), to deal in
+   7:comtest.c     ****  * the Software without restriction, including without limitation the rights to
+   8:comtest.c     ****  * use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+   9:comtest.c     ****  * the Software, and to permit persons to whom the Software is furnished to do so,
+  10:comtest.c     ****  * subject to the following conditions:
+  11:comtest.c     ****  *
+  12:comtest.c     ****  * The above copyright notice and this permission notice shall be included in all
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 2
+
+
+  13:comtest.c     ****  * copies or substantial portions of the Software.
+  14:comtest.c     ****  *
+  15:comtest.c     ****  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  16:comtest.c     ****  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  17:comtest.c     ****  * FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+  18:comtest.c     ****  * COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+  19:comtest.c     ****  * IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+  20:comtest.c     ****  * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+  21:comtest.c     ****  *
+  22:comtest.c     ****  * http://www.FreeRTOS.org
+  23:comtest.c     ****  * http://aws.amazon.com/freertos
+  24:comtest.c     ****  *
+  25:comtest.c     ****  * 1 tab == 4 spaces!
+  26:comtest.c     ****  */
+  27:comtest.c     **** 
+  28:comtest.c     **** 
+  29:comtest.c     **** /*
+  30:comtest.c     ****  * This version of comtest. c is for use on systems that have limited stack
+  31:comtest.c     ****  * space and no display facilities.  The complete version can be found in
+  32:comtest.c     ****  * the Demo/Common/Full directory.
+  33:comtest.c     ****  *
+  34:comtest.c     ****  * Creates two tasks that operate on an interrupt driven serial port.  A
+  35:comtest.c     ****  * loopback connector should be used so that everything that is transmitted is
+  36:comtest.c     ****  * also received.  The serial port does not use any flow control.  On a
+  37:comtest.c     ****  * standard 9way 'D' connector pins two and three should be connected together.
+  38:comtest.c     ****  *
+  39:comtest.c     ****  * The first task posts a sequence of characters to the Tx queue, toggling an
+  40:comtest.c     ****  * LED on each successful post.  At the end of the sequence it sleeps for a
+  41:comtest.c     ****  * pseudo-random period before resending the same sequence.
+  42:comtest.c     ****  *
+  43:comtest.c     ****  * The UART Tx end interrupt is enabled whenever data is available in the Tx
+  44:comtest.c     ****  * queue.  The Tx end ISR removes a single character from the Tx queue and
+  45:comtest.c     ****  * passes it to the UART for transmission.
+  46:comtest.c     ****  *
+  47:comtest.c     ****  * The second task blocks on the Rx queue waiting for a character to become
+  48:comtest.c     ****  * available.  When the UART Rx end interrupt receives a character it places
+  49:comtest.c     ****  * it in the Rx queue, waking the second task.  The second task checks that the
+  50:comtest.c     ****  * characters removed from the Rx queue form the same sequence as those posted
+  51:comtest.c     ****  * to the Tx queue, and toggles an LED for each correct character.
+  52:comtest.c     ****  *
+  53:comtest.c     ****  * The receiving task is spawned with a higher priority than the transmitting
+  54:comtest.c     ****  * task.  The receiver will therefore wake every time a character is
+  55:comtest.c     ****  * transmitted so neither the Tx or Rx queue should ever hold more than a few
+  56:comtest.c     ****  * characters.
+  57:comtest.c     ****  *
+  58:comtest.c     ****  */
+  59:comtest.c     **** 
+  60:comtest.c     **** /* Scheduler include files. */
+  61:comtest.c     **** #include <stdlib.h>
+  62:comtest.c     **** #include "FreeRTOS.h"
+  63:comtest.c     **** #include "task.h"
+  64:comtest.c     **** 
+  65:comtest.c     **** /* Demo program include files. */
+  66:comtest.c     **** #include "serial.h"
+  67:comtest.c     **** #include "comtest.h"
+  68:comtest.c     **** 
+  69:comtest.c     **** #define comSTACK_SIZE				configMINIMAL_STACK_SIZE
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 3
+
+
+  70:comtest.c     **** #define comTX_LED_OFFSET			( 0 )
+  71:comtest.c     **** #define comRX_LED_OFFSET			( 1 )
+  72:comtest.c     **** #define comTOTAL_PERMISSIBLE_ERRORS ( 2 )
+  73:comtest.c     **** 
+  74:comtest.c     **** /* The Tx task will transmit the sequence of characters at a pseudo random
+  75:comtest.c     **** interval.  This is the maximum and minimum block time between sends. */
+  76:comtest.c     **** #define comTX_MAX_BLOCK_TIME		( ( TickType_t ) 0x96 )
+  77:comtest.c     **** #define comTX_MIN_BLOCK_TIME		( ( TickType_t ) 0x32 )
+  78:comtest.c     **** #define comOFFSET_TIME				( ( TickType_t ) 3 )
+  79:comtest.c     **** 
+  80:comtest.c     **** /* We should find that each character can be queued for Tx immediately and we
+  81:comtest.c     **** don't have to block to send. */
+  82:comtest.c     **** #define comNO_BLOCK					( ( TickType_t ) 0 )
+  83:comtest.c     **** 
+  84:comtest.c     **** /* The Rx task will block on the Rx queue for a long period. */
+  85:comtest.c     **** #define comRX_BLOCK_TIME			( ( TickType_t ) 0xffff )
+  86:comtest.c     **** 
+  87:comtest.c     **** /* The sequence transmitted is from comFIRST_BYTE to and including comLAST_BYTE. */
+  88:comtest.c     **** #define comFIRST_BYTE				( 'A' )
+  89:comtest.c     **** #define comLAST_BYTE				( 'X' )
+  90:comtest.c     **** 
+  91:comtest.c     **** #define comBUFFER_LEN				( ( UBaseType_t ) ( comLAST_BYTE - comFIRST_BYTE ) + ( UBaseType_t ) 1 )
+  92:comtest.c     **** #define comINITIAL_RX_COUNT_VALUE	( 0 )
+  93:comtest.c     **** 
+  94:comtest.c     **** /* Handle to the com port used by both tasks. */
+  95:comtest.c     **** static xComPortHandle xPort = NULL;
+  96:comtest.c     **** 
+  97:comtest.c     **** /* The transmit task as described at the top of the file. */
+  98:comtest.c     **** static portTASK_FUNCTION_PROTO( vComTxTask, pvParameters );
+  99:comtest.c     **** 
+ 100:comtest.c     **** /* The receive task as described at the top of the file. */
+ 101:comtest.c     **** static portTASK_FUNCTION_PROTO( vComRxTask, pvParameters );
+ 102:comtest.c     **** 
+ 103:comtest.c     **** /* The LED that should be toggled by the Rx and Tx tasks.  The Rx task will
+ 104:comtest.c     **** toggle LED ( uxBaseLED + comRX_LED_OFFSET).  The Tx task will toggle LED
+ 105:comtest.c     **** ( uxBaseLED + comTX_LED_OFFSET ). */
+ 106:comtest.c     **** static UBaseType_t uxBaseLED = 0;
+ 107:comtest.c     **** 
+ 108:comtest.c     **** /* Check variable used to ensure no error have occurred.  The Rx task will
+ 109:comtest.c     **** increment this variable after every successfully received sequence.  If at any
+ 110:comtest.c     **** time the sequence is incorrect the the variable will stop being incremented. */
+ 111:comtest.c     **** static volatile UBaseType_t uxRxLoops = comINITIAL_RX_COUNT_VALUE;
+ 112:comtest.c     **** 
+ 113:comtest.c     **** /*-----------------------------------------------------------*/
+ 114:comtest.c     **** 
+ 115:comtest.c     **** void vAltStartComTestTasks( UBaseType_t uxPriority, uint32_t ulBaudRate, UBaseType_t uxLED )
+ 116:comtest.c     **** {
+  44              		.loc 1 116 0
+  45              		.cfi_startproc
+  46              		@ args = 0, pretend = 0, frame = 16
+  47              		@ frame_needed = 1, uses_anonymous_args = 0
+  48 0000 80B5     		push	{r7, lr}
+  49              		.cfi_def_cfa_offset 8
+  50              		.cfi_offset 7, -8
+  51              		.cfi_offset 14, -4
+  52 0002 86B0     		sub	sp, sp, #24
+  53              		.cfi_def_cfa_offset 32
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 4
+
+
+  54 0004 02AF     		add	r7, sp, #8
+  55              		.cfi_def_cfa 7, 24
+  56 0006 F860     		str	r0, [r7, #12]
+  57 0008 B960     		str	r1, [r7, #8]
+  58 000a 7A60     		str	r2, [r7, #4]
+ 117:comtest.c     **** 	/* Initialise the com port then spawn the Rx and Tx tasks. */
+ 118:comtest.c     **** 	uxBaseLED = uxLED;
+  59              		.loc 1 118 0
+  60 000c 0F4A     		ldr	r2, .L2
+  61 000e 7B68     		ldr	r3, [r7, #4]
+  62 0010 1360     		str	r3, [r2]
+ 119:comtest.c     **** 	xSerialPortInitMinimal( ulBaudRate, comBUFFER_LEN );
+  63              		.loc 1 119 0
+  64 0012 B868     		ldr	r0, [r7, #8]
+  65 0014 1821     		movs	r1, #24
+  66 0016 FFF7FEFF 		bl	xSerialPortInitMinimal
+ 120:comtest.c     **** 
+ 121:comtest.c     **** 	/* The Tx task is spawned with a lower priority than the Rx task. */
+ 122:comtest.c     **** 	xTaskCreate( vComTxTask, "COMTx", comSTACK_SIZE, NULL, uxPriority - 1, ( TaskHandle_t * ) NULL );
+  67              		.loc 1 122 0
+  68 001a FB68     		ldr	r3, [r7, #12]
+  69 001c 013B     		subs	r3, r3, #1
+  70 001e 0093     		str	r3, [sp]
+  71 0020 0023     		movs	r3, #0
+  72 0022 0193     		str	r3, [sp, #4]
+  73 0024 0A48     		ldr	r0, .L2+4
+  74 0026 0B49     		ldr	r1, .L2+8
+  75 0028 6422     		movs	r2, #100
+  76 002a 0023     		movs	r3, #0
+  77 002c FFF7FEFF 		bl	xTaskCreate
+ 123:comtest.c     **** 	xTaskCreate( vComRxTask, "COMRx", comSTACK_SIZE, NULL, uxPriority, ( TaskHandle_t * ) NULL );
+  78              		.loc 1 123 0
+  79 0030 FB68     		ldr	r3, [r7, #12]
+  80 0032 0093     		str	r3, [sp]
+  81 0034 0023     		movs	r3, #0
+  82 0036 0193     		str	r3, [sp, #4]
+  83 0038 0748     		ldr	r0, .L2+12
+  84 003a 0849     		ldr	r1, .L2+16
+  85 003c 6422     		movs	r2, #100
+  86 003e 0023     		movs	r3, #0
+  87 0040 FFF7FEFF 		bl	xTaskCreate
+ 124:comtest.c     **** }
+  88              		.loc 1 124 0
+  89 0044 1037     		adds	r7, r7, #16
+  90              		.cfi_def_cfa_offset 8
+  91 0046 BD46     		mov	sp, r7
+  92              		.cfi_def_cfa_register 13
+  93              		@ sp needed
+  94 0048 80BD     		pop	{r7, pc}
+  95              	.L3:
+  96 004a 00BF     		.align	2
+  97              	.L2:
+  98 004c 04000000 		.word	uxBaseLED
+  99 0050 00000000 		.word	vComTxTask
+ 100 0054 00000000 		.word	.LC0
+ 101 0058 00000000 		.word	vComRxTask
+ 102 005c 08000000 		.word	.LC1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 5
+
+
+ 103              		.cfi_endproc
+ 104              	.LFE68:
+ 105              		.size	vAltStartComTestTasks, .-vAltStartComTestTasks
+ 106              		.section	.text.vComTxTask,"ax",%progbits
+ 107              		.align	2
+ 108              		.thumb
+ 109              		.thumb_func
+ 110              		.type	vComTxTask, %function
+ 111              	vComTxTask:
+ 112              	.LFB69:
+ 125:comtest.c     **** /*-----------------------------------------------------------*/
+ 126:comtest.c     **** 
+ 127:comtest.c     **** static portTASK_FUNCTION( vComTxTask, pvParameters )
+ 128:comtest.c     **** {
+ 113              		.loc 1 128 0
+ 114              		.cfi_startproc
+ 115              		@ args = 0, pretend = 0, frame = 16
+ 116              		@ frame_needed = 1, uses_anonymous_args = 0
+ 117 0000 80B5     		push	{r7, lr}
+ 118              		.cfi_def_cfa_offset 8
+ 119              		.cfi_offset 7, -8
+ 120              		.cfi_offset 14, -4
+ 121 0002 84B0     		sub	sp, sp, #16
+ 122              		.cfi_def_cfa_offset 24
+ 123 0004 00AF     		add	r7, sp, #0
+ 124              		.cfi_def_cfa_register 7
+ 125 0006 7860     		str	r0, [r7, #4]
+ 126              	.L8:
+ 129:comtest.c     **** char cByteToSend;
+ 130:comtest.c     **** TickType_t xTimeToWait;
+ 131:comtest.c     **** 
+ 132:comtest.c     **** 	/* Just to stop compiler warnings. */
+ 133:comtest.c     **** 	( void ) pvParameters;
+ 134:comtest.c     **** 
+ 135:comtest.c     **** 	for( ;; )
+ 136:comtest.c     **** 	{
+ 137:comtest.c     **** 		/* Simply transmit a sequence of characters from comFIRST_BYTE to
+ 138:comtest.c     **** 		comLAST_BYTE. */
+ 139:comtest.c     **** 		for( cByteToSend = comFIRST_BYTE; cByteToSend <= comLAST_BYTE; cByteToSend++ )
+ 127              		.loc 1 139 0
+ 128 0008 4123     		movs	r3, #65
+ 129 000a FB73     		strb	r3, [r7, #15]
+ 130 000c 0BE0     		b	.L5
+ 131              	.L6:
+ 140:comtest.c     **** 		{
+ 141:comtest.c     **** 			if( xSerialPutChar( xPort, cByteToSend, comNO_BLOCK ) == pdPASS )
+ 132              		.loc 1 141 0
+ 133 000e 134B     		ldr	r3, .L9
+ 134 0010 1A68     		ldr	r2, [r3]
+ 135 0012 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 136 0014 5BB2     		sxtb	r3, r3
+ 137 0016 1046     		mov	r0, r2
+ 138 0018 1946     		mov	r1, r3
+ 139 001a 0022     		movs	r2, #0
+ 140 001c FFF7FEFF 		bl	xSerialPutChar
+ 139:comtest.c     **** 		{
+ 141              		.loc 1 139 0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 6
+
+
+ 142 0020 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 143 0022 0133     		adds	r3, r3, #1
+ 144 0024 FB73     		strb	r3, [r7, #15]
+ 145              	.L5:
+ 139:comtest.c     **** 		{
+ 146              		.loc 1 139 0 is_stmt 0 discriminator 1
+ 147 0026 FB7B     		ldrb	r3, [r7, #15]	@ zero_extendqisi2
+ 148 0028 582B     		cmp	r3, #88
+ 149 002a F0D9     		bls	.L6
+ 142:comtest.c     **** 			{
+ 143:comtest.c     **** 				
+ 144:comtest.c     **** 			}
+ 145:comtest.c     **** 		}
+ 146:comtest.c     **** 
+ 147:comtest.c     **** 		/* Turn the LED off while we are not doing anything. */
+ 148:comtest.c     **** 		
+ 149:comtest.c     **** 
+ 150:comtest.c     **** 		/* We have posted all the characters in the string - wait before
+ 151:comtest.c     **** 		re-sending.  Wait a pseudo-random time as this will provide a better
+ 152:comtest.c     **** 		test. */
+ 153:comtest.c     **** 		xTimeToWait = xTaskGetTickCount() + comOFFSET_TIME;
+ 150              		.loc 1 153 0 is_stmt 1
+ 151 002c FFF7FEFF 		bl	xTaskGetTickCount
+ 152 0030 0346     		mov	r3, r0
+ 153 0032 0333     		adds	r3, r3, #3
+ 154 0034 BB60     		str	r3, [r7, #8]
+ 154:comtest.c     **** 
+ 155:comtest.c     **** 		/* Make sure we don't wait too long... */
+ 156:comtest.c     **** 		xTimeToWait %= comTX_MAX_BLOCK_TIME;
+ 155              		.loc 1 156 0
+ 156 0036 BB68     		ldr	r3, [r7, #8]
+ 157 0038 094A     		ldr	r2, .L9+4
+ 158 003a A2FB0312 		umull	r1, r2, r2, r3
+ 159 003e 1209     		lsrs	r2, r2, #4
+ 160 0040 9621     		movs	r1, #150
+ 161 0042 01FB02F2 		mul	r2, r1, r2
+ 162 0046 9B1A     		subs	r3, r3, r2
+ 163 0048 BB60     		str	r3, [r7, #8]
+ 157:comtest.c     **** 
+ 158:comtest.c     **** 		/* ...but we do want to wait. */
+ 159:comtest.c     **** 		if( xTimeToWait < comTX_MIN_BLOCK_TIME )
+ 164              		.loc 1 159 0
+ 165 004a BB68     		ldr	r3, [r7, #8]
+ 166 004c 312B     		cmp	r3, #49
+ 167 004e 01D8     		bhi	.L7
+ 160:comtest.c     **** 		{
+ 161:comtest.c     **** 			xTimeToWait = comTX_MIN_BLOCK_TIME;
+ 168              		.loc 1 161 0
+ 169 0050 3223     		movs	r3, #50
+ 170 0052 BB60     		str	r3, [r7, #8]
+ 171              	.L7:
+ 162:comtest.c     **** 		}
+ 163:comtest.c     **** 
+ 164:comtest.c     **** 		vTaskDelay( xTimeToWait );
+ 172              		.loc 1 164 0
+ 173 0054 B868     		ldr	r0, [r7, #8]
+ 174 0056 FFF7FEFF 		bl	vTaskDelay
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 7
+
+
+ 165:comtest.c     **** 	}
+ 175              		.loc 1 165 0
+ 176 005a D5E7     		b	.L8
+ 177              	.L10:
+ 178              		.align	2
+ 179              	.L9:
+ 180 005c 00000000 		.word	xPort
+ 181 0060 B5814E1B 		.word	458129845
+ 182              		.cfi_endproc
+ 183              	.LFE69:
+ 184              		.size	vComTxTask, .-vComTxTask
+ 185              		.section	.text.vComRxTask,"ax",%progbits
+ 186              		.align	2
+ 187              		.thumb
+ 188              		.thumb_func
+ 189              		.type	vComRxTask, %function
+ 190              	vComRxTask:
+ 191              	.LFB70:
+ 166:comtest.c     **** } /*lint !e715 !e818 pvParameters is required for a task function even if it is not referenced. */
+ 167:comtest.c     **** /*-----------------------------------------------------------*/
+ 168:comtest.c     **** 
+ 169:comtest.c     **** static portTASK_FUNCTION( vComRxTask, pvParameters )
+ 170:comtest.c     **** {
+ 192              		.loc 1 170 0
+ 193              		.cfi_startproc
+ 194              		@ args = 0, pretend = 0, frame = 24
+ 195              		@ frame_needed = 1, uses_anonymous_args = 0
+ 196 0000 80B5     		push	{r7, lr}
+ 197              		.cfi_def_cfa_offset 8
+ 198              		.cfi_offset 7, -8
+ 199              		.cfi_offset 14, -4
+ 200 0002 86B0     		sub	sp, sp, #24
+ 201              		.cfi_def_cfa_offset 32
+ 202 0004 00AF     		add	r7, sp, #0
+ 203              		.cfi_def_cfa_register 7
+ 204 0006 7860     		str	r0, [r7, #4]
+ 171:comtest.c     **** signed char cExpectedByte, cByteRxed;
+ 172:comtest.c     **** BaseType_t xResyncRequired = pdFALSE, xErrorOccurred = pdFALSE;
+ 205              		.loc 1 172 0
+ 206 0008 0023     		movs	r3, #0
+ 207 000a 3B61     		str	r3, [r7, #16]
+ 208 000c 0023     		movs	r3, #0
+ 209 000e FB60     		str	r3, [r7, #12]
+ 210              	.L20:
+ 173:comtest.c     **** 
+ 174:comtest.c     **** 	/* Just to stop compiler warnings. */
+ 175:comtest.c     **** 	( void ) pvParameters;
+ 176:comtest.c     **** 
+ 177:comtest.c     **** 	for( ;; )
+ 178:comtest.c     **** 	{
+ 179:comtest.c     **** 		/* We expect to receive the characters from comFIRST_BYTE to
+ 180:comtest.c     **** 		comLAST_BYTE in an incrementing order.  Loop to receive each byte. */
+ 181:comtest.c     **** 		for( cExpectedByte = comFIRST_BYTE; cExpectedByte <= comLAST_BYTE; cExpectedByte++ )
+ 211              		.loc 1 181 0
+ 212 0010 4123     		movs	r3, #65
+ 213 0012 FB75     		strb	r3, [r7, #23]
+ 214 0014 1AE0     		b	.L12
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 8
+
+
+ 215              	.L15:
+ 182:comtest.c     **** 		{
+ 183:comtest.c     **** 			/* Block on the queue that contains received bytes until a byte is
+ 184:comtest.c     **** 			available. */
+ 185:comtest.c     **** 			if( xSerialGetChar( xPort, &cByteRxed, comRX_BLOCK_TIME ) )
+ 216              		.loc 1 185 0
+ 217 0016 204B     		ldr	r3, .L21
+ 218 0018 1A68     		ldr	r2, [r3]
+ 219 001a 07F10B03 		add	r3, r7, #11
+ 220 001e 1046     		mov	r0, r2
+ 221 0020 1946     		mov	r1, r3
+ 222 0022 4FF6FF72 		movw	r2, #65535
+ 223 0026 FFF7FEFF 		bl	xSerialGetChar
+ 224 002a 0346     		mov	r3, r0
+ 225 002c 002B     		cmp	r3, #0
+ 226 002e 08D0     		beq	.L13
+ 186:comtest.c     **** 			{
+ 187:comtest.c     **** 				/* Was this the byte we were expecting?  If so, toggle the LED,
+ 188:comtest.c     **** 				otherwise we are out on sync and should break out of the loop
+ 189:comtest.c     **** 				until the expected character sequence is about to restart. */
+ 190:comtest.c     **** 				if( cByteRxed == cExpectedByte )
+ 227              		.loc 1 190 0
+ 228 0030 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 229 0032 97F91720 		ldrsb	r2, [r7, #23]
+ 230 0036 5BB2     		sxtb	r3, r3
+ 231 0038 9A42     		cmp	r2, r3
+ 232 003a 02D0     		beq	.L13
+ 191:comtest.c     **** 				{
+ 192:comtest.c     **** 					
+ 193:comtest.c     **** 				}
+ 194:comtest.c     **** 				else
+ 195:comtest.c     **** 				{
+ 196:comtest.c     **** 					xResyncRequired = pdTRUE;
+ 233              		.loc 1 196 0
+ 234 003c 0123     		movs	r3, #1
+ 235 003e 3B61     		str	r3, [r7, #16]
+ 197:comtest.c     **** 					break; /*lint !e960 Non-switch break allowed. */
+ 236              		.loc 1 197 0
+ 237 0040 08E0     		b	.L14
+ 238              	.L13:
+ 181:comtest.c     **** 		{
+ 239              		.loc 1 181 0 discriminator 2
+ 240 0042 FB7D     		ldrb	r3, [r7, #23]	@ zero_extendqisi2
+ 241 0044 DBB2     		uxtb	r3, r3
+ 242 0046 0133     		adds	r3, r3, #1
+ 243 0048 DBB2     		uxtb	r3, r3
+ 244 004a FB75     		strb	r3, [r7, #23]
+ 245              	.L12:
+ 181:comtest.c     **** 		{
+ 246              		.loc 1 181 0 is_stmt 0 discriminator 1
+ 247 004c 97F91730 		ldrsb	r3, [r7, #23]
+ 248 0050 582B     		cmp	r3, #88
+ 249 0052 E0DD     		ble	.L15
+ 250              	.L14:
+ 198:comtest.c     **** 				}
+ 199:comtest.c     **** 			}
+ 200:comtest.c     **** 		}
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 9
+
+
+ 201:comtest.c     **** 
+ 202:comtest.c     **** 		/* Turn the LED off while we are not doing anything. */
+ 203:comtest.c     **** 		
+ 204:comtest.c     **** 
+ 205:comtest.c     **** 		/* Did we break out of the loop because the characters were received in
+ 206:comtest.c     **** 		an unexpected order?  If so wait here until the character sequence is
+ 207:comtest.c     **** 		about to restart. */
+ 208:comtest.c     **** 		if( xResyncRequired == pdTRUE )
+ 251              		.loc 1 208 0 is_stmt 1
+ 252 0054 3B69     		ldr	r3, [r7, #16]
+ 253 0056 012B     		cmp	r3, #1
+ 254 0058 14D1     		bne	.L16
+ 209:comtest.c     **** 		{
+ 210:comtest.c     **** 			while( cByteRxed != comLAST_BYTE )
+ 255              		.loc 1 210 0
+ 256 005a 09E0     		b	.L17
+ 257              	.L18:
+ 211:comtest.c     **** 			{
+ 212:comtest.c     **** 				/* Block until the next char is available. */
+ 213:comtest.c     **** 				xSerialGetChar( xPort, &cByteRxed, comRX_BLOCK_TIME );
+ 258              		.loc 1 213 0
+ 259 005c 0E4B     		ldr	r3, .L21
+ 260 005e 1A68     		ldr	r2, [r3]
+ 261 0060 07F10B03 		add	r3, r7, #11
+ 262 0064 1046     		mov	r0, r2
+ 263 0066 1946     		mov	r1, r3
+ 264 0068 4FF6FF72 		movw	r2, #65535
+ 265 006c FFF7FEFF 		bl	xSerialGetChar
+ 266              	.L17:
+ 210:comtest.c     **** 			{
+ 267              		.loc 1 210 0
+ 268 0070 FB7A     		ldrb	r3, [r7, #11]	@ zero_extendqisi2
+ 269 0072 5BB2     		sxtb	r3, r3
+ 270 0074 582B     		cmp	r3, #88
+ 271 0076 F1D1     		bne	.L18
+ 214:comtest.c     **** 			}
+ 215:comtest.c     **** 
+ 216:comtest.c     **** 			/* Note that an error occurred which caused us to have to resync.
+ 217:comtest.c     **** 			We use this to stop incrementing the loop counter so
+ 218:comtest.c     **** 			sAreComTestTasksStillRunning() will return false - indicating an
+ 219:comtest.c     **** 			error. */
+ 220:comtest.c     **** 			xErrorOccurred++;
+ 272              		.loc 1 220 0
+ 273 0078 FB68     		ldr	r3, [r7, #12]
+ 274 007a 0133     		adds	r3, r3, #1
+ 275 007c FB60     		str	r3, [r7, #12]
+ 221:comtest.c     **** 
+ 222:comtest.c     **** 			/* We have now resynced with the Tx task and can continue. */
+ 223:comtest.c     **** 			xResyncRequired = pdFALSE;
+ 276              		.loc 1 223 0
+ 277 007e 0023     		movs	r3, #0
+ 278 0080 3B61     		str	r3, [r7, #16]
+ 279 0082 07E0     		b	.L19
+ 280              	.L16:
+ 224:comtest.c     **** 		}
+ 225:comtest.c     **** 		else
+ 226:comtest.c     **** 		{
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 10
+
+
+ 227:comtest.c     **** 			if( xErrorOccurred < comTOTAL_PERMISSIBLE_ERRORS )
+ 281              		.loc 1 227 0
+ 282 0084 FB68     		ldr	r3, [r7, #12]
+ 283 0086 012B     		cmp	r3, #1
+ 284 0088 04DC     		bgt	.L19
+ 228:comtest.c     **** 			{
+ 229:comtest.c     **** 				/* Increment the count of successful loops.  As error
+ 230:comtest.c     **** 				occurring (i.e. an unexpected character being received) will
+ 231:comtest.c     **** 				prevent this counter being incremented for the rest of the
+ 232:comtest.c     **** 				execution.   Don't worry about mutual exclusion on this
+ 233:comtest.c     **** 				variable - it doesn't really matter as we just want it
+ 234:comtest.c     **** 				to change. */
+ 235:comtest.c     **** 				uxRxLoops++;
+ 285              		.loc 1 235 0
+ 286 008a 044B     		ldr	r3, .L21+4
+ 287 008c 1B68     		ldr	r3, [r3]
+ 288 008e 0133     		adds	r3, r3, #1
+ 289 0090 024A     		ldr	r2, .L21+4
+ 290 0092 1360     		str	r3, [r2]
+ 291              	.L19:
+ 236:comtest.c     **** 			}
+ 237:comtest.c     **** 		}
+ 238:comtest.c     **** 	}
+ 292              		.loc 1 238 0
+ 293 0094 BCE7     		b	.L20
+ 294              	.L22:
+ 295 0096 00BF     		.align	2
+ 296              	.L21:
+ 297 0098 00000000 		.word	xPort
+ 298 009c 08000000 		.word	uxRxLoops
+ 299              		.cfi_endproc
+ 300              	.LFE70:
+ 301              		.size	vComRxTask, .-vComRxTask
+ 302              		.section	.text.xAreComTestTasksStillRunning,"ax",%progbits
+ 303              		.align	2
+ 304              		.global	xAreComTestTasksStillRunning
+ 305              		.thumb
+ 306              		.thumb_func
+ 307              		.type	xAreComTestTasksStillRunning, %function
+ 308              	xAreComTestTasksStillRunning:
+ 309              	.LFB71:
+ 239:comtest.c     **** } /*lint !e715 !e818 pvParameters is required for a task function even if it is not referenced. */
+ 240:comtest.c     **** /*-----------------------------------------------------------*/
+ 241:comtest.c     **** 
+ 242:comtest.c     **** BaseType_t xAreComTestTasksStillRunning( void )
+ 243:comtest.c     **** {
+ 310              		.loc 1 243 0
+ 311              		.cfi_startproc
+ 312              		@ args = 0, pretend = 0, frame = 8
+ 313              		@ frame_needed = 1, uses_anonymous_args = 0
+ 314              		@ link register save eliminated.
+ 315 0000 80B4     		push	{r7}
+ 316              		.cfi_def_cfa_offset 4
+ 317              		.cfi_offset 7, -4
+ 318 0002 83B0     		sub	sp, sp, #12
+ 319              		.cfi_def_cfa_offset 16
+ 320 0004 00AF     		add	r7, sp, #0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 11
+
+
+ 321              		.cfi_def_cfa_register 7
+ 244:comtest.c     **** BaseType_t xReturn;
+ 245:comtest.c     **** 
+ 246:comtest.c     **** 	/* If the count of successful reception loops has not changed than at
+ 247:comtest.c     **** 	some time an error occurred (i.e. a character was received out of sequence)
+ 248:comtest.c     **** 	and we will return false. */
+ 249:comtest.c     **** 	if( uxRxLoops == comINITIAL_RX_COUNT_VALUE )
+ 322              		.loc 1 249 0
+ 323 0006 094B     		ldr	r3, .L27
+ 324 0008 1B68     		ldr	r3, [r3]
+ 325 000a 002B     		cmp	r3, #0
+ 326 000c 02D1     		bne	.L24
+ 250:comtest.c     **** 	{
+ 251:comtest.c     **** 		xReturn = pdFALSE;
+ 327              		.loc 1 251 0
+ 328 000e 0023     		movs	r3, #0
+ 329 0010 7B60     		str	r3, [r7, #4]
+ 330 0012 01E0     		b	.L25
+ 331              	.L24:
+ 252:comtest.c     **** 	}
+ 253:comtest.c     **** 	else
+ 254:comtest.c     **** 	{
+ 255:comtest.c     **** 		xReturn = pdTRUE;
+ 332              		.loc 1 255 0
+ 333 0014 0123     		movs	r3, #1
+ 334 0016 7B60     		str	r3, [r7, #4]
+ 335              	.L25:
+ 256:comtest.c     **** 	}
+ 257:comtest.c     **** 
+ 258:comtest.c     **** 	/* Reset the count of successful Rx loops.  When this function is called
+ 259:comtest.c     **** 	again we expect this to have been incremented. */
+ 260:comtest.c     **** 	uxRxLoops = comINITIAL_RX_COUNT_VALUE;
+ 336              		.loc 1 260 0
+ 337 0018 044B     		ldr	r3, .L27
+ 338 001a 0022     		movs	r2, #0
+ 339 001c 1A60     		str	r2, [r3]
+ 261:comtest.c     **** 
+ 262:comtest.c     **** 	return xReturn;
+ 340              		.loc 1 262 0
+ 341 001e 7B68     		ldr	r3, [r7, #4]
+ 263:comtest.c     **** }
+ 342              		.loc 1 263 0
+ 343 0020 1846     		mov	r0, r3
+ 344 0022 0C37     		adds	r7, r7, #12
+ 345              		.cfi_def_cfa_offset 4
+ 346 0024 BD46     		mov	sp, r7
+ 347              		.cfi_def_cfa_register 13
+ 348              		@ sp needed
+ 349 0026 5DF8047B 		ldr	r7, [sp], #4
+ 350              		.cfi_restore 7
+ 351              		.cfi_def_cfa_offset 0
+ 352 002a 7047     		bx	lr
+ 353              	.L28:
+ 354              		.align	2
+ 355              	.L27:
+ 356 002c 08000000 		.word	uxRxLoops
+ 357              		.cfi_endproc
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 12
+
+
+ 358              	.LFE71:
+ 359              		.size	xAreComTestTasksStillRunning, .-xAreComTestTasksStillRunning
+ 360              		.text
+ 361              	.Letext0:
+ 362              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 363              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.0\\psoc creator\\import\\gnu\\arm\\4.9.
+ 364              		.file 4 "..\\..\\FreeRTOS_Source\\portable\\GCC\\ARM_CM3/portmacro.h"
+ 365              		.file 5 "..\\..\\FreeRTOS_Source\\include/task.h"
+ 366              		.file 6 "..\\..\\FreeRTOS_Source\\include/serial.h"
+ 367              		.file 7 "Generated_Source\\PSoC5/core_cm3.h"
+ 368              		.section	.debug_info,"",%progbits
+ 369              	.Ldebug_info0:
+ 370 0000 41020000 		.4byte	0x241
+ 371 0004 0400     		.2byte	0x4
+ 372 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 373 000a 04       		.byte	0x4
+ 374 000b 01       		.uleb128 0x1
+ 375 000c 2A000000 		.4byte	.LASF38
+ 376 0010 01       		.byte	0x1
+ 377 0011 54020000 		.4byte	.LASF39
+ 378 0015 A8010000 		.4byte	.LASF40
+ 379 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 380 001d 00000000 		.4byte	0
+ 381 0021 00000000 		.4byte	.Ldebug_line0
+ 382 0025 02       		.uleb128 0x2
+ 383 0026 04       		.byte	0x4
+ 384 0027 07       		.byte	0x7
+ 385 0028 9B010000 		.4byte	.LASF0
+ 386 002c 03       		.uleb128 0x3
+ 387 002d 04       		.byte	0x4
+ 388 002e 05       		.byte	0x5
+ 389 002f 696E7400 		.ascii	"int\000"
+ 390 0033 02       		.uleb128 0x2
+ 391 0034 01       		.byte	0x1
+ 392 0035 06       		.byte	0x6
+ 393 0036 C7020000 		.4byte	.LASF1
+ 394 003a 02       		.uleb128 0x2
+ 395 003b 01       		.byte	0x1
+ 396 003c 08       		.byte	0x8
+ 397 003d D6000000 		.4byte	.LASF2
+ 398 0041 02       		.uleb128 0x2
+ 399 0042 02       		.byte	0x2
+ 400 0043 05       		.byte	0x5
+ 401 0044 88020000 		.4byte	.LASF3
+ 402 0048 02       		.uleb128 0x2
+ 403 0049 02       		.byte	0x2
+ 404 004a 07       		.byte	0x7
+ 405 004b 00010000 		.4byte	.LASF4
+ 406 004f 04       		.uleb128 0x4
+ 407 0050 11000000 		.4byte	.LASF6
+ 408 0054 02       		.byte	0x2
+ 409 0055 3F       		.byte	0x3f
+ 410 0056 5A000000 		.4byte	0x5a
+ 411 005a 02       		.uleb128 0x2
+ 412 005b 04       		.byte	0x4
+ 413 005c 05       		.byte	0x5
+ 414 005d B3020000 		.4byte	.LASF5
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 13
+
+
+ 415 0061 04       		.uleb128 0x4
+ 416 0062 4E010000 		.4byte	.LASF7
+ 417 0066 02       		.byte	0x2
+ 418 0067 41       		.byte	0x41
+ 419 0068 6C000000 		.4byte	0x6c
+ 420 006c 02       		.uleb128 0x2
+ 421 006d 04       		.byte	0x4
+ 422 006e 07       		.byte	0x7
+ 423 006f EE000000 		.4byte	.LASF8
+ 424 0073 02       		.uleb128 0x2
+ 425 0074 08       		.byte	0x8
+ 426 0075 05       		.byte	0x5
+ 427 0076 5E020000 		.4byte	.LASF9
+ 428 007a 02       		.uleb128 0x2
+ 429 007b 08       		.byte	0x8
+ 430 007c 07       		.byte	0x7
+ 431 007d F4010000 		.4byte	.LASF10
+ 432 0081 02       		.uleb128 0x2
+ 433 0082 04       		.byte	0x4
+ 434 0083 07       		.byte	0x7
+ 435 0084 4B020000 		.4byte	.LASF11
+ 436 0088 05       		.uleb128 0x5
+ 437 0089 04       		.byte	0x4
+ 438 008a 02       		.uleb128 0x2
+ 439 008b 01       		.byte	0x1
+ 440 008c 08       		.byte	0x8
+ 441 008d 6C020000 		.4byte	.LASF12
+ 442 0091 04       		.uleb128 0x4
+ 443 0092 43020000 		.4byte	.LASF13
+ 444 0096 03       		.byte	0x3
+ 445 0097 2C       		.byte	0x2c
+ 446 0098 4F000000 		.4byte	0x4f
+ 447 009c 04       		.uleb128 0x4
+ 448 009d AA020000 		.4byte	.LASF14
+ 449 00a1 03       		.byte	0x3
+ 450 00a2 2D       		.byte	0x2d
+ 451 00a3 61000000 		.4byte	0x61
+ 452 00a7 02       		.uleb128 0x2
+ 453 00a8 04       		.byte	0x4
+ 454 00a9 04       		.byte	0x4
+ 455 00aa C2000000 		.4byte	.LASF15
+ 456 00ae 02       		.uleb128 0x2
+ 457 00af 08       		.byte	0x8
+ 458 00b0 04       		.byte	0x4
+ 459 00b1 30010000 		.4byte	.LASF16
+ 460 00b5 04       		.uleb128 0x4
+ 461 00b6 DF020000 		.4byte	.LASF17
+ 462 00ba 04       		.byte	0x4
+ 463 00bb 38       		.byte	0x38
+ 464 00bc 5A000000 		.4byte	0x5a
+ 465 00c0 04       		.uleb128 0x4
+ 466 00c1 D3020000 		.4byte	.LASF18
+ 467 00c5 04       		.byte	0x4
+ 468 00c6 39       		.byte	0x39
+ 469 00c7 6C000000 		.4byte	0x6c
+ 470 00cb 04       		.uleb128 0x4
+ 471 00cc 00000000 		.4byte	.LASF19
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 14
+
+
+ 472 00d0 04       		.byte	0x4
+ 473 00d1 3F       		.byte	0x3f
+ 474 00d2 9C000000 		.4byte	0x9c
+ 475 00d6 06       		.uleb128 0x6
+ 476 00d7 C0000000 		.4byte	0xc0
+ 477 00db 04       		.uleb128 0x4
+ 478 00dc 9D020000 		.4byte	.LASF20
+ 479 00e0 05       		.byte	0x5
+ 480 00e1 3E       		.byte	0x3e
+ 481 00e2 E6000000 		.4byte	0xe6
+ 482 00e6 07       		.uleb128 0x7
+ 483 00e7 04       		.byte	0x4
+ 484 00e8 EC000000 		.4byte	0xec
+ 485 00ec 08       		.uleb128 0x8
+ 486 00ed 6F010000 		.4byte	.LASF41
+ 487 00f1 04       		.uleb128 0x4
+ 488 00f2 1B000000 		.4byte	.LASF21
+ 489 00f6 06       		.byte	0x6
+ 490 00f7 1F       		.byte	0x1f
+ 491 00f8 88000000 		.4byte	0x88
+ 492 00fc 09       		.uleb128 0x9
+ 493 00fd 59010000 		.4byte	.LASF42
+ 494 0101 01       		.byte	0x1
+ 495 0102 73       		.byte	0x73
+ 496 0103 00000000 		.4byte	.LFB68
+ 497 0107 60000000 		.4byte	.LFE68-.LFB68
+ 498 010b 01       		.uleb128 0x1
+ 499 010c 9C       		.byte	0x9c
+ 500 010d 3C010000 		.4byte	0x13c
+ 501 0111 0A       		.uleb128 0xa
+ 502 0112 90010000 		.4byte	.LASF22
+ 503 0116 01       		.byte	0x1
+ 504 0117 73       		.byte	0x73
+ 505 0118 C0000000 		.4byte	0xc0
+ 506 011c 02       		.uleb128 0x2
+ 507 011d 91       		.byte	0x91
+ 508 011e 74       		.sleb128 -12
+ 509 011f 0A       		.uleb128 0xa
+ 510 0120 92020000 		.4byte	.LASF23
+ 511 0124 01       		.byte	0x1
+ 512 0125 73       		.byte	0x73
+ 513 0126 9C000000 		.4byte	0x9c
+ 514 012a 02       		.uleb128 0x2
+ 515 012b 91       		.byte	0x91
+ 516 012c 70       		.sleb128 -16
+ 517 012d 0A       		.uleb128 0xa
+ 518 012e 0B000000 		.4byte	.LASF24
+ 519 0132 01       		.byte	0x1
+ 520 0133 73       		.byte	0x73
+ 521 0134 C0000000 		.4byte	0xc0
+ 522 0138 02       		.uleb128 0x2
+ 523 0139 91       		.byte	0x91
+ 524 013a 6C       		.sleb128 -20
+ 525 013b 00       		.byte	0
+ 526 013c 0B       		.uleb128 0xb
+ 527 013d 37010000 		.4byte	.LASF28
+ 528 0141 01       		.byte	0x1
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 15
+
+
+ 529 0142 7F       		.byte	0x7f
+ 530 0143 00000000 		.4byte	.LFB69
+ 531 0147 64000000 		.4byte	.LFE69-.LFB69
+ 532 014b 01       		.uleb128 0x1
+ 533 014c 9C       		.byte	0x9c
+ 534 014d 7C010000 		.4byte	0x17c
+ 535 0151 0A       		.uleb128 0xa
+ 536 0152 71020000 		.4byte	.LASF25
+ 537 0156 01       		.byte	0x1
+ 538 0157 7F       		.byte	0x7f
+ 539 0158 88000000 		.4byte	0x88
+ 540 015c 02       		.uleb128 0x2
+ 541 015d 91       		.byte	0x91
+ 542 015e 6C       		.sleb128 -20
+ 543 015f 0C       		.uleb128 0xc
+ 544 0160 0B020000 		.4byte	.LASF26
+ 545 0164 01       		.byte	0x1
+ 546 0165 81       		.byte	0x81
+ 547 0166 8A000000 		.4byte	0x8a
+ 548 016a 02       		.uleb128 0x2
+ 549 016b 91       		.byte	0x91
+ 550 016c 77       		.sleb128 -9
+ 551 016d 0C       		.uleb128 0xc
+ 552 016e 42010000 		.4byte	.LASF27
+ 553 0172 01       		.byte	0x1
+ 554 0173 82       		.byte	0x82
+ 555 0174 CB000000 		.4byte	0xcb
+ 556 0178 02       		.uleb128 0x2
+ 557 0179 91       		.byte	0x91
+ 558 017a 70       		.sleb128 -16
+ 559 017b 00       		.byte	0
+ 560 017c 0B       		.uleb128 0xb
+ 561 017d BC020000 		.4byte	.LASF29
+ 562 0181 01       		.byte	0x1
+ 563 0182 A9       		.byte	0xa9
+ 564 0183 00000000 		.4byte	.LFB70
+ 565 0187 A0000000 		.4byte	.LFE70-.LFB70
+ 566 018b 01       		.uleb128 0x1
+ 567 018c 9C       		.byte	0x9c
+ 568 018d D8010000 		.4byte	0x1d8
+ 569 0191 0A       		.uleb128 0xa
+ 570 0192 71020000 		.4byte	.LASF25
+ 571 0196 01       		.byte	0x1
+ 572 0197 A9       		.byte	0xa9
+ 573 0198 88000000 		.4byte	0x88
+ 574 019c 02       		.uleb128 0x2
+ 575 019d 91       		.byte	0x91
+ 576 019e 64       		.sleb128 -28
+ 577 019f 0C       		.uleb128 0xc
+ 578 01a0 C8000000 		.4byte	.LASF30
+ 579 01a4 01       		.byte	0x1
+ 580 01a5 AB       		.byte	0xab
+ 581 01a6 33000000 		.4byte	0x33
+ 582 01aa 02       		.uleb128 0x2
+ 583 01ab 91       		.byte	0x91
+ 584 01ac 77       		.sleb128 -9
+ 585 01ad 0C       		.uleb128 0xc
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 16
+
+
+ 586 01ae E4000000 		.4byte	.LASF31
+ 587 01b2 01       		.byte	0x1
+ 588 01b3 AB       		.byte	0xab
+ 589 01b4 33000000 		.4byte	0x33
+ 590 01b8 02       		.uleb128 0x2
+ 591 01b9 91       		.byte	0x91
+ 592 01ba 6B       		.sleb128 -21
+ 593 01bb 0C       		.uleb128 0xc
+ 594 01bc 20010000 		.4byte	.LASF32
+ 595 01c0 01       		.byte	0x1
+ 596 01c1 AC       		.byte	0xac
+ 597 01c2 B5000000 		.4byte	0xb5
+ 598 01c6 02       		.uleb128 0x2
+ 599 01c7 91       		.byte	0x91
+ 600 01c8 70       		.sleb128 -16
+ 601 01c9 0C       		.uleb128 0xc
+ 602 01ca 17020000 		.4byte	.LASF33
+ 603 01ce 01       		.byte	0x1
+ 604 01cf AC       		.byte	0xac
+ 605 01d0 B5000000 		.4byte	0xb5
+ 606 01d4 02       		.uleb128 0x2
+ 607 01d5 91       		.byte	0x91
+ 608 01d6 6C       		.sleb128 -20
+ 609 01d7 00       		.byte	0
+ 610 01d8 0D       		.uleb128 0xd
+ 611 01d9 26020000 		.4byte	.LASF43
+ 612 01dd 01       		.byte	0x1
+ 613 01de F2       		.byte	0xf2
+ 614 01df B5000000 		.4byte	0xb5
+ 615 01e3 00000000 		.4byte	.LFB71
+ 616 01e7 30000000 		.4byte	.LFE71-.LFB71
+ 617 01eb 01       		.uleb128 0x1
+ 618 01ec 9C       		.byte	0x9c
+ 619 01ed 00020000 		.4byte	0x200
+ 620 01f1 0C       		.uleb128 0xc
+ 621 01f2 82010000 		.4byte	.LASF34
+ 622 01f6 01       		.byte	0x1
+ 623 01f7 F4       		.byte	0xf4
+ 624 01f8 B5000000 		.4byte	0xb5
+ 625 01fc 02       		.uleb128 0x2
+ 626 01fd 91       		.byte	0x91
+ 627 01fe 74       		.sleb128 -12
+ 628 01ff 00       		.byte	0
+ 629 0200 0C       		.uleb128 0xc
+ 630 0201 8A010000 		.4byte	.LASF35
+ 631 0205 01       		.byte	0x1
+ 632 0206 5F       		.byte	0x5f
+ 633 0207 F1000000 		.4byte	0xf1
+ 634 020b 05       		.uleb128 0x5
+ 635 020c 03       		.byte	0x3
+ 636 020d 00000000 		.4byte	xPort
+ 637 0211 0C       		.uleb128 0xc
+ 638 0212 7E020000 		.4byte	.LASF36
+ 639 0216 01       		.byte	0x1
+ 640 0217 6A       		.byte	0x6a
+ 641 0218 C0000000 		.4byte	0xc0
+ 642 021c 05       		.uleb128 0x5
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 17
+
+
+ 643 021d 03       		.byte	0x3
+ 644 021e 04000000 		.4byte	uxBaseLED
+ 645 0222 0C       		.uleb128 0xc
+ 646 0223 B8000000 		.4byte	.LASF37
+ 647 0227 01       		.byte	0x1
+ 648 0228 6F       		.byte	0x6f
+ 649 0229 D6000000 		.4byte	0xd6
+ 650 022d 05       		.uleb128 0x5
+ 651 022e 03       		.byte	0x3
+ 652 022f 08000000 		.4byte	uxRxLoops
+ 653 0233 0E       		.uleb128 0xe
+ 654 0234 13010000 		.4byte	.LASF44
+ 655 0238 07       		.byte	0x7
+ 656 0239 9606     		.2byte	0x696
+ 657 023b 3F020000 		.4byte	0x23f
+ 658 023f 06       		.uleb128 0x6
+ 659 0240 91000000 		.4byte	0x91
+ 660 0244 00       		.byte	0
+ 661              		.section	.debug_abbrev,"",%progbits
+ 662              	.Ldebug_abbrev0:
+ 663 0000 01       		.uleb128 0x1
+ 664 0001 11       		.uleb128 0x11
+ 665 0002 01       		.byte	0x1
+ 666 0003 25       		.uleb128 0x25
+ 667 0004 0E       		.uleb128 0xe
+ 668 0005 13       		.uleb128 0x13
+ 669 0006 0B       		.uleb128 0xb
+ 670 0007 03       		.uleb128 0x3
+ 671 0008 0E       		.uleb128 0xe
+ 672 0009 1B       		.uleb128 0x1b
+ 673 000a 0E       		.uleb128 0xe
+ 674 000b 55       		.uleb128 0x55
+ 675 000c 17       		.uleb128 0x17
+ 676 000d 11       		.uleb128 0x11
+ 677 000e 01       		.uleb128 0x1
+ 678 000f 10       		.uleb128 0x10
+ 679 0010 17       		.uleb128 0x17
+ 680 0011 00       		.byte	0
+ 681 0012 00       		.byte	0
+ 682 0013 02       		.uleb128 0x2
+ 683 0014 24       		.uleb128 0x24
+ 684 0015 00       		.byte	0
+ 685 0016 0B       		.uleb128 0xb
+ 686 0017 0B       		.uleb128 0xb
+ 687 0018 3E       		.uleb128 0x3e
+ 688 0019 0B       		.uleb128 0xb
+ 689 001a 03       		.uleb128 0x3
+ 690 001b 0E       		.uleb128 0xe
+ 691 001c 00       		.byte	0
+ 692 001d 00       		.byte	0
+ 693 001e 03       		.uleb128 0x3
+ 694 001f 24       		.uleb128 0x24
+ 695 0020 00       		.byte	0
+ 696 0021 0B       		.uleb128 0xb
+ 697 0022 0B       		.uleb128 0xb
+ 698 0023 3E       		.uleb128 0x3e
+ 699 0024 0B       		.uleb128 0xb
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 18
+
+
+ 700 0025 03       		.uleb128 0x3
+ 701 0026 08       		.uleb128 0x8
+ 702 0027 00       		.byte	0
+ 703 0028 00       		.byte	0
+ 704 0029 04       		.uleb128 0x4
+ 705 002a 16       		.uleb128 0x16
+ 706 002b 00       		.byte	0
+ 707 002c 03       		.uleb128 0x3
+ 708 002d 0E       		.uleb128 0xe
+ 709 002e 3A       		.uleb128 0x3a
+ 710 002f 0B       		.uleb128 0xb
+ 711 0030 3B       		.uleb128 0x3b
+ 712 0031 0B       		.uleb128 0xb
+ 713 0032 49       		.uleb128 0x49
+ 714 0033 13       		.uleb128 0x13
+ 715 0034 00       		.byte	0
+ 716 0035 00       		.byte	0
+ 717 0036 05       		.uleb128 0x5
+ 718 0037 0F       		.uleb128 0xf
+ 719 0038 00       		.byte	0
+ 720 0039 0B       		.uleb128 0xb
+ 721 003a 0B       		.uleb128 0xb
+ 722 003b 00       		.byte	0
+ 723 003c 00       		.byte	0
+ 724 003d 06       		.uleb128 0x6
+ 725 003e 35       		.uleb128 0x35
+ 726 003f 00       		.byte	0
+ 727 0040 49       		.uleb128 0x49
+ 728 0041 13       		.uleb128 0x13
+ 729 0042 00       		.byte	0
+ 730 0043 00       		.byte	0
+ 731 0044 07       		.uleb128 0x7
+ 732 0045 0F       		.uleb128 0xf
+ 733 0046 00       		.byte	0
+ 734 0047 0B       		.uleb128 0xb
+ 735 0048 0B       		.uleb128 0xb
+ 736 0049 49       		.uleb128 0x49
+ 737 004a 13       		.uleb128 0x13
+ 738 004b 00       		.byte	0
+ 739 004c 00       		.byte	0
+ 740 004d 08       		.uleb128 0x8
+ 741 004e 13       		.uleb128 0x13
+ 742 004f 00       		.byte	0
+ 743 0050 03       		.uleb128 0x3
+ 744 0051 0E       		.uleb128 0xe
+ 745 0052 3C       		.uleb128 0x3c
+ 746 0053 19       		.uleb128 0x19
+ 747 0054 00       		.byte	0
+ 748 0055 00       		.byte	0
+ 749 0056 09       		.uleb128 0x9
+ 750 0057 2E       		.uleb128 0x2e
+ 751 0058 01       		.byte	0x1
+ 752 0059 3F       		.uleb128 0x3f
+ 753 005a 19       		.uleb128 0x19
+ 754 005b 03       		.uleb128 0x3
+ 755 005c 0E       		.uleb128 0xe
+ 756 005d 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 19
+
+
+ 757 005e 0B       		.uleb128 0xb
+ 758 005f 3B       		.uleb128 0x3b
+ 759 0060 0B       		.uleb128 0xb
+ 760 0061 27       		.uleb128 0x27
+ 761 0062 19       		.uleb128 0x19
+ 762 0063 11       		.uleb128 0x11
+ 763 0064 01       		.uleb128 0x1
+ 764 0065 12       		.uleb128 0x12
+ 765 0066 06       		.uleb128 0x6
+ 766 0067 40       		.uleb128 0x40
+ 767 0068 18       		.uleb128 0x18
+ 768 0069 9642     		.uleb128 0x2116
+ 769 006b 19       		.uleb128 0x19
+ 770 006c 01       		.uleb128 0x1
+ 771 006d 13       		.uleb128 0x13
+ 772 006e 00       		.byte	0
+ 773 006f 00       		.byte	0
+ 774 0070 0A       		.uleb128 0xa
+ 775 0071 05       		.uleb128 0x5
+ 776 0072 00       		.byte	0
+ 777 0073 03       		.uleb128 0x3
+ 778 0074 0E       		.uleb128 0xe
+ 779 0075 3A       		.uleb128 0x3a
+ 780 0076 0B       		.uleb128 0xb
+ 781 0077 3B       		.uleb128 0x3b
+ 782 0078 0B       		.uleb128 0xb
+ 783 0079 49       		.uleb128 0x49
+ 784 007a 13       		.uleb128 0x13
+ 785 007b 02       		.uleb128 0x2
+ 786 007c 18       		.uleb128 0x18
+ 787 007d 00       		.byte	0
+ 788 007e 00       		.byte	0
+ 789 007f 0B       		.uleb128 0xb
+ 790 0080 2E       		.uleb128 0x2e
+ 791 0081 01       		.byte	0x1
+ 792 0082 03       		.uleb128 0x3
+ 793 0083 0E       		.uleb128 0xe
+ 794 0084 3A       		.uleb128 0x3a
+ 795 0085 0B       		.uleb128 0xb
+ 796 0086 3B       		.uleb128 0x3b
+ 797 0087 0B       		.uleb128 0xb
+ 798 0088 27       		.uleb128 0x27
+ 799 0089 19       		.uleb128 0x19
+ 800 008a 11       		.uleb128 0x11
+ 801 008b 01       		.uleb128 0x1
+ 802 008c 12       		.uleb128 0x12
+ 803 008d 06       		.uleb128 0x6
+ 804 008e 40       		.uleb128 0x40
+ 805 008f 18       		.uleb128 0x18
+ 806 0090 9642     		.uleb128 0x2116
+ 807 0092 19       		.uleb128 0x19
+ 808 0093 01       		.uleb128 0x1
+ 809 0094 13       		.uleb128 0x13
+ 810 0095 00       		.byte	0
+ 811 0096 00       		.byte	0
+ 812 0097 0C       		.uleb128 0xc
+ 813 0098 34       		.uleb128 0x34
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 20
+
+
+ 814 0099 00       		.byte	0
+ 815 009a 03       		.uleb128 0x3
+ 816 009b 0E       		.uleb128 0xe
+ 817 009c 3A       		.uleb128 0x3a
+ 818 009d 0B       		.uleb128 0xb
+ 819 009e 3B       		.uleb128 0x3b
+ 820 009f 0B       		.uleb128 0xb
+ 821 00a0 49       		.uleb128 0x49
+ 822 00a1 13       		.uleb128 0x13
+ 823 00a2 02       		.uleb128 0x2
+ 824 00a3 18       		.uleb128 0x18
+ 825 00a4 00       		.byte	0
+ 826 00a5 00       		.byte	0
+ 827 00a6 0D       		.uleb128 0xd
+ 828 00a7 2E       		.uleb128 0x2e
+ 829 00a8 01       		.byte	0x1
+ 830 00a9 3F       		.uleb128 0x3f
+ 831 00aa 19       		.uleb128 0x19
+ 832 00ab 03       		.uleb128 0x3
+ 833 00ac 0E       		.uleb128 0xe
+ 834 00ad 3A       		.uleb128 0x3a
+ 835 00ae 0B       		.uleb128 0xb
+ 836 00af 3B       		.uleb128 0x3b
+ 837 00b0 0B       		.uleb128 0xb
+ 838 00b1 27       		.uleb128 0x27
+ 839 00b2 19       		.uleb128 0x19
+ 840 00b3 49       		.uleb128 0x49
+ 841 00b4 13       		.uleb128 0x13
+ 842 00b5 11       		.uleb128 0x11
+ 843 00b6 01       		.uleb128 0x1
+ 844 00b7 12       		.uleb128 0x12
+ 845 00b8 06       		.uleb128 0x6
+ 846 00b9 40       		.uleb128 0x40
+ 847 00ba 18       		.uleb128 0x18
+ 848 00bb 9742     		.uleb128 0x2117
+ 849 00bd 19       		.uleb128 0x19
+ 850 00be 01       		.uleb128 0x1
+ 851 00bf 13       		.uleb128 0x13
+ 852 00c0 00       		.byte	0
+ 853 00c1 00       		.byte	0
+ 854 00c2 0E       		.uleb128 0xe
+ 855 00c3 34       		.uleb128 0x34
+ 856 00c4 00       		.byte	0
+ 857 00c5 03       		.uleb128 0x3
+ 858 00c6 0E       		.uleb128 0xe
+ 859 00c7 3A       		.uleb128 0x3a
+ 860 00c8 0B       		.uleb128 0xb
+ 861 00c9 3B       		.uleb128 0x3b
+ 862 00ca 05       		.uleb128 0x5
+ 863 00cb 49       		.uleb128 0x49
+ 864 00cc 13       		.uleb128 0x13
+ 865 00cd 3F       		.uleb128 0x3f
+ 866 00ce 19       		.uleb128 0x19
+ 867 00cf 3C       		.uleb128 0x3c
+ 868 00d0 19       		.uleb128 0x19
+ 869 00d1 00       		.byte	0
+ 870 00d2 00       		.byte	0
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 21
+
+
+ 871 00d3 00       		.byte	0
+ 872              		.section	.debug_aranges,"",%progbits
+ 873 0000 34000000 		.4byte	0x34
+ 874 0004 0200     		.2byte	0x2
+ 875 0006 00000000 		.4byte	.Ldebug_info0
+ 876 000a 04       		.byte	0x4
+ 877 000b 00       		.byte	0
+ 878 000c 0000     		.2byte	0
+ 879 000e 0000     		.2byte	0
+ 880 0010 00000000 		.4byte	.LFB68
+ 881 0014 60000000 		.4byte	.LFE68-.LFB68
+ 882 0018 00000000 		.4byte	.LFB69
+ 883 001c 64000000 		.4byte	.LFE69-.LFB69
+ 884 0020 00000000 		.4byte	.LFB70
+ 885 0024 A0000000 		.4byte	.LFE70-.LFB70
+ 886 0028 00000000 		.4byte	.LFB71
+ 887 002c 30000000 		.4byte	.LFE71-.LFB71
+ 888 0030 00000000 		.4byte	0
+ 889 0034 00000000 		.4byte	0
+ 890              		.section	.debug_ranges,"",%progbits
+ 891              	.Ldebug_ranges0:
+ 892 0000 00000000 		.4byte	.LFB68
+ 893 0004 60000000 		.4byte	.LFE68
+ 894 0008 00000000 		.4byte	.LFB69
+ 895 000c 64000000 		.4byte	.LFE69
+ 896 0010 00000000 		.4byte	.LFB70
+ 897 0014 A0000000 		.4byte	.LFE70
+ 898 0018 00000000 		.4byte	.LFB71
+ 899 001c 30000000 		.4byte	.LFE71
+ 900 0020 00000000 		.4byte	0
+ 901 0024 00000000 		.4byte	0
+ 902              		.section	.debug_line,"",%progbits
+ 903              	.Ldebug_line0:
+ 904 0000 33020000 		.section	.debug_str,"MS",%progbits,1
+ 904      0200AB01 
+ 904      00000201 
+ 904      FB0E0D00 
+ 904      01010101 
+ 905              	.LASF19:
+ 906 0000 5469636B 		.ascii	"TickType_t\000"
+ 906      54797065 
+ 906      5F7400
+ 907              	.LASF24:
+ 908 000b 75784C45 		.ascii	"uxLED\000"
+ 908      4400
+ 909              	.LASF6:
+ 910 0011 5F5F696E 		.ascii	"__int32_t\000"
+ 910      7433325F 
+ 910      7400
+ 911              	.LASF21:
+ 912 001b 78436F6D 		.ascii	"xComPortHandle\000"
+ 912      506F7274 
+ 912      48616E64 
+ 912      6C6500
+ 913              	.LASF38:
+ 914 002a 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 914      4320342E 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 22
+
+
+ 914      392E3320 
+ 914      32303135 
+ 914      30333033 
+ 915 005d 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 915      20726576 
+ 915      6973696F 
+ 915      6E203232 
+ 915      31323230 
+ 916 0090 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 916      66756E63 
+ 916      74696F6E 
+ 916      2D736563 
+ 916      74696F6E 
+ 917              	.LASF37:
+ 918 00b8 75785278 		.ascii	"uxRxLoops\000"
+ 918      4C6F6F70 
+ 918      7300
+ 919              	.LASF15:
+ 920 00c2 666C6F61 		.ascii	"float\000"
+ 920      7400
+ 921              	.LASF30:
+ 922 00c8 63457870 		.ascii	"cExpectedByte\000"
+ 922      65637465 
+ 922      64427974 
+ 922      6500
+ 923              	.LASF2:
+ 924 00d6 756E7369 		.ascii	"unsigned char\000"
+ 924      676E6564 
+ 924      20636861 
+ 924      7200
+ 925              	.LASF31:
+ 926 00e4 63427974 		.ascii	"cByteRxed\000"
+ 926      65527865 
+ 926      6400
+ 927              	.LASF8:
+ 928 00ee 6C6F6E67 		.ascii	"long unsigned int\000"
+ 928      20756E73 
+ 928      69676E65 
+ 928      6420696E 
+ 928      7400
+ 929              	.LASF4:
+ 930 0100 73686F72 		.ascii	"short unsigned int\000"
+ 930      7420756E 
+ 930      7369676E 
+ 930      65642069 
+ 930      6E7400
+ 931              	.LASF44:
+ 932 0113 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 932      52784275 
+ 932      66666572 
+ 932      00
+ 933              	.LASF32:
+ 934 0120 78526573 		.ascii	"xResyncRequired\000"
+ 934      796E6352 
+ 934      65717569 
+ 934      72656400 
+ 935              	.LASF16:
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 23
+
+
+ 936 0130 646F7562 		.ascii	"double\000"
+ 936      6C6500
+ 937              	.LASF28:
+ 938 0137 76436F6D 		.ascii	"vComTxTask\000"
+ 938      54785461 
+ 938      736B00
+ 939              	.LASF27:
+ 940 0142 7854696D 		.ascii	"xTimeToWait\000"
+ 940      65546F57 
+ 940      61697400 
+ 941              	.LASF7:
+ 942 014e 5F5F7569 		.ascii	"__uint32_t\000"
+ 942      6E743332 
+ 942      5F7400
+ 943              	.LASF42:
+ 944 0159 76416C74 		.ascii	"vAltStartComTestTasks\000"
+ 944      53746172 
+ 944      74436F6D 
+ 944      54657374 
+ 944      5461736B 
+ 945              	.LASF41:
+ 946 016f 5461736B 		.ascii	"TaskControlBlock_t\000"
+ 946      436F6E74 
+ 946      726F6C42 
+ 946      6C6F636B 
+ 946      5F7400
+ 947              	.LASF34:
+ 948 0182 78526574 		.ascii	"xReturn\000"
+ 948      75726E00 
+ 949              	.LASF35:
+ 950 018a 78506F72 		.ascii	"xPort\000"
+ 950      7400
+ 951              	.LASF22:
+ 952 0190 75785072 		.ascii	"uxPriority\000"
+ 952      696F7269 
+ 952      747900
+ 953              	.LASF0:
+ 954 019b 756E7369 		.ascii	"unsigned int\000"
+ 954      676E6564 
+ 954      20696E74 
+ 954      00
+ 955              	.LASF40:
+ 956 01a8 453A5C47 		.ascii	"E:\\GitHub\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 956      69744875 
+ 956      625C4659 
+ 956      505F4E65 
+ 956      775F5465 
+ 957 01d8 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 957      4743435C 
+ 957      46726565 
+ 957      52544F53 
+ 957      5F44656D 
+ 958              	.LASF10:
+ 959 01f4 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 959      206C6F6E 
+ 959      6720756E 
+ 959      7369676E 
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 24
+
+
+ 959      65642069 
+ 960              	.LASF26:
+ 961 020b 63427974 		.ascii	"cByteToSend\000"
+ 961      65546F53 
+ 961      656E6400 
+ 962              	.LASF33:
+ 963 0217 78457272 		.ascii	"xErrorOccurred\000"
+ 963      6F724F63 
+ 963      63757272 
+ 963      656400
+ 964              	.LASF43:
+ 965 0226 78417265 		.ascii	"xAreComTestTasksStillRunning\000"
+ 965      436F6D54 
+ 965      65737454 
+ 965      61736B73 
+ 965      5374696C 
+ 966              	.LASF13:
+ 967 0243 696E7433 		.ascii	"int32_t\000"
+ 967      325F7400 
+ 968              	.LASF11:
+ 969 024b 73697A65 		.ascii	"sizetype\000"
+ 969      74797065 
+ 969      00
+ 970              	.LASF39:
+ 971 0254 636F6D74 		.ascii	"comtest.c\000"
+ 971      6573742E 
+ 971      6300
+ 972              	.LASF9:
+ 973 025e 6C6F6E67 		.ascii	"long long int\000"
+ 973      206C6F6E 
+ 973      6720696E 
+ 973      7400
+ 974              	.LASF12:
+ 975 026c 63686172 		.ascii	"char\000"
+ 975      00
+ 976              	.LASF25:
+ 977 0271 70765061 		.ascii	"pvParameters\000"
+ 977      72616D65 
+ 977      74657273 
+ 977      00
+ 978              	.LASF36:
+ 979 027e 75784261 		.ascii	"uxBaseLED\000"
+ 979      73654C45 
+ 979      4400
+ 980              	.LASF3:
+ 981 0288 73686F72 		.ascii	"short int\000"
+ 981      7420696E 
+ 981      7400
+ 982              	.LASF23:
+ 983 0292 756C4261 		.ascii	"ulBaudRate\000"
+ 983      75645261 
+ 983      746500
+ 984              	.LASF20:
+ 985 029d 5461736B 		.ascii	"TaskHandle_t\000"
+ 985      48616E64 
+ 985      6C655F74 
+ 985      00
+ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccYkkuUe.s 			page 25
+
+
+ 986              	.LASF14:
+ 987 02aa 75696E74 		.ascii	"uint32_t\000"
+ 987      33325F74 
+ 987      00
+ 988              	.LASF5:
+ 989 02b3 6C6F6E67 		.ascii	"long int\000"
+ 989      20696E74 
+ 989      00
+ 990              	.LASF29:
+ 991 02bc 76436F6D 		.ascii	"vComRxTask\000"
+ 991      52785461 
+ 991      736B00
+ 992              	.LASF1:
+ 993 02c7 7369676E 		.ascii	"signed char\000"
+ 993      65642063 
+ 993      68617200 
+ 994              	.LASF18:
+ 995 02d3 55426173 		.ascii	"UBaseType_t\000"
+ 995      65547970 
+ 995      655F7400 
+ 996              	.LASF17:
+ 997 02df 42617365 		.ascii	"BaseType_t\000"
+ 997      54797065 
+ 997      5F7400
+ 998              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br
