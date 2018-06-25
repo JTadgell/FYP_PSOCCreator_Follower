@@ -1,5 +1,5 @@
--- Project:   E:\GitHub\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\FreeRTOS_Demo.cyprj
--- Generated: 06/14/2018 16:43:11
+-- Project:   C:\Users\tadge\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\FreeRTOS_Demo.cyprj
+-- Generated: 06/25/2018 15:09:34
 -- PSoC Creator  4.0
 
 ENTITY FreeRTOS_Demo IS

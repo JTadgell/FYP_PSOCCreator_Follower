@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 1
 
 
    1              		.syntax unified
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
   29:Generated_Source\PSoC5/cyutils.c ****     *  No
   30:Generated_Source\PSoC5/cyutils.c ****     *
   31:Generated_Source\PSoC5/cyutils.c ****     ***************************************************************************/
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 2
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 2
 
 
   32:Generated_Source\PSoC5/cyutils.c ****     void CySetReg24(uint32 volatile * addr, uint32 value)
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
   71              		.cfi_def_cfa_offset 0
   72 0036 7047     		bx	lr
   73              		.cfi_endproc
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 3
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 3
 
 
   74              	.LFE0:
@@ -135,15 +135,15 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
   85 000b 01       		.uleb128 0x1
   86 000c 11000000 		.4byte	.LASF16
   87 0010 01       		.byte	0x1
-  88 0011 E5000000 		.4byte	.LASF17
-  89 0015 21010000 		.4byte	.LASF18
+  88 0011 60010000 		.4byte	.LASF17
+  89 0015 E5000000 		.4byte	.LASF18
   90 0019 00000000 		.4byte	.Ldebug_ranges0+0
   91 001d 00000000 		.4byte	0
   92 0021 00000000 		.4byte	.Ldebug_line0
   93 0025 02       		.uleb128 0x2
   94 0026 01       		.byte	0x1
   95 0027 06       		.byte	0x6
-  96 0028 B0010000 		.4byte	.LASF0
+  96 0028 DF010000 		.4byte	.LASF0
   97 002c 02       		.uleb128 0x2
   98 002d 01       		.byte	0x1
   99 002e 08       		.byte	0x8
@@ -151,7 +151,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  101 0033 02       		.uleb128 0x2
  102 0034 02       		.byte	0x2
  103 0035 05       		.byte	0x5
- 104 0036 97010000 		.4byte	.LASF2
+ 104 0036 C6010000 		.4byte	.LASF2
  105 003a 02       		.uleb128 0x2
  106 003b 02       		.byte	0x2
  107 003c 07       		.byte	0x7
@@ -159,7 +159,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  109 0041 02       		.uleb128 0x2
  110 0042 04       		.byte	0x4
  111 0043 05       		.byte	0x5
- 112 0044 A7010000 		.4byte	.LASF4
+ 112 0044 D6010000 		.4byte	.LASF4
  113 0048 02       		.uleb128 0x2
  114 0049 04       		.byte	0x4
  115 004a 07       		.byte	0x7
@@ -167,29 +167,29 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  117 004f 02       		.uleb128 0x2
  118 0050 08       		.byte	0x8
  119 0051 05       		.byte	0x5
- 120 0052 84010000 		.4byte	.LASF6
+ 120 0052 B3010000 		.4byte	.LASF6
  121 0056 02       		.uleb128 0x2
  122 0057 08       		.byte	0x8
  123 0058 07       		.byte	0x7
- 124 0059 6D010000 		.4byte	.LASF7
+ 124 0059 9C010000 		.4byte	.LASF7
  125 005d 03       		.uleb128 0x3
  126 005e 04       		.byte	0x4
  127 005f 05       		.byte	0x5
  128 0060 696E7400 		.ascii	"int\000"
  129 0064 02       		.uleb128 0x2
  130 0065 04       		.byte	0x4
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 4
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 4
 
 
  131 0066 07       		.byte	0x7
- 132 0067 14010000 		.4byte	.LASF8
+ 132 0067 8F010000 		.4byte	.LASF8
  133 006b 04       		.uleb128 0x4
- 134 006c A1010000 		.4byte	.LASF9
+ 134 006c D0010000 		.4byte	.LASF9
  135 0070 02       		.byte	0x2
  136 0071 9201     		.2byte	0x192
  137 0073 2C000000 		.4byte	0x2c
  138 0077 04       		.uleb128 0x4
- 139 0078 0D010000 		.4byte	.LASF10
+ 139 0078 88010000 		.4byte	.LASF10
  140 007c 02       		.byte	0x2
  141 007d 9401     		.2byte	0x194
  142 007f 48000000 		.4byte	0x48
@@ -200,11 +200,11 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  147 008a 02       		.uleb128 0x2
  148 008b 08       		.byte	0x8
  149 008c 04       		.byte	0x4
- 150 008d 06010000 		.4byte	.LASF12
+ 150 008d 81010000 		.4byte	.LASF12
  151 0091 02       		.uleb128 0x2
  152 0092 01       		.byte	0x1
  153 0093 08       		.byte	0x8
- 154 0094 92010000 		.4byte	.LASF13
+ 154 0094 C1010000 		.4byte	.LASF13
  155 0098 05       		.uleb128 0x5
  156 0099 6B000000 		.4byte	0x6b
  157 009d 05       		.uleb128 0x5
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  185 00d4 B8000000 		.4byte	.LASF20
  186 00d8 01       		.byte	0x1
  187 00d9 22       		.byte	0x22
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 5
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 5
 
 
  188 00da E8000000 		.4byte	0xe8
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  242 0028 00       		.byte	0
  243 0029 04       		.uleb128 0x4
  244 002a 16       		.uleb128 0x16
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 6
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 6
 
 
  245 002b 00       		.byte	0
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  299 0062 02       		.uleb128 0x2
  300 0063 18       		.uleb128 0x18
  301 0064 00       		.byte	0
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 7
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 7
 
 
  302 0065 00       		.byte	0
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  351              	.LASF19:
  352 0006 43795365 		.ascii	"CySetReg24\000"
  352      74526567 
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 8
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 8
 
 
  352      323400
@@ -464,64 +464,69 @@ ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 1
  368      7369676E 
  368      65642069 
  368      6E7400
- 369              	.LASF17:
- 370 00e5 47656E65 		.ascii	"Generated_Source\\PSoC5\\cyutils.c\000"
- 370      72617465 
- 370      645F536F 
- 370      75726365 
- 370      5C50536F 
- 371              	.LASF12:
- 372 0106 646F7562 		.ascii	"double\000"
- 372      6C6500
- 373              	.LASF10:
- 374 010d 75696E74 		.ascii	"uint32\000"
- 374      333200
- 375              	.LASF8:
- 376 0114 756E7369 		.ascii	"unsigned int\000"
-ARM GAS  C:\Users\Jamie\AppData\Local\Temp\ccwdOPg0.s 			page 9
+ 369              	.LASF18:
+ 370 00e5 433A5C55 		.ascii	"C:\\Users\\tadge\\Documents\\GitHub\\FYP_PSOCCreato"
+ 370      73657273 
+ 370      5C746164 
+ 370      67655C44 
+ 370      6F63756D 
+ 371 0113 725F466F 		.ascii	"r_Follower\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 371      6C6C6F77 
+ 371      65725C46 
+ 371      59505F4E 
+ 371      65775F54 
+ 372 0144 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 372      4743435C 
+ 372      46726565 
+ARM GAS  C:\Users\tadge\AppData\Local\Temp\cczVT53H.s 			page 9
 
 
- 376      676E6564 
- 376      20696E74 
- 376      00
- 377              	.LASF18:
- 378 0121 453A5C47 		.ascii	"E:\\GitHub\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
- 378      69744875 
- 378      625C4659 
- 378      505F4E65 
- 378      775F5465 
- 379 0151 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
- 379      4743435C 
- 379      46726565 
- 379      52544F53 
- 379      5F44656D 
- 380              	.LASF7:
- 381 016d 6C6F6E67 		.ascii	"long long unsigned int\000"
- 381      206C6F6E 
- 381      6720756E 
- 381      7369676E 
- 381      65642069 
- 382              	.LASF6:
- 383 0184 6C6F6E67 		.ascii	"long long int\000"
- 383      206C6F6E 
- 383      6720696E 
- 383      7400
- 384              	.LASF13:
- 385 0192 63686172 		.ascii	"char\000"
- 385      00
- 386              	.LASF2:
- 387 0197 73686F72 		.ascii	"short int\000"
- 387      7420696E 
- 387      7400
- 388              	.LASF9:
- 389 01a1 75696E74 		.ascii	"uint8\000"
- 389      3800
- 390              	.LASF4:
- 391 01a7 6C6F6E67 		.ascii	"long int\000"
- 391      20696E74 
- 391      00
- 392              	.LASF0:
- 393 01b0 7369676E 		.ascii	"signed char\000"
- 393      65642063 
- 393      68617200 
- 394              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br
+ 372      52544F53 
+ 372      5F44656D 
+ 373              	.LASF17:
+ 374 0160 47656E65 		.ascii	"Generated_Source\\PSoC5\\cyutils.c\000"
+ 374      72617465 
+ 374      645F536F 
+ 374      75726365 
+ 374      5C50536F 
+ 375              	.LASF12:
+ 376 0181 646F7562 		.ascii	"double\000"
+ 376      6C6500
+ 377              	.LASF10:
+ 378 0188 75696E74 		.ascii	"uint32\000"
+ 378      333200
+ 379              	.LASF8:
+ 380 018f 756E7369 		.ascii	"unsigned int\000"
+ 380      676E6564 
+ 380      20696E74 
+ 380      00
+ 381              	.LASF7:
+ 382 019c 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 382      206C6F6E 
+ 382      6720756E 
+ 382      7369676E 
+ 382      65642069 
+ 383              	.LASF6:
+ 384 01b3 6C6F6E67 		.ascii	"long long int\000"
+ 384      206C6F6E 
+ 384      6720696E 
+ 384      7400
+ 385              	.LASF13:
+ 386 01c1 63686172 		.ascii	"char\000"
+ 386      00
+ 387              	.LASF2:
+ 388 01c6 73686F72 		.ascii	"short int\000"
+ 388      7420696E 
+ 388      7400
+ 389              	.LASF9:
+ 390 01d0 75696E74 		.ascii	"uint8\000"
+ 390      3800
+ 391              	.LASF4:
+ 392 01d6 6C6F6E67 		.ascii	"long int\000"
+ 392      20696E74 
+ 392      00
+ 393              	.LASF0:
+ 394 01df 7369676E 		.ascii	"signed char\000"
+ 394      65642063 
+ 394      68617200 
+ 395              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 4.9.3 20150303 (release) [ARM/embedded-4_9-br

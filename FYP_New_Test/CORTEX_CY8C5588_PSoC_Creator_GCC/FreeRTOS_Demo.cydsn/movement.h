@@ -9,7 +9,7 @@ typedef struct {
     int motor_volt;
     int inc;
     uint32_t time;
-    long int time_prev;
+    uint32_t time_prev;
 } wheel_data;
 
 typedef struct {

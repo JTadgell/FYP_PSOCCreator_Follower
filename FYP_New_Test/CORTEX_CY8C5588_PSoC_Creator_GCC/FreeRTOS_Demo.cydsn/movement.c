@@ -74,10 +74,10 @@ void mov_update_error(wheel_data *left, wheel_data *right) {
     right->cur_dest = right->cur_dest + right->inc;
     
     left->time_prev = left->time;
-    left->time = Timer_1_ReadCounter() / 12000;
+    left->time = 357912 - Timer_1_ReadCounter() / 12000;
     
     right->time_prev = right->time;
-    right->time = Timer_1_ReadCounter() / 12000;
+    right->time = 357912 - Timer_1_ReadCounter() / 12000;
     
     
     left->error_prev = left->error;
@@ -122,8 +122,8 @@ void initialise_wheel_data(wheel_data *w){
     w->inc = 0;
     w->motor_volt = 0;
     w->prev_dest = 0;
-    w->time_prev = Timer_1_ReadCounter();
-    w->time = Timer_1_ReadCounter();
+    w->time_prev = 0;
+    w->time = 0;
 }
 void update_inc( wheel_data *left, wheel_data *right, unsigned char *buffer){
     

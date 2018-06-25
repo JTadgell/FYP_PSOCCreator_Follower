@@ -222,8 +222,6 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\project.h</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Pins</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Analog</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Clocks</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Interrupts</v>
@@ -408,8 +406,6 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\M2QuadDec_PM.lst</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\main.lst</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\MClock.lst</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\movement.lst</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\CortexM3\ARM_GCC_493\Debug\Listing Files\port.lst</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 </TreeStates>
