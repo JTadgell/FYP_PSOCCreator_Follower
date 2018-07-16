@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 1
 
 
    1              		.syntax unified
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
   24:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c **** /*******************************************************************************
   25:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c **** * Function Name: M2QuadDec_Cnt16_SaveConfig
   26:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c **** ********************************************************************************
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 2
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 2
 
 
   27:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c **** * Summary:
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
   58 0020 00000000 		.word	M2QuadDec_Cnt16_backup
   59              		.cfi_endproc
   60              	.LFE0:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 3
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 3
 
 
   61              		.size	M2QuadDec_Cnt16_SaveConfig, .-M2QuadDec_Cnt16_SaveConfig
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
   87 0010 1B79     		ldrb	r3, [r3, #4]	@ zero_extendqisi2
   88 0012 1846     		mov	r0, r3
   89 0014 FFF7FEFF 		bl	M2QuadDec_Cnt16_WriteControlRegister
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 4
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 4
 
 
   82:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c ****         #endif /* (!M2QuadDec_Cnt16_ControlRegRemoved) */
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  109:Generated_Source\PSoC5/M2QuadDec_Cnt16_PM.c ****         if(M2QuadDec_Cnt16_CTRL_ENABLE == (M2QuadDec_Cnt16_CONTROL & M2QuadDec_Cnt16_CTRL_ENABLE))
  117              		.loc 1 109 0
  118 0004 094B     		ldr	r3, .L10
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 5
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 5
 
 
  119 0006 1B78     		ldrb	r3, [r3]
@@ -287,7 +287,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  142              	.L11:
  143 002a 00BF     		.align	2
  144              	.L10:
- 145 002c 74650040 		.word	1073767796
+ 145 002c 77640040 		.word	1073767543
  146 0030 00000000 		.word	M2QuadDec_Cnt16_backup
  147              		.cfi_endproc
  148              	.LFE2:
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  153              		.thumb
  154              		.thumb_func
  155              		.type	M2QuadDec_Cnt16_Wakeup, %function
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 6
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 6
 
 
  156              	M2QuadDec_Cnt16_Wakeup:
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  178              		.loc 1 161 0
  179 0014 80BD     		pop	{r7, pc}
  180              	.L15:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 7
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 7
 
 
  181 0016 00BF     		.align	2
@@ -378,25 +378,25 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  195 0006 00000000 		.4byte	.Ldebug_abbrev0
  196 000a 04       		.byte	0x4
  197 000b 01       		.uleb128 0x1
- 198 000c 26010000 		.4byte	.LASF24
+ 198 000c 92010000 		.4byte	.LASF24
  199 0010 01       		.byte	0x1
  200 0011 52000000 		.4byte	.LASF25
- 201 0015 1F020000 		.4byte	.LASF26
+ 201 0015 9B000000 		.4byte	.LASF26
  202 0019 00000000 		.4byte	.Ldebug_ranges0+0
  203 001d 00000000 		.4byte	0
  204 0021 00000000 		.4byte	.Ldebug_line0
  205 0025 02       		.uleb128 0x2
  206 0026 01       		.byte	0x1
  207 0027 06       		.byte	0x6
- 208 0028 F3010000 		.4byte	.LASF0
+ 208 0028 5F020000 		.4byte	.LASF0
  209 002c 02       		.uleb128 0x2
  210 002d 01       		.byte	0x1
  211 002e 08       		.byte	0x8
- 212 002f DF000000 		.4byte	.LASF1
+ 212 002f 4B010000 		.4byte	.LASF1
  213 0033 02       		.uleb128 0x2
  214 0034 02       		.byte	0x2
  215 0035 05       		.byte	0x5
- 216 0036 B8000000 		.4byte	.LASF2
+ 216 0036 8B020000 		.4byte	.LASF2
  217 003a 02       		.uleb128 0x2
  218 003b 02       		.byte	0x2
  219 003c 07       		.byte	0x7
@@ -404,21 +404,21 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  221 0041 02       		.uleb128 0x2
  222 0042 04       		.byte	0x4
  223 0043 05       		.byte	0x5
- 224 0044 FF010000 		.4byte	.LASF4
+ 224 0044 6B020000 		.4byte	.LASF4
  225 0048 02       		.uleb128 0x2
  226 0049 04       		.byte	0x4
  227 004a 07       		.byte	0x7
- 228 004b A6000000 		.4byte	.LASF5
+ 228 004b 1C010000 		.4byte	.LASF5
  229 004f 02       		.uleb128 0x2
  230 0050 08       		.byte	0x8
  231 0051 05       		.byte	0x5
- 232 0052 CE010000 		.4byte	.LASF6
+ 232 0052 3A020000 		.4byte	.LASF6
  233 0056 02       		.uleb128 0x2
  234 0057 08       		.byte	0x8
  235 0058 07       		.byte	0x7
- 236 0059 C2000000 		.4byte	.LASF7
+ 236 0059 2E010000 		.4byte	.LASF7
  237 005d 03       		.uleb128 0x3
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 8
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 8
 
 
  238 005e 04       		.byte	0x4
@@ -429,29 +429,29 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  243 0066 07       		.byte	0x7
  244 0067 2A000000 		.4byte	.LASF8
  245 006b 04       		.uleb128 0x4
- 246 006c A0000000 		.4byte	.LASF9
+ 246 006c 16010000 		.4byte	.LASF9
  247 0070 02       		.byte	0x2
  248 0071 9201     		.2byte	0x192
  249 0073 2C000000 		.4byte	0x2c
  250 0077 04       		.uleb128 0x4
- 251 0078 9A020000 		.4byte	.LASF10
+ 251 0078 95020000 		.4byte	.LASF10
  252 007c 02       		.byte	0x2
  253 007d 9301     		.2byte	0x193
  254 007f 3A000000 		.4byte	0x3a
  255 0083 02       		.uleb128 0x2
  256 0084 04       		.byte	0x4
  257 0085 04       		.byte	0x4
- 258 0086 D9000000 		.4byte	.LASF11
+ 258 0086 45010000 		.4byte	.LASF11
  259 008a 02       		.uleb128 0x2
  260 008b 08       		.byte	0x8
  261 008c 04       		.byte	0x4
- 262 008d C7010000 		.4byte	.LASF12
+ 262 008d 33020000 		.4byte	.LASF12
  263 0091 02       		.uleb128 0x2
  264 0092 01       		.byte	0x1
  265 0093 08       		.byte	0x8
- 266 0094 ED000000 		.4byte	.LASF13
+ 266 0094 59010000 		.4byte	.LASF13
  267 0098 04       		.uleb128 0x4
- 268 0099 9B000000 		.4byte	.LASF14
+ 268 0099 A7020000 		.4byte	.LASF14
  269 009d 02       		.byte	0x2
  270 009e 3C02     		.2byte	0x23c
  271 00a0 A4000000 		.4byte	0xa4
@@ -467,22 +467,22 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  281 00b3 40       		.byte	0x40
  282 00b4 DD000000 		.4byte	0xdd
  283 00b8 07       		.uleb128 0x7
- 284 00b9 B4010000 		.4byte	.LASF16
+ 284 00b9 20020000 		.4byte	.LASF16
  285 00bd 03       		.byte	0x3
  286 00be 42       		.byte	0x42
  287 00bf 6B000000 		.4byte	0x6b
  288 00c3 00       		.byte	0
  289 00c4 07       		.uleb128 0x7
- 290 00c5 A1020000 		.4byte	.LASF17
+ 290 00c5 9C020000 		.4byte	.LASF17
  291 00c9 03       		.byte	0x3
  292 00ca 43       		.byte	0x43
  293 00cb 77000000 		.4byte	0x77
  294 00cf 02       		.byte	0x2
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 9
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 9
 
 
  295 00d0 07       		.uleb128 0x7
- 296 00d1 08020000 		.4byte	.LASF18
+ 296 00d1 74020000 		.4byte	.LASF18
  297 00d5 03       		.byte	0x3
  298 00d6 46       		.byte	0x46
  299 00d7 6B000000 		.4byte	0x6b
@@ -502,7 +502,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  313 00f7 01       		.uleb128 0x1
  314 00f8 9C       		.byte	0x9c
  315 00f9 09       		.uleb128 0x9
- 316 00fa 08010000 		.4byte	.LASF21
+ 316 00fa 74010000 		.4byte	.LASF21
  317 00fe 01       		.byte	0x1
  318 00ff 4A       		.byte	0x4a
  319 0100 00000000 		.4byte	.LFB1
@@ -510,7 +510,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  321 0108 01       		.uleb128 0x1
  322 0109 9C       		.byte	0x9c
  323 010a 09       		.uleb128 0x9
- 324 010b F2000000 		.4byte	.LASF22
+ 324 010b 5E010000 		.4byte	.LASF22
  325 010f 01       		.byte	0x1
  326 0110 69       		.byte	0x69
  327 0111 00000000 		.4byte	.LFB2
@@ -526,7 +526,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  337 012a 01       		.uleb128 0x1
  338 012b 9C       		.byte	0x9c
  339 012c 0A       		.uleb128 0xa
- 340 012d DC010000 		.4byte	.LASF27
+ 340 012d 48020000 		.4byte	.LASF27
  341 0131 01       		.byte	0x1
  342 0132 15       		.byte	0x15
  343 0133 DD000000 		.4byte	0xdd
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  349              	.Ldebug_abbrev0:
  350 0000 01       		.uleb128 0x1
  351 0001 11       		.uleb128 0x11
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 10
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 10
 
 
  352 0002 01       		.byte	0x1
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  406 0038 00       		.byte	0
  407 0039 49       		.uleb128 0x49
  408 003a 13       		.uleb128 0x13
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 11
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 11
 
 
  409 003b 00       		.byte	0
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  463 0071 27       		.uleb128 0x27
  464 0072 19       		.uleb128 0x19
  465 0073 11       		.uleb128 0x11
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 12
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 12
 
 
  466 0074 01       		.uleb128 0x1
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  520 0024 00000000 		.4byte	0
  521              		.section	.debug_line,"",%progbits
  522              	.Ldebug_line0:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 13
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 13
 
 
  523 0000 BB000000 		.section	.debug_str,"MS",%progbits,1
@@ -761,130 +761,130 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 1
  535      635F436E 
  535      7431365F 
  535      6261636B 
- 536              	.LASF14:
- 537 009b 72656738 		.ascii	"reg8\000"
- 537      00
- 538              	.LASF9:
- 539 00a0 75696E74 		.ascii	"uint8\000"
- 539      3800
- 540              	.LASF5:
- 541 00a6 6C6F6E67 		.ascii	"long unsigned int\000"
- 541      20756E73 
- 541      69676E65 
- 541      6420696E 
- 541      7400
- 542              	.LASF2:
- 543 00b8 73686F72 		.ascii	"short int\000"
- 543      7420696E 
+ 536              	.LASF26:
+ 537 009b 433A5C55 		.ascii	"C:\\Users\\shevi\\Documents\\GitHub\\FYP_PSOCCreato"
+ 537      73657273 
+ 537      5C736865 
+ 537      76695C44 
+ 537      6F63756D 
+ 538 00c9 725F466F 		.ascii	"r_Follower\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 538      6C6C6F77 
+ 538      65725C46 
+ 538      59505F4E 
+ 538      65775F54 
+ 539 00fa 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 539      4743435C 
+ 539      46726565 
+ 539      52544F53 
+ 539      5F44656D 
+ 540              	.LASF9:
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 14
+
+
+ 541 0116 75696E74 		.ascii	"uint8\000"
+ 541      3800
+ 542              	.LASF5:
+ 543 011c 6C6F6E67 		.ascii	"long unsigned int\000"
+ 543      20756E73 
+ 543      69676E65 
+ 543      6420696E 
  543      7400
  544              	.LASF7:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 14
-
-
- 545 00c2 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 545 012e 6C6F6E67 		.ascii	"long long unsigned int\000"
  545      206C6F6E 
  545      6720756E 
  545      7369676E 
  545      65642069 
  546              	.LASF11:
- 547 00d9 666C6F61 		.ascii	"float\000"
+ 547 0145 666C6F61 		.ascii	"float\000"
  547      7400
  548              	.LASF1:
- 549 00df 756E7369 		.ascii	"unsigned char\000"
+ 549 014b 756E7369 		.ascii	"unsigned char\000"
  549      676E6564 
  549      20636861 
  549      7200
  550              	.LASF13:
- 551 00ed 63686172 		.ascii	"char\000"
+ 551 0159 63686172 		.ascii	"char\000"
  551      00
  552              	.LASF22:
- 553 00f2 4D325175 		.ascii	"M2QuadDec_Cnt16_Sleep\000"
+ 553 015e 4D325175 		.ascii	"M2QuadDec_Cnt16_Sleep\000"
  553      61644465 
  553      635F436E 
  553      7431365F 
  553      536C6565 
  554              	.LASF21:
- 555 0108 4D325175 		.ascii	"M2QuadDec_Cnt16_RestoreConfig\000"
+ 555 0174 4D325175 		.ascii	"M2QuadDec_Cnt16_RestoreConfig\000"
  555      61644465 
  555      635F436E 
  555      7431365F 
  555      52657374 
  556              	.LASF24:
- 557 0126 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
+ 557 0192 474E5520 		.ascii	"GNU C 4.9.3 20150303 (release) [ARM/embedded-4_9-br"
  557      4320342E 
  557      392E3320 
  557      32303135 
  557      30333033 
- 558 0159 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
+ 558 01c5 616E6368 		.ascii	"anch revision 221220] -mcpu=cortex-m3 -mthumb -g -O"
  558      20726576 
  558      6973696F 
  558      6E203232 
  558      31323230 
- 559 018c 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
+ 559 01f8 30202D66 		.ascii	"0 -ffunction-sections -ffat-lto-objects\000"
  559      66756E63 
  559      74696F6E 
  559      2D736563 
  559      74696F6E 
  560              	.LASF16:
- 561 01b4 436F756E 		.ascii	"CounterEnableState\000"
+ 561 0220 436F756E 		.ascii	"CounterEnableState\000"
  561      74657245 
  561      6E61626C 
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5p16zV.s 			page 15
+
+
  561      65537461 
  561      746500
  562              	.LASF12:
- 563 01c7 646F7562 		.ascii	"double\000"
+ 563 0233 646F7562 		.ascii	"double\000"
  563      6C6500
  564              	.LASF6:
- 565 01ce 6C6F6E67 		.ascii	"long long int\000"
+ 565 023a 6C6F6E67 		.ascii	"long long int\000"
  565      206C6F6E 
  565      6720696E 
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccsCmNpW.s 			page 15
-
-
  565      7400
  566              	.LASF27:
- 567 01dc 4D325175 		.ascii	"M2QuadDec_Cnt16_backup\000"
+ 567 0248 4D325175 		.ascii	"M2QuadDec_Cnt16_backup\000"
  567      61644465 
  567      635F436E 
  567      7431365F 
  567      6261636B 
  568              	.LASF0:
- 569 01f3 7369676E 		.ascii	"signed char\000"
+ 569 025f 7369676E 		.ascii	"signed char\000"
  569      65642063 
  569      68617200 
  570              	.LASF4:
- 571 01ff 6C6F6E67 		.ascii	"long int\000"
+ 571 026b 6C6F6E67 		.ascii	"long int\000"
  571      20696E74 
  571      00
  572              	.LASF18:
- 573 0208 436F756E 		.ascii	"CounterControlRegister\000"
+ 573 0274 436F756E 		.ascii	"CounterControlRegister\000"
  573      74657243 
  573      6F6E7472 
  573      6F6C5265 
  573      67697374 
- 574              	.LASF26:
- 575 021f 433A5C55 		.ascii	"C:\\Users\\tadge\\Documents\\GitHub\\FYP_PSOCCreato"
- 575      73657273 
- 575      5C746164 
- 575      67655C44 
- 575      6F63756D 
- 576 024d 725F466F 		.ascii	"r_Follower\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
- 576      6C6C6F77 
- 576      65725C46 
- 576      59505F4E 
- 576      65775F54 
- 577 027e 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
- 577      4743435C 
- 577      46726565 
- 577      52544F53 
- 577      5F44656D 
- 578              	.LASF10:
- 579 029a 75696E74 		.ascii	"uint16\000"
- 579      313600
- 580              	.LASF17:
- 581 02a1 436F756E 		.ascii	"CounterUdb\000"
- 581      74657255 
- 581      646200
+ 574              	.LASF2:
+ 575 028b 73686F72 		.ascii	"short int\000"
+ 575      7420696E 
+ 575      7400
+ 576              	.LASF10:
+ 577 0295 75696E74 		.ascii	"uint16\000"
+ 577      313600
+ 578              	.LASF17:
+ 579 029c 436F756E 		.ascii	"CounterUdb\000"
+ 579      74657255 
+ 579      646200
+ 580              	.LASF14:
+ 581 02a7 72656738 		.ascii	"reg8\000"
+ 581      00
  582              	.LASF15:
  583 02ac 73697A65 		.ascii	"sizetype\000"
  583      74797065 

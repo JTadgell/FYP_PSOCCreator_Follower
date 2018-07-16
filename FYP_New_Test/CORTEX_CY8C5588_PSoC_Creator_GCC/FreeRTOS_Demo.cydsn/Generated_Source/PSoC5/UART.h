@@ -31,7 +31,7 @@
 #define UART_RX_ENABLED                     (1u)
 #define UART_TX_ENABLED                     (1u)
 #define UART_HD_ENABLED                     (0u)
-#define UART_RX_INTERRUPT_ENABLED           (0u)
+#define UART_RX_INTERRUPT_ENABLED           (1u)
 #define UART_TX_INTERRUPT_ENABLED           (0u)
 #define UART_INTERNAL_CLOCK_USED            (1u)
 #define UART_RXHW_ADDRESS_ENABLED           (0u)
@@ -46,7 +46,7 @@
 #define UART_FLOW_CONTROL                   (0u)
 #define UART_CLK_FREQ                       (0u)
 #define UART_TX_BUFFER_SIZE                 (4u)
-#define UART_RX_BUFFER_SIZE                 (4u)
+#define UART_RX_BUFFER_SIZE                 (1024u)
 
 /* Check to see if required defines such as CY_PSOC5LP are available */
 /* They are defined starting with cy_boot v3.0 */
@@ -112,7 +112,7 @@ void UART_Wakeup(void) ;
     uint8 UART_ReadRxStatus(void) ;
     uint8 UART_GetChar(void) ;
     uint16 UART_GetByte(void) ;
-    uint8 UART_GetRxBufferSize(void)
+    uint16 UART_GetRxBufferSize(void)
                                                             ;
     void UART_ClearRxBuffer(void) ;
 
@@ -316,8 +316,8 @@ extern uint8 UART_initVar;
 #if (UART_RX_INTERRUPT_ENABLED && (UART_RX_ENABLED || UART_HD_ENABLED))
     extern uint8 UART_errorStatus;
     extern volatile uint8 UART_rxBuffer[UART_RX_BUFFER_SIZE];
-    extern volatile uint8 UART_rxBufferRead;
-    extern volatile uint8 UART_rxBufferWrite;
+    extern volatile uint16 UART_rxBufferRead;
+    extern volatile uint16 UART_rxBufferWrite;
     extern volatile uint8 UART_rxBufferLoopDetect;
     extern volatile uint8 UART_rxBufferOverflow;
     #if (UART_RXHW_ADDRESS_ENABLED)

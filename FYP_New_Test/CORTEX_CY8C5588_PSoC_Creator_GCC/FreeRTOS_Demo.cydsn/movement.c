@@ -17,10 +17,12 @@
 #include "task.h"
 #include "semphr.h"
 #include "serial.h"
-
 #include "movement.h"
 
 
+
+static xComPortHandle pxPort = NULL;
+#define comRX_BLOCK_TIME			( ( TickType_t ) 0xffff )
 
 /* initiate functions */
 

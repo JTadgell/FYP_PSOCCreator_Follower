@@ -214,6 +214,7 @@
       <Data key="c47fb12c-6974-486d-b829-a20f4afd3d9e" value="isr_High_Frequency_2000Hz" />
     </Group>
     <Group key="Pin">
+      <Data key="1c97b18b-7da2-4c83-844d-4f75c797cb1b" value="LED" />
       <Data key="3a0a5806-ffd9-43bc-b395-84692ceed6cb" value="Pin_1" />
       <Data key="5ccc7cc4-5e58-4ba3-bbaf-044ffcb68e45" value="M1_Phase2" />
       <Data key="48a0bff4-6745-484a-ab45-06053e57b619" value="M1_BWD" />
@@ -245,6 +246,11 @@
     <Data key="c47fb12c-6974-486d-b829-a20f4afd3d9e" value="6" />
   </Group>
   <Group key="Pin2">
+    <Group key="1c97b18b-7da2-4c83-844d-4f75c797cb1b">
+      <Group key="0">
+        <Data key="Port Format" value="3,3" />
+      </Group>
+    </Group>
     <Group key="3a0a5806-ffd9-43bc-b395-84692ceed6cb">
       <Group key="0">
         <Data key="Port Format" value="0,2" />

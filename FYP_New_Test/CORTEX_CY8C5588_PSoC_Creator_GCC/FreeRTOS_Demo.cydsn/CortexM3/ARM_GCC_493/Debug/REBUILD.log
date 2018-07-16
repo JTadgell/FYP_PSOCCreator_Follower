@@ -1,3 +1,8 @@
---------------- Rebuild Started: 06/25/2018 15:36:10 Project: main.c, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
-arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/main.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c main.c -o .\CortexM3\ARM_GCC_493\Debug\main.o
---------------- Rebuild Succeeded: 06/25/2018 15:36:11 ---------------
+--------------- Rebuild Started: 07/13/2018 17:38:55 Project: movement.c, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/movement.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c movement.c -o .\CortexM3\ARM_GCC_493\Debug\movement.o
+movement.c: In function 'get_serial_control':
+movement.c:160:21: warning: format '%li' expects argument of type 'long int', but argument 3 has type 'double' [-Wformat=]
+                     sprintf(str,"Recieved 1st [%li] \n",*int1);
+                     ^
+movement.c:160:21: warning: format '%li' expects argument of type 'long int', but argument 3 has type 'double' [-Wformat=]
+--------------- Rebuild Succeeded: 07/13/2018 17:38:56 ---------------

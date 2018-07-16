@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 1
 
 
    1              		.syntax unified
@@ -58,7 +58,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
   23:Generated_Source\PSoC5/M2QuadDec.c **** #endif /* M2QuadDec_COUNTER_SIZE == M2QuadDec_COUNTER_SIZE_32_BIT */
   24:Generated_Source\PSoC5/M2QuadDec.c **** 
   25:Generated_Source\PSoC5/M2QuadDec.c **** uint8 M2QuadDec_initVar = 0u;
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 2
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 2
 
 
   26:Generated_Source\PSoC5/M2QuadDec.c **** 
@@ -118,7 +118,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
   60 001c 80E100E0 		.word	-536813184
   61 0020 00000000 		.word	M2QuadDec_ISR
   62              		.cfi_endproc
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 3
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 3
 
 
   63              	.LFE0:
@@ -178,7 +178,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
   90              		.loc 1 79 0
   91 0010 FFF7FEFF 		bl	CyEnterCriticalSection
   92 0014 0346     		mov	r3, r0
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 4
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 4
 
 
   93 0016 FB71     		strb	r3, [r7, #7]
@@ -219,7 +219,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  117              	.L6:
  118              		.align	2
  119              	.L5:
- 120 003c 95640040 		.word	1073767573
+ 120 003c 98640040 		.word	1073767576
  121 0040 00E100E0 		.word	-536813312
  122              		.cfi_endproc
  123              	.LFE1:
@@ -238,7 +238,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
   94:Generated_Source\PSoC5/M2QuadDec.c **** * Function Name: M2QuadDec_Start
   95:Generated_Source\PSoC5/M2QuadDec.c **** ********************************************************************************
   96:Generated_Source\PSoC5/M2QuadDec.c **** *
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 5
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 5
 
 
   97:Generated_Source\PSoC5/M2QuadDec.c **** * Summary:
@@ -298,7 +298,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  132:Generated_Source\PSoC5/M2QuadDec.c **** 
  133:Generated_Source\PSoC5/M2QuadDec.c ****     if (M2QuadDec_initVar == 0u)
  152              		.loc 1 133 0
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 6
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 6
 
 
  153 0016 074B     		ldr	r3, .L9+4
@@ -358,7 +358,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  157:Generated_Source\PSoC5/M2QuadDec.c **** void M2QuadDec_Stop(void) 
  158:Generated_Source\PSoC5/M2QuadDec.c **** {
  184              		.loc 1 158 0
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 7
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 7
 
 
  185              		.cfi_startproc
@@ -418,7 +418,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  180:Generated_Source\PSoC5/M2QuadDec.c **** }
  218              		.loc 1 180 0
  219 0030 0837     		adds	r7, r7, #8
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 8
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 8
 
 
  220              		.cfi_def_cfa_offset 8
@@ -429,7 +429,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  225              	.L13:
  226 0036 00BF     		.align	2
  227              	.L12:
- 228 0038 95640040 		.word	1073767573
+ 228 0038 98640040 		.word	1073767576
  229 003c 80E100E0 		.word	-536813184
  230              		.cfi_endproc
  231              	.LFE3:
@@ -478,7 +478,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  251 0004 00AF     		add	r7, sp, #0
  252              		.cfi_def_cfa_register 7
  204:Generated_Source\PSoC5/M2QuadDec.c ****     int32 count;
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 9
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 9
 
 
  205:Generated_Source\PSoC5/M2QuadDec.c ****     uint16 tmpCnt;
@@ -538,7 +538,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  278              		.loc 1 233 0
  279 0032 1846     		mov	r0, r3
  280 0034 0837     		adds	r7, r7, #8
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 10
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 10
 
 
  281              		.cfi_def_cfa_offset 8
@@ -598,7 +598,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  309              		.cfi_offset 7, -8
  310              		.cfi_offset 14, -4
  311 0002 82B0     		sub	sp, sp, #8
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 11
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 11
 
 
  312              		.cfi_def_cfa_offset 16
@@ -658,7 +658,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  338              	.L20:
  339              		.align	2
  340              	.L19:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 12
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 12
 
 
  341 0028 80E100E0 		.word	-536813184
@@ -718,7 +718,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  370 000e DBB2     		uxtb	r3, r3
  313:Generated_Source\PSoC5/M2QuadDec.c **** }
  371              		.loc 1 313 0
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 13
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 13
 
 
  372 0010 1846     		mov	r0, r3
@@ -732,7 +732,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  380              	.L24:
  381 001a 00BF     		.align	2
  382              	.L23:
- 383 001c 65640040 		.word	1073767525
+ 383 001c 68640040 		.word	1073767528
  384              		.cfi_endproc
  385              	.LFE6:
  386              		.size	M2QuadDec_GetEvents, .-M2QuadDec_GetEvents
@@ -778,7 +778,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  406              		.cfi_def_cfa_register 7
  407 0006 0346     		mov	r3, r0
  408 0008 FB71     		strb	r3, [r7, #7]
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 14
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 14
 
 
  334:Generated_Source\PSoC5/M2QuadDec.c ****     #if (M2QuadDec_COUNTER_SIZE == M2QuadDec_COUNTER_SIZE_32_BIT)
@@ -810,7 +810,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  427              	.L27:
  428 0022 00BF     		.align	2
  429              	.L26:
- 430 0024 85640040 		.word	1073767557
+ 430 0024 88640040 		.word	1073767560
  431              		.cfi_endproc
  432              	.LFE7:
  433              		.size	M2QuadDec_SetInterruptMask, .-M2QuadDec_SetInterruptMask
@@ -838,7 +838,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  355:Generated_Source\PSoC5/M2QuadDec.c **** *  Enable / disable bits in an 8-bit value, where 1 enables the interrupt.
  356:Generated_Source\PSoC5/M2QuadDec.c **** *  For the 32-bit counter, the overflow, underflow and reset enable bits are
  357:Generated_Source\PSoC5/M2QuadDec.c **** *  always set.
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 15
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 15
 
 
  358:Generated_Source\PSoC5/M2QuadDec.c **** *
@@ -875,7 +875,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  467              	.L31:
  468 001a 00BF     		.align	2
  469              	.L30:
- 470 001c 85640040 		.word	1073767557
+ 470 001c 88640040 		.word	1073767560
  471              		.cfi_endproc
  472              	.LFE8:
  473              		.size	M2QuadDec_GetInterruptMask, .-M2QuadDec_GetInterruptMask
@@ -893,12 +893,12 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  485 000c 3C010000 		.4byte	.LASF36
  486 0010 01       		.byte	0x1
  487 0011 D1010000 		.4byte	.LASF37
- 488 0015 95000000 		.4byte	.LASF38
+ 488 0015 12000000 		.4byte	.LASF38
  489 0019 00000000 		.4byte	.Ldebug_ranges0+0
  490 001d 00000000 		.4byte	0
  491 0021 00000000 		.4byte	.Ldebug_line0
  492 0025 02       		.uleb128 0x2
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 16
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 16
 
 
  493 0026 04       		.byte	0x4
@@ -915,7 +915,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  504 003a 03       		.uleb128 0x3
  505 003b 01       		.byte	0x1
  506 003c 08       		.byte	0x8
- 507 003d 3B000000 		.4byte	.LASF2
+ 507 003d B6000000 		.4byte	.LASF2
  508 0041 03       		.uleb128 0x3
  509 0042 02       		.byte	0x2
  510 0043 05       		.byte	0x5
@@ -923,7 +923,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  512 0048 03       		.uleb128 0x3
  513 0049 02       		.byte	0x2
  514 004a 07       		.byte	0x7
- 515 004b 12000000 		.4byte	.LASF4
+ 515 004b 8D000000 		.4byte	.LASF4
  516 004f 03       		.uleb128 0x3
  517 0050 04       		.byte	0x4
  518 0051 05       		.byte	0x5
@@ -931,7 +931,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  520 0056 03       		.uleb128 0x3
  521 0057 04       		.byte	0x4
  522 0058 07       		.byte	0x7
- 523 0059 5C000000 		.4byte	.LASF6
+ 523 0059 D7000000 		.4byte	.LASF6
  524 005d 03       		.uleb128 0x3
  525 005e 08       		.byte	0x8
  526 005f 05       		.byte	0x5
@@ -958,7 +958,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  547 008a 02       		.byte	0x2
  548 008b 9301     		.2byte	0x193
  549 008d 48000000 		.4byte	0x48
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 17
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 17
 
 
  550 0091 04       		.uleb128 0x4
@@ -967,25 +967,25 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  553 0097 9401     		.2byte	0x194
  554 0099 56000000 		.4byte	0x56
  555 009d 04       		.uleb128 0x4
- 556 009e 56000000 		.4byte	.LASF14
+ 556 009e D1000000 		.4byte	.LASF14
  557 00a2 02       		.byte	0x2
  558 00a3 9601     		.2byte	0x196
  559 00a5 41000000 		.4byte	0x41
  560 00a9 04       		.uleb128 0x4
- 561 00aa 6E000000 		.4byte	.LASF15
+ 561 00aa E9000000 		.4byte	.LASF15
  562 00ae 02       		.byte	0x2
  563 00af 9701     		.2byte	0x197
  564 00b1 4F000000 		.4byte	0x4f
  565 00b5 03       		.uleb128 0x3
  566 00b6 04       		.byte	0x4
  567 00b7 04       		.byte	0x4
- 568 00b8 35000000 		.4byte	.LASF16
+ 568 00b8 B0000000 		.4byte	.LASF16
  569 00bc 03       		.uleb128 0x3
  570 00bd 08       		.byte	0x8
  571 00be 04       		.byte	0x4
  572 00bf CA010000 		.4byte	.LASF17
  573 00c3 04       		.uleb128 0x4
- 574 00c4 51000000 		.4byte	.LASF18
+ 574 00c4 CC000000 		.4byte	.LASF18
  575 00c8 02       		.byte	0x2
  576 00c9 3C02     		.2byte	0x23c
  577 00cb CF000000 		.4byte	0xcf
@@ -1018,7 +1018,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  604 010b 08       		.uleb128 0x8
  605 010c 2B010000 		.4byte	.LASF24
  606 0110 01       		.byte	0x1
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 18
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 18
 
 
  607 0111 48       		.byte	0x48
@@ -1028,7 +1028,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  611 0118 77       		.sleb128 -9
  612 0119 00       		.byte	0
  613 011a 06       		.uleb128 0x6
- 614 011b 25000000 		.4byte	.LASF21
+ 614 011b A0000000 		.4byte	.LASF21
  615 011f 01       		.byte	0x1
  616 0120 74       		.byte	0x74
  617 0121 00000000 		.4byte	.LFB2
@@ -1072,18 +1072,18 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  655 0174 91       		.byte	0x91
  656 0175 70       		.sleb128 -16
  657 0176 08       		.uleb128 0x8
- 658 0177 74000000 		.4byte	.LASF26
+ 658 0177 EF000000 		.4byte	.LASF26
  659 017b 01       		.byte	0x1
  660 017c CD       		.byte	0xcd
  661 017d 85000000 		.4byte	0x85
  662 0181 02       		.uleb128 0x2
  663 0182 91       		.byte	0x91
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 19
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 19
 
 
  664 0183 76       		.sleb128 -10
  665 0184 08       		.uleb128 0x8
- 666 0185 49000000 		.4byte	.LASF27
+ 666 0185 C4000000 		.4byte	.LASF27
  667 0189 01       		.byte	0x1
  668 018a D0       		.byte	0xd0
  669 018b 9D000000 		.4byte	0x9d
@@ -1138,7 +1138,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  718 01f4 00       		.byte	0
  719 01f5 0C       		.uleb128 0xc
  720 01f6 81020000 		.4byte	.LASF33
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 20
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 20
 
 
  721 01fa 01       		.byte	0x1
@@ -1157,7 +1157,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  734 0217 03       		.byte	0x3
  735 0218 00000000 		.4byte	M2QuadDec_initVar
  736 021c 0F       		.uleb128 0xf
- 737 021d 7B000000 		.4byte	.LASF35
+ 737 021d F6000000 		.4byte	.LASF35
  738 0221 03       		.byte	0x3
  739 0222 18       		.byte	0x18
  740 0223 27020000 		.4byte	0x227
@@ -1198,7 +1198,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  775 001d 00       		.byte	0
  776 001e 03       		.uleb128 0x3
  777 001f 24       		.uleb128 0x24
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 21
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 21
 
 
  778 0020 00       		.byte	0
@@ -1258,7 +1258,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  832 0057 01       		.byte	0x1
  833 0058 3F       		.uleb128 0x3f
  834 0059 19       		.uleb128 0x19
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 22
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 22
 
 
  835 005a 03       		.uleb128 0x3
@@ -1318,7 +1318,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  889 0091 40       		.uleb128 0x40
  890 0092 18       		.uleb128 0x18
  891 0093 9642     		.uleb128 0x2116
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 23
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 23
 
 
  892 0095 19       		.uleb128 0x19
@@ -1378,7 +1378,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  946 00cc 3B       		.uleb128 0x3b
  947 00cd 05       		.uleb128 0x5
  948 00ce 27       		.uleb128 0x27
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 24
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 24
 
 
  949 00cf 19       		.uleb128 0x19
@@ -1438,7 +1438,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  1003 0107 00       		.byte	0
  1004 0108 0F       		.uleb128 0xf
  1005 0109 34       		.uleb128 0x34
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 25
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 25
 
 
  1006 010a 00       		.byte	0
@@ -1498,7 +1498,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  1060 0020 00000000 		.4byte	.LFB4
  1061 0024 48000000 		.4byte	.LFE4
  1062 0028 00000000 		.4byte	.LFB5
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 26
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 26
 
 
  1063 002c 34000000 		.4byte	.LFE5
@@ -1526,71 +1526,71 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  1079              	.LASF25:
  1080 000c 636F756E 		.ascii	"count\000"
  1080      7400
- 1081              	.LASF4:
- 1082 0012 73686F72 		.ascii	"short unsigned int\000"
- 1082      7420756E 
- 1082      7369676E 
- 1082      65642069 
- 1082      6E7400
- 1083              	.LASF21:
- 1084 0025 4D325175 		.ascii	"M2QuadDec_Start\000"
- 1084      61644465 
- 1084      635F5374 
- 1084      61727400 
- 1085              	.LASF16:
- 1086 0035 666C6F61 		.ascii	"float\000"
- 1086      7400
- 1087              	.LASF2:
- 1088 003b 756E7369 		.ascii	"unsigned char\000"
- 1088      676E6564 
- 1088      20636861 
- 1088      7200
- 1089              	.LASF27:
- 1090 0049 6877436F 		.ascii	"hwCount\000"
- 1090      756E7400 
- 1091              	.LASF18:
- 1092 0051 72656738 		.ascii	"reg8\000"
- 1092      00
- 1093              	.LASF14:
- 1094 0056 696E7431 		.ascii	"int16\000"
- 1094      3600
- 1095              	.LASF6:
- 1096 005c 6C6F6E67 		.ascii	"long unsigned int\000"
- 1096      20756E73 
- 1096      69676E65 
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 27
+ 1081              	.LASF38:
+ 1082 0012 433A5C55 		.ascii	"C:\\Users\\shevi\\Documents\\GitHub\\FYP_PSOCCreato"
+ 1082      73657273 
+ 1082      5C736865 
+ 1082      76695C44 
+ 1082      6F63756D 
+ 1083 0040 725F466F 		.ascii	"r_Follower\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
+ 1083      6C6C6F77 
+ 1083      65725C46 
+ 1083      59505F4E 
+ 1083      65775F54 
+ 1084 0071 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
+ 1084      4743435C 
+ 1084      46726565 
+ 1084      52544F53 
+ 1084      5F44656D 
+ 1085              	.LASF4:
+ 1086 008d 73686F72 		.ascii	"short unsigned int\000"
+ 1086      7420756E 
+ 1086      7369676E 
+ 1086      65642069 
+ 1086      6E7400
+ 1087              	.LASF21:
+ 1088 00a0 4D325175 		.ascii	"M2QuadDec_Start\000"
+ 1088      61644465 
+ 1088      635F5374 
+ 1088      61727400 
+ 1089              	.LASF16:
+ 1090 00b0 666C6F61 		.ascii	"float\000"
+ 1090      7400
+ 1091              	.LASF2:
+ 1092 00b6 756E7369 		.ascii	"unsigned char\000"
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 27
 
 
- 1096      6420696E 
- 1096      7400
- 1097              	.LASF15:
- 1098 006e 696E7433 		.ascii	"int32\000"
- 1098      3200
- 1099              	.LASF26:
- 1100 0074 746D7043 		.ascii	"tmpCnt\000"
- 1100      6E7400
- 1101              	.LASF35:
- 1102 007b 4D325175 		.ascii	"M2QuadDec_count32SoftPart\000"
- 1102      61644465 
- 1102      635F636F 
- 1102      756E7433 
- 1102      32536F66 
- 1103              	.LASF38:
- 1104 0095 433A5C55 		.ascii	"C:\\Users\\tadge\\Documents\\GitHub\\FYP_PSOCCreato"
- 1104      73657273 
- 1104      5C746164 
- 1104      67655C44 
- 1104      6F63756D 
- 1105 00c3 725F466F 		.ascii	"r_Follower\\FYP_New_Test\\CORTEX_CY8C5588_PSoC_Crea"
- 1105      6C6C6F77 
- 1105      65725C46 
- 1105      59505F4E 
- 1105      65775F54 
- 1106 00f4 746F725F 		.ascii	"tor_GCC\\FreeRTOS_Demo.cydsn\000"
- 1106      4743435C 
- 1106      46726565 
- 1106      52544F53 
- 1106      5F44656D 
+ 1092      676E6564 
+ 1092      20636861 
+ 1092      7200
+ 1093              	.LASF27:
+ 1094 00c4 6877436F 		.ascii	"hwCount\000"
+ 1094      756E7400 
+ 1095              	.LASF18:
+ 1096 00cc 72656738 		.ascii	"reg8\000"
+ 1096      00
+ 1097              	.LASF14:
+ 1098 00d1 696E7431 		.ascii	"int16\000"
+ 1098      3600
+ 1099              	.LASF6:
+ 1100 00d7 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1100      20756E73 
+ 1100      69676E65 
+ 1100      6420696E 
+ 1100      7400
+ 1101              	.LASF15:
+ 1102 00e9 696E7433 		.ascii	"int32\000"
+ 1102      3200
+ 1103              	.LASF26:
+ 1104 00ef 746D7043 		.ascii	"tmpCnt\000"
+ 1104      6E7400
+ 1105              	.LASF35:
+ 1106 00f6 4D325175 		.ascii	"M2QuadDec_count32SoftPart\000"
+ 1106      61644465 
+ 1106      635F636F 
+ 1106      756E7433 
+ 1106      32536F66 
  1107              	.LASF29:
  1108 0110 4D325175 		.ascii	"M2QuadDec_SetInterruptMask\000"
  1108      61644465 
@@ -1618,7 +1618,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  1114      66756E63 
  1114      74696F6E 
  1114      2D736563 
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 28
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 28
 
 
  1114      74696F6E 
@@ -1678,7 +1678,7 @@ ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 1
  1136      635F496E 
  1136      697400
  1137              	.LASF33:
-ARM GAS  C:\Users\tadge\AppData\Local\Temp\ccRJEo5M.s 			page 29
+ARM GAS  C:\Users\shevi\AppData\Local\Temp\cc5GCF9h.s 			page 29
 
 
  1138 0281 4D325175 		.ascii	"M2QuadDec_GetInterruptMask\000"
