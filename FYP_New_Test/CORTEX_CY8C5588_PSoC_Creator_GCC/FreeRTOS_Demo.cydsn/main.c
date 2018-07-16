@@ -29,6 +29,11 @@
 #include <device.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+ 
 
 /* FreeRTOS includes */
 #include "FreeRTOS.h"
@@ -153,7 +158,7 @@ void receive_data( void *p ) {
     int i = 0;
     int go = 0;
     signed char type = 0;
-    
+    char temp[10];
     while(1) {
         if (pdTRUE == xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME)) {
             type = rx_receive;
@@ -179,8 +184,9 @@ void receive_data( void *p ) {
                     }
                     sprintf((char *) local_write, "buffer read as %s\n", buffer);
                     vSerialPutString(pxPort, (const signed char *) local_write, 64);
-                    update_inc( &left_wheel, &right_wheel, buffer);
-                    sprintf((char *) local_write, "left inc: %i\nright inc: %i\n", left_wheel.inc, right_wheel.inc);
+                    update_k( &k, buffer);
+                    snprintf((char *) local_write,64, "Kp Value: %f", k.Kp);
+                    
                     vSerialPutString(pxPort, (const signed char *) local_write, 64);
                     
                 }

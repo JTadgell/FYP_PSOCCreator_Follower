@@ -142,4 +142,20 @@ void update_inc( wheel_data *left, wheel_data *right, unsigned char *buffer){
     left->inc = int0*1000 + int1*100 + int2*10 + int3*1;
     right->inc = int4*1000 + int5*100 + int6*10 + int7*1;
 }
+void update_k( PID_data *K, unsigned char *buffer){
+    
+    int int0 = (unsigned char) buffer[0] - 48;
+    int int1 = (unsigned char) buffer[1] - 48;
+    int int2 = (unsigned char) buffer[2] - 48;
+    int int3 = (unsigned char) buffer[3] - 48;
+    int int4 = (unsigned char) buffer[4] - 48;
+    int int5 = (unsigned char) buffer[5] - 48;
+    int int6 = (unsigned char) buffer[6] - 48;
+    int int7 = (unsigned char) buffer[7] - 48;
+    
+    
+    K->Kp = (int0*100000 + int1*10000 + int2*1000 + int3*100 +int4*10 +int5*1)*10^-2;
+    K->Kd =0;
+    K->Ki = 0;
+}
 /* [] END OF FILE */

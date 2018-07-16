@@ -24,3 +24,4 @@ extern void mov_get_PID(wheel_data *left, wheel_data *right, PID_data *k);
 extern void mov_Adj_Volt(wheel_data *left, wheel_data *right);
 extern void initialise_wheel_data(wheel_data *w);
 extern void update_inc( wheel_data *left, wheel_data *right, unsigned char *buffer);
+extern void update_k(PID_data *K, unsigned char *buffer);
