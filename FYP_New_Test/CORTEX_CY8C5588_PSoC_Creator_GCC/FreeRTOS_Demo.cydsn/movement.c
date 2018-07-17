@@ -72,8 +72,8 @@ void turn_wheel(char side, int volt) {
     }
 }
 void mov_update_error(wheel_data *left, wheel_data *right) {
-    left->cur_dest = left->cur_dest + left->inc;
-    right->cur_dest = right->cur_dest + right->inc;
+    //left->cur_dest = left->cur_dest + left->inc;
+    //right->cur_dest = right->cur_dest + right->inc;
     
     left->time_prev = left->time;
     left->time = 357912 - Timer_1_ReadCounter() / 12000;
@@ -139,8 +139,8 @@ void update_inc( wheel_data *left, wheel_data *right, unsigned char *buffer){
     int int7 = (unsigned char) buffer[7] - 48;
     
     
-    left->inc = int0*1000 + int1*100 + int2*10 + int3*1;
-    right->inc = int4*1000 + int5*100 + int6*10 + int7*1;
+    left->cur_dest = int0*1000 + int1*100 + int2*10 + int3*1;
+    right->cur_dest = int4*1000 + int5*100 + int6*10 + int7*1;
 }
 void update_k( PID_data *K, unsigned char *buffer){
     

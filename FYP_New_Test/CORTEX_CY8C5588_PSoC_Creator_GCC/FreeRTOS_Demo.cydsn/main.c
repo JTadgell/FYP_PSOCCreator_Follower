@@ -162,22 +162,30 @@ void receive_data( void *p ) {
     while(1) {
         if (pdTRUE == xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME)) {
             type = rx_receive;
+            sprintf((char *) local_write, "got data\n");
+            vSerialPutString(pxPort, (const signed char *) local_write, 64);
             if(xSemaphoreTake(gatekeeper, 50000)) {
+                sprintf((char *) local_write, "semaphore taken\n");
+            vSerialPutString(pxPort, (const signed char *) local_write, 64);
                 if(type=='1'){
                     for(i=0;i<8;i++){
                         xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME);
                         buffer[i] = rx_receive;
                     }
-                    sprintf((char *) local_write, "buffer read as %s\n", buffer);
+                    //sprintf((char *) local_write, "buffer read as %s\n", buffer);
                     //vSerialPutString(pxPort, (const signed char *) local_write, 64);
                     update_inc( &left_wheel, &right_wheel, buffer);
                     sprintf((char *) local_write, "left dest: %li\nright dest: %li\n", left_wheel.cur_dest, right_wheel.cur_dest);
                     //vSerialPutString(pxPort, (const signed char *) local_write, 64);
                 }
                 if(type=='2'){
-                    CySoftwareReset();
+                    sprintf((char *) local_write, "reset\n");
+                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
+                    
                 }  
                 if (type=='3'){
+                    sprintf((char *) local_write, "end of byte\n");
+                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
                     for(i=0;i<8;i++){
                         xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME);
                         buffer[i] = rx_receive;
@@ -192,7 +200,9 @@ void receive_data( void *p ) {
                 }
                 go = 0;
                 i = 0;
-                type=0;                   
+                type=0; 
+                sprintf((char *) local_write, "semaphore given\n");
+                vSerialPutString(pxPort, (const signed char *) local_write, 64);
                 xSemaphoreGive(gatekeeper);
             }
         }
@@ -216,12 +226,12 @@ void PID_initialise( void *p ) {
             mov_update_error(&left_wheel, &right_wheel);    // update error values
                 //sprintf((char *) local_write, "left wheel inc: %li\n", left_wheel.cur_dest);
                 //vSerialPutString(pxPort, (signed char *) local_write, 64);
-            sprintf((char *) local_write, "%d|%d|%ld|%ld|%i|%d|%d|%d\n", left_wheel.error, left_wheel.motor_volt, -64*M1QuadDec_GetCounter(), left_wheel.cur_dest, left_wheel.time,left_wheel.error,(left_wheel.error-left_wheel.error_prev), (left_wheel.error_sum));
-            vSerialPutString(pxPort, (signed char *) local_write, 64);
+            
             mov_get_PID(&left_wheel, &right_wheel, &k);     // calculate wheel voltage from errors using PID
             
             mov_Adj_Volt(&left_wheel, &right_wheel);        // adjust the voltage of the wheels
-            
+            sprintf((char *) local_write, "%d|%d|%ld|%ld|%i|%d|%d|%d\n", left_wheel.error, left_wheel.motor_volt, -64*M1QuadDec_GetCounter(), left_wheel.cur_dest, left_wheel.time,left_wheel.error,(left_wheel.error-left_wheel.error_prev), (left_wheel.error_sum));
+            vSerialPutString(pxPort, (signed char *) local_write, 64);
 			xSemaphoreGive(gatekeeper);                     // give the semaphore back
     	}
         vTaskDelay(10);                                     // wait 10ms before going again
@@ -244,6 +254,7 @@ extern cyisraddress CyRamVectors[];
 
 	/* Start the UART. */
 	UART_1_Start();                         // Start the UART
+                             // Start the UART
     xSerialPortInitMinimal( 57600, 64 );    // Set the serial baud rate and buffer size in bytes
     
     PWM_M1_Start();

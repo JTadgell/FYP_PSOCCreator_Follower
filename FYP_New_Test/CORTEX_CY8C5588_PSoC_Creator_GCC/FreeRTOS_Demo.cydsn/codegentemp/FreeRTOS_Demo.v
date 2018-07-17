@@ -1,6 +1,6 @@
 // ======================================================================
 // FreeRTOS_Demo.v generated from TopDesign.cysch
-// 07/17/2018 at 13:21
+// 07/17/2018 at 15:57
 // This file is auto generated. ANY EDITS YOU MAKE MAY BE LOST WHEN THIS FILE IS REGENERATED!!!
 // ======================================================================
 
@@ -1098,11 +1098,11 @@ module top ;
           wire  Net_214;
           wire  Net_213;
           wire  Net_212;
+          wire  Net_29;
           wire  Net_4;
           wire  Net_12;
           wire  Net_135;
           wire  Net_732;
-          wire  Net_29;
           wire  Net_30;
 
     UART_v2_50_0 UART_1 (

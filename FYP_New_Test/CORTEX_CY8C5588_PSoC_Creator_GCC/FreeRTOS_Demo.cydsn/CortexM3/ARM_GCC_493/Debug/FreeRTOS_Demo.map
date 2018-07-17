@@ -445,6 +445,8 @@ Discarded input sections
                 0x00000000       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
  .text.CyXTAL_SetWdVoltage
                 0x00000000       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+ .text.CySoftwareReset
+                0x00000000       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
  .text.CyDelay  0x00000000       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
  .text.CyDelayUs
                 0x00000000       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
@@ -941,7 +943,7 @@ END GROUP
                 0x00000800                ee_size = (CY_APPL_LOADABLE && ! (CY_EE_IN_BTLDR))?(CY_EE_SIZE / CY_APPL_MAX):CY_EE_SIZE
                 0x00000000                PROVIDE (CY_ECC_OFFSET, ecc_offset)
 
-.text           0x00000000     0x4f60
+.text           0x00000000     0x4fd0
  CREATE_OBJECT_SYMBOLS
                 0x00000000                PROVIDE (__cy_interrupt_vector, RomVectors)
  *(.romvectors)
@@ -1116,460 +1118,457 @@ END GROUP
  .text.main     0x00001ca8       0x80 .\CortexM3\ARM_GCC_493\Debug\main.o
                 0x00001ca8                main
  .text.receive_data
-                0x00001d28      0x190 .\CortexM3\ARM_GCC_493\Debug\main.o
+                0x00001d28      0x23c .\CortexM3\ARM_GCC_493\Debug\main.o
                 0x00001d28                receive_data
  .text.PID_initialise
-                0x00001eb8      0x108 .\CortexM3\ARM_GCC_493\Debug\main.o
-                0x00001eb8                PID_initialise
+                0x00001f64      0x108 .\CortexM3\ARM_GCC_493\Debug\main.o
+                0x00001f64                PID_initialise
  .text.prvHardwareSetup
-                0x00001fc0       0x68 .\CortexM3\ARM_GCC_493\Debug\main.o
+                0x0000206c       0x68 .\CortexM3\ARM_GCC_493\Debug\main.o
  .text.vApplicationStackOverflowHook
-                0x00002028       0x20 .\CortexM3\ARM_GCC_493\Debug\main.o
-                0x00002028                vApplicationStackOverflowHook
+                0x000020d4       0x20 .\CortexM3\ARM_GCC_493\Debug\main.o
+                0x000020d4                vApplicationStackOverflowHook
  .text.vApplicationMallocFailedHook
-                0x00002048       0x1c .\CortexM3\ARM_GCC_493\Debug\main.o
-                0x00002048                vApplicationMallocFailedHook
+                0x000020f4       0x1c .\CortexM3\ARM_GCC_493\Debug\main.o
+                0x000020f4                vApplicationMallocFailedHook
  .text.xSerialPortInitMinimal
-                0x00002064       0x74 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x00002064                xSerialPortInitMinimal
+                0x00002110       0x74 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x00002110                xSerialPortInitMinimal
  .text.vSerialPutString
-                0x000020d8       0x50 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x000020d8                vSerialPutString
+                0x00002184       0x50 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x00002184                vSerialPutString
  .text.xSerialGetChar
-                0x00002128       0x38 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x00002128                xSerialGetChar
+                0x000021d4       0x38 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x000021d4                xSerialGetChar
  .text.xSerialPutChar
-                0x00002160       0x54 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x00002160                xSerialPutChar
+                0x0000220c       0x54 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x0000220c                xSerialPutChar
  .text.vUartRxISR
-                0x000021b4       0x94 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x000021b4                vUartRxISR
+                0x00002260       0x94 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x00002260                vUartRxISR
  .text.vUartTxISR
-                0x00002248       0xb0 .\CortexM3\ARM_GCC_493\Debug\Serial.o
-                0x00002248                vUartTxISR
+                0x000022f4       0xb0 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+                0x000022f4                vUartTxISR
  .text.turn_wheel
-                0x000022f8       0xb4 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x000022f8                turn_wheel
+                0x000023a4       0xb4 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x000023a4                turn_wheel
  .text.mov_update_error
-                0x000023ac       0xc4 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x000023ac                mov_update_error
+                0x00002458       0xa8 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x00002458                mov_update_error
  .text.mov_get_PID
-                0x00002470      0x1cc .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x00002470                mov_get_PID
+                0x00002500      0x1cc .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x00002500                mov_get_PID
  .text.mov_Adj_Volt
-                0x0000263c       0x28 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x0000263c                mov_Adj_Volt
+                0x000026cc       0x28 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x000026cc                mov_Adj_Volt
  .text.initialise_wheel_data
-                0x00002664       0x48 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x00002664                initialise_wheel_data
+                0x000026f4       0x48 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x000026f4                initialise_wheel_data
  .text.update_inc
-                0x000026ac       0xb4 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x000026ac                update_inc
+                0x0000273c       0xb4 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x0000273c                update_inc
  .text.update_k
-                0x00002760       0xd8 .\CortexM3\ARM_GCC_493\Debug\movement.o
-                0x00002760                update_k
+                0x000027f0       0xd8 .\CortexM3\ARM_GCC_493\Debug\movement.o
+                0x000027f0                update_k
  .text.IntDefaultHandler
-                0x00002838       0x14 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
-                0x00002838                IntDefaultHandler
- .text._sbrk    0x0000284c       0x50 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
-                0x0000284c                _sbrk
- .text.Start_c  0x0000289c       0x98 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
-                0x0000289c                Start_c
+                0x000028c8       0x14 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+                0x000028c8                IntDefaultHandler
+ .text._sbrk    0x000028dc       0x50 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+                0x000028dc                _sbrk
+ .text.Start_c  0x0000292c       0x98 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+                0x0000292c                Start_c
  .text.initialize_psoc
-                0x00002934       0x8c .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
-                0x00002934                initialize_psoc
+                0x000029c4       0x8c .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+                0x000029c4                initialize_psoc
  .text.CYMEMZERO
-                0x000029c0       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002a50       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.CYCONFIGCPY
-                0x000029dc       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002a6c       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.CyClockStartupError
-                0x000029f8        0xc .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002a88        0xc .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.cfg_write_bytes32
-                0x00002a04       0x74 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002a94       0x74 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.ClockSetup
-                0x00002a78      0x128 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002b08      0x128 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.AnalogSetDefault
-                0x00002ba0       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002c30       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .text.cyfitter_cfg
-                0x00002be4      0x1ac .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
-                0x00002be4                cyfitter_cfg
+                0x00002c74      0x1ac .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+                0x00002c74                cyfitter_cfg
  .text.UART_1_Start
-                0x00002d90       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002d90                UART_1_Start
+                0x00002e20       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002e20                UART_1_Start
  .text.UART_1_Init
-                0x00002db0       0x40 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002db0                UART_1_Init
+                0x00002e40       0x40 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002e40                UART_1_Init
  .text.UART_1_Enable
-                0x00002df0       0x5c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002df0                UART_1_Enable
+                0x00002e80       0x5c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002e80                UART_1_Enable
  .text.UART_1_ReadRxStatus
-                0x00002e4c       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002e4c                UART_1_ReadRxStatus
+                0x00002edc       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002edc                UART_1_ReadRxStatus
  .text.UART_1_GetChar
-                0x00002e70       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002e70                UART_1_GetChar
+                0x00002f00       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002f00                UART_1_GetChar
  .text.UART_1_SetTxInterruptMode
-                0x00002eb4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002eb4                UART_1_SetTxInterruptMode
+                0x00002f44       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002f44                UART_1_SetTxInterruptMode
  .text.UART_1_ReadTxStatus
-                0x00002ed4       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002ed4                UART_1_ReadTxStatus
+                0x00002f64       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002f64                UART_1_ReadTxStatus
  .text.UART_1_PutChar
-                0x00002eec       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
-                0x00002eec                UART_1_PutChar
+                0x00002f7c       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+                0x00002f7c                UART_1_PutChar
  .text.isr_UART1_TX_BYTE_COMPLETE_StartEx
-                0x00002f20       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002f20                isr_UART1_TX_BYTE_COMPLETE_StartEx
+                0x00002fb0       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x00002fb0                isr_UART1_TX_BYTE_COMPLETE_StartEx
  .text.isr_UART1_TX_BYTE_COMPLETE_SetVector
-                0x00002f44       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002f44                isr_UART1_TX_BYTE_COMPLETE_SetVector
+                0x00002fd4       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x00002fd4                isr_UART1_TX_BYTE_COMPLETE_SetVector
  .text.isr_UART1_TX_BYTE_COMPLETE_SetPriority
-                0x00002f68       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002f68                isr_UART1_TX_BYTE_COMPLETE_SetPriority
+                0x00002ff8       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x00002ff8                isr_UART1_TX_BYTE_COMPLETE_SetPriority
  .text.isr_UART1_TX_BYTE_COMPLETE_Enable
-                0x00002f8c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002f8c                isr_UART1_TX_BYTE_COMPLETE_Enable
+                0x0000301c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x0000301c                isr_UART1_TX_BYTE_COMPLETE_Enable
  .text.isr_UART1_TX_BYTE_COMPLETE_Disable
-                0x00002fa4       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002fa4                isr_UART1_TX_BYTE_COMPLETE_Disable
+                0x00003034       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x00003034                isr_UART1_TX_BYTE_COMPLETE_Disable
  .text.isr_UART1_TX_BYTE_COMPLETE_ClearPending
-                0x00002fbc       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
-                0x00002fbc                isr_UART1_TX_BYTE_COMPLETE_ClearPending
+                0x0000304c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+                0x0000304c                isr_UART1_TX_BYTE_COMPLETE_ClearPending
  .text.isr_UART1_RX_BYTE_RECEIVED_StartEx
-                0x00002fd4       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x00002fd4                isr_UART1_RX_BYTE_RECEIVED_StartEx
+                0x00003064       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x00003064                isr_UART1_RX_BYTE_RECEIVED_StartEx
  .text.isr_UART1_RX_BYTE_RECEIVED_SetVector
-                0x00002ff8       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x00002ff8                isr_UART1_RX_BYTE_RECEIVED_SetVector
+                0x00003088       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x00003088                isr_UART1_RX_BYTE_RECEIVED_SetVector
  .text.isr_UART1_RX_BYTE_RECEIVED_SetPriority
-                0x0000301c       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x0000301c                isr_UART1_RX_BYTE_RECEIVED_SetPriority
+                0x000030ac       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x000030ac                isr_UART1_RX_BYTE_RECEIVED_SetPriority
  .text.isr_UART1_RX_BYTE_RECEIVED_Enable
-                0x00003040       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x00003040                isr_UART1_RX_BYTE_RECEIVED_Enable
+                0x000030d0       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x000030d0                isr_UART1_RX_BYTE_RECEIVED_Enable
  .text.isr_UART1_RX_BYTE_RECEIVED_Disable
-                0x00003058       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x00003058                isr_UART1_RX_BYTE_RECEIVED_Disable
+                0x000030e8       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x000030e8                isr_UART1_RX_BYTE_RECEIVED_Disable
  .text.isr_UART1_RX_BYTE_RECEIVED_ClearPending
-                0x00003070       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
-                0x00003070                isr_UART1_RX_BYTE_RECEIVED_ClearPending
+                0x00003100       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+                0x00003100                isr_UART1_RX_BYTE_RECEIVED_ClearPending
  .text.UART_1_IntClock_Start
-                0x00003088       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
-                0x00003088                UART_1_IntClock_Start
- .text.CyHalt   0x000030bc       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
-                0x000030bc                CyHalt
- .text.CySoftwareReset
-                0x000030d4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
-                0x000030d4                CySoftwareReset
+                0x00003118       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
+                0x00003118                UART_1_IntClock_Start
+ .text.CyHalt   0x0000314c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+                0x0000314c                CyHalt
  .text.CyIntSetVector
-                0x000030f4       0x50 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
-                0x000030f4                CyIntSetVector
+                0x00003164       0x50 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+                0x00003164                CyIntSetVector
  .text.CyIntSetPriority
-                0x00003144       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
-                0x00003144                CyIntSetPriority
+                0x000031b4       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+                0x000031b4                CyIntSetPriority
  .text.PWM_M1_Start
-                0x00003188       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x00003188                PWM_M1_Start
+                0x000031f8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x000031f8                PWM_M1_Start
  .text.PWM_M1_Init
-                0x000031a8       0x90 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x000031a8                PWM_M1_Init
+                0x00003218       0x90 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x00003218                PWM_M1_Init
  .text.PWM_M1_Enable
-                0x00003238       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x00003238                PWM_M1_Enable
+                0x000032a8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x000032a8                PWM_M1_Enable
  .text.PWM_M1_WriteCounter
-                0x00003258       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x00003258                PWM_M1_WriteCounter
+                0x000032c8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x000032c8                PWM_M1_WriteCounter
  .text.PWM_M1_ClearFIFO
-                0x00003278       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x00003278                PWM_M1_ClearFIFO
+                0x000032e8       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x000032e8                PWM_M1_ClearFIFO
  .text.PWM_M1_WritePeriod
-                0x00003294       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x00003294                PWM_M1_WritePeriod
+                0x00003304       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x00003304                PWM_M1_WritePeriod
  .text.PWM_M1_WriteCompare
-                0x000032b4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x000032b4                PWM_M1_WriteCompare
+                0x00003324       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x00003324                PWM_M1_WriteCompare
  .text.PWM_M1_SetInterruptMode
-                0x000032d4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x000032d4                PWM_M1_SetInterruptMode
+                0x00003344       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x00003344                PWM_M1_SetInterruptMode
  .text.PWM_M1_ReadStatusRegister
-                0x000032f4       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x000032f4                PWM_M1_ReadStatusRegister
+                0x00003364       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x00003364                PWM_M1_ReadStatusRegister
  .text.PWM_M1_ReadCapture
-                0x0000330c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
-                0x0000330c                PWM_M1_ReadCapture
+                0x0000337c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+                0x0000337c                PWM_M1_ReadCapture
  .text.MClock_Start
-                0x00003324       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
-                0x00003324                MClock_Start
+                0x00003394       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
+                0x00003394                MClock_Start
  .text.M1_FWD_Write
-                0x00003358       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
-                0x00003358                M1_FWD_Write
+                0x000033c8       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
+                0x000033c8                M1_FWD_Write
  .text.M1_BWD_Write
-                0x00003394       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
-                0x00003394                M1_BWD_Write
+                0x00003404       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
+                0x00003404                M1_BWD_Write
  .text.PWM_M2_Start
-                0x000033d0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x000033d0                PWM_M2_Start
+                0x00003440       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003440                PWM_M2_Start
  .text.PWM_M2_Init
-                0x000033f0       0x94 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x000033f0                PWM_M2_Init
+                0x00003460       0x94 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003460                PWM_M2_Init
  .text.PWM_M2_Enable
-                0x00003484       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x00003484                PWM_M2_Enable
+                0x000034f4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x000034f4                PWM_M2_Enable
  .text.PWM_M2_WriteCounter
-                0x000034a4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x000034a4                PWM_M2_WriteCounter
+                0x00003514       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003514                PWM_M2_WriteCounter
  .text.PWM_M2_ClearFIFO
-                0x000034c4       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x000034c4                PWM_M2_ClearFIFO
+                0x00003534       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003534                PWM_M2_ClearFIFO
  .text.PWM_M2_WritePeriod
-                0x000034e0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x000034e0                PWM_M2_WritePeriod
+                0x00003550       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003550                PWM_M2_WritePeriod
  .text.PWM_M2_WriteCompare
-                0x00003500       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x00003500                PWM_M2_WriteCompare
+                0x00003570       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003570                PWM_M2_WriteCompare
  .text.PWM_M2_SetInterruptMode
-                0x00003520       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x00003520                PWM_M2_SetInterruptMode
+                0x00003590       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x00003590                PWM_M2_SetInterruptMode
  .text.PWM_M2_ReadStatusRegister
-                0x00003540       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x00003540                PWM_M2_ReadStatusRegister
+                0x000035b0       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x000035b0                PWM_M2_ReadStatusRegister
  .text.PWM_M2_ReadCapture
-                0x00003558       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
-                0x00003558                PWM_M2_ReadCapture
+                0x000035c8       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+                0x000035c8                PWM_M2_ReadCapture
  .text.M2_FWD_Write
-                0x00003570       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
-                0x00003570                M2_FWD_Write
+                0x000035e0       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
+                0x000035e0                M2_FWD_Write
  .text.M2_BWD_Write
-                0x000035ac       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
-                0x000035ac                M2_BWD_Write
+                0x0000361c       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
+                0x0000361c                M2_BWD_Write
  .text.Standby_Write
-                0x000035e8       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
-                0x000035e8                Standby_Write
+                0x00003658       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
+                0x00003658                Standby_Write
  .text.M1QuadDec_Init
-                0x00003624       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x00003624                M1QuadDec_Init
+                0x00003694       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x00003694                M1QuadDec_Init
  .text.M1QuadDec_Enable
-                0x00003648       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x00003648                M1QuadDec_Enable
+                0x000036b8       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x000036b8                M1QuadDec_Enable
  .text.M1QuadDec_Start
-                0x0000368c       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x0000368c                M1QuadDec_Start
+                0x000036fc       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x000036fc                M1QuadDec_Start
  .text.M1QuadDec_GetCounter
-                0x000036c4       0x48 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x000036c4                M1QuadDec_GetCounter
+                0x00003734       0x48 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x00003734                M1QuadDec_GetCounter
  .text.M1QuadDec_SetCounter
-                0x0000370c       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x0000370c                M1QuadDec_SetCounter
+                0x0000377c       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x0000377c                M1QuadDec_SetCounter
  .text.M1QuadDec_GetEvents
-                0x00003740       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x00003740                M1QuadDec_GetEvents
+                0x000037b0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x000037b0                M1QuadDec_GetEvents
  .text.M1QuadDec_SetInterruptMask
-                0x00003760       0x28 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
-                0x00003760                M1QuadDec_SetInterruptMask
+                0x000037d0       0x28 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+                0x000037d0                M1QuadDec_SetInterruptMask
  .text.M1QuadDec_ISR
-                0x00003788       0x60 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
-                0x00003788                M1QuadDec_ISR
+                0x000037f8       0x60 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
+                0x000037f8                M1QuadDec_ISR
  .text.M1Clock_Start
-                0x000037e8       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
-                0x000037e8                M1Clock_Start
+                0x00003858       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
+                0x00003858                M1Clock_Start
  .text.M2QuadDec_Init
-                0x0000381c       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x0000381c                M2QuadDec_Init
+                0x0000388c       0x24 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x0000388c                M2QuadDec_Init
  .text.M2QuadDec_Enable
-                0x00003840       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x00003840                M2QuadDec_Enable
+                0x000038b0       0x44 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x000038b0                M2QuadDec_Enable
  .text.M2QuadDec_Start
-                0x00003884       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x00003884                M2QuadDec_Start
+                0x000038f4       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x000038f4                M2QuadDec_Start
  .text.M2QuadDec_GetCounter
-                0x000038bc       0x48 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x000038bc                M2QuadDec_GetCounter
+                0x0000392c       0x48 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x0000392c                M2QuadDec_GetCounter
  .text.M2QuadDec_SetCounter
-                0x00003904       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x00003904                M2QuadDec_SetCounter
+                0x00003974       0x34 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x00003974                M2QuadDec_SetCounter
  .text.M2QuadDec_GetEvents
-                0x00003938       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x00003938                M2QuadDec_GetEvents
+                0x000039a8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x000039a8                M2QuadDec_GetEvents
  .text.M2QuadDec_SetInterruptMask
-                0x00003958       0x28 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
-                0x00003958                M2QuadDec_SetInterruptMask
+                0x000039c8       0x28 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+                0x000039c8                M2QuadDec_SetInterruptMask
  .text.M2QuadDec_ISR
-                0x00003980       0x60 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
-                0x00003980                M2QuadDec_ISR
+                0x000039f0       0x60 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
+                0x000039f0                M2QuadDec_ISR
  .text.M1QuadDec_Cnt16_Init
-                0x000039e0       0x80 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x000039e0                M1QuadDec_Cnt16_Init
+                0x00003a50       0x80 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003a50                M1QuadDec_Cnt16_Init
  .text.M1QuadDec_Cnt16_Enable
-                0x00003a60       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003a60                M1QuadDec_Cnt16_Enable
+                0x00003ad0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003ad0                M1QuadDec_Cnt16_Enable
  .text.M1QuadDec_Cnt16_Start
-                0x00003a80       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003a80                M1QuadDec_Cnt16_Start
+                0x00003af0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003af0                M1QuadDec_Cnt16_Start
  .text.M1QuadDec_Cnt16_SetInterruptMode
-                0x00003aa0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003aa0                M1QuadDec_Cnt16_SetInterruptMode
+                0x00003b10       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003b10                M1QuadDec_Cnt16_SetInterruptMode
  .text.M1QuadDec_Cnt16_ReadStatusRegister
-                0x00003ac0       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003ac0                M1QuadDec_Cnt16_ReadStatusRegister
+                0x00003b30       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003b30                M1QuadDec_Cnt16_ReadStatusRegister
  .text.M1QuadDec_Cnt16_WriteCounter
-                0x00003ad8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003ad8                M1QuadDec_Cnt16_WriteCounter
+                0x00003b48       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003b48                M1QuadDec_Cnt16_WriteCounter
  .text.M1QuadDec_Cnt16_ReadCounter
-                0x00003af8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003af8                M1QuadDec_Cnt16_ReadCounter
+                0x00003b68       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003b68                M1QuadDec_Cnt16_ReadCounter
  .text.M1QuadDec_Cnt16_ReadCapture
-                0x00003b18       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003b18                M1QuadDec_Cnt16_ReadCapture
+                0x00003b88       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003b88                M1QuadDec_Cnt16_ReadCapture
  .text.M1QuadDec_Cnt16_WritePeriod
-                0x00003b30       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003b30                M1QuadDec_Cnt16_WritePeriod
+                0x00003ba0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003ba0                M1QuadDec_Cnt16_WritePeriod
  .text.M1QuadDec_Cnt16_WriteCompare
-                0x00003b50       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003b50                M1QuadDec_Cnt16_WriteCompare
+                0x00003bc0       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003bc0                M1QuadDec_Cnt16_WriteCompare
  .text.M1QuadDec_Cnt16_ClearFIFO
-                0x00003b70       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
-                0x00003b70                M1QuadDec_Cnt16_ClearFIFO
+                0x00003be0       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+                0x00003be0                M1QuadDec_Cnt16_ClearFIFO
  .text.M2QuadDec_Cnt16_Init
-                0x00003b8c       0x80 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003b8c                M2QuadDec_Cnt16_Init
+                0x00003bfc       0x80 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003bfc                M2QuadDec_Cnt16_Init
  .text.M2QuadDec_Cnt16_Enable
-                0x00003c0c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003c0c                M2QuadDec_Cnt16_Enable
+                0x00003c7c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003c7c                M2QuadDec_Cnt16_Enable
  .text.M2QuadDec_Cnt16_Start
-                0x00003c2c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003c2c                M2QuadDec_Cnt16_Start
+                0x00003c9c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003c9c                M2QuadDec_Cnt16_Start
  .text.M2QuadDec_Cnt16_SetInterruptMode
-                0x00003c4c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003c4c                M2QuadDec_Cnt16_SetInterruptMode
+                0x00003cbc       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003cbc                M2QuadDec_Cnt16_SetInterruptMode
  .text.M2QuadDec_Cnt16_ReadStatusRegister
-                0x00003c6c       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003c6c                M2QuadDec_Cnt16_ReadStatusRegister
+                0x00003cdc       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003cdc                M2QuadDec_Cnt16_ReadStatusRegister
  .text.M2QuadDec_Cnt16_WriteCounter
-                0x00003c84       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003c84                M2QuadDec_Cnt16_WriteCounter
+                0x00003cf4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003cf4                M2QuadDec_Cnt16_WriteCounter
  .text.M2QuadDec_Cnt16_ReadCounter
-                0x00003ca4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003ca4                M2QuadDec_Cnt16_ReadCounter
+                0x00003d14       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003d14                M2QuadDec_Cnt16_ReadCounter
  .text.M2QuadDec_Cnt16_ReadCapture
-                0x00003cc4       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003cc4                M2QuadDec_Cnt16_ReadCapture
+                0x00003d34       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003d34                M2QuadDec_Cnt16_ReadCapture
  .text.M2QuadDec_Cnt16_WritePeriod
-                0x00003cdc       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003cdc                M2QuadDec_Cnt16_WritePeriod
+                0x00003d4c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003d4c                M2QuadDec_Cnt16_WritePeriod
  .text.M2QuadDec_Cnt16_WriteCompare
-                0x00003cfc       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003cfc                M2QuadDec_Cnt16_WriteCompare
+                0x00003d6c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003d6c                M2QuadDec_Cnt16_WriteCompare
  .text.M2QuadDec_Cnt16_ClearFIFO
-                0x00003d1c       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
-                0x00003d1c                M2QuadDec_Cnt16_ClearFIFO
+                0x00003d8c       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+                0x00003d8c                M2QuadDec_Cnt16_ClearFIFO
  .text.Timer_1_Init
-                0x00003d38       0x4c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003d38                Timer_1_Init
+                0x00003da8       0x4c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003da8                Timer_1_Init
  .text.Timer_1_Enable
-                0x00003d84       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003d84                Timer_1_Enable
+                0x00003df4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003df4                Timer_1_Enable
  .text.Timer_1_Start
-                0x00003da4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003da4                Timer_1_Start
+                0x00003e14       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003e14                Timer_1_Start
  .text.Timer_1_SetInterruptMode
-                0x00003dc4       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003dc4                Timer_1_SetInterruptMode
+                0x00003e34       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003e34                Timer_1_SetInterruptMode
  .text.Timer_1_ReadStatusRegister
-                0x00003de4       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003de4                Timer_1_ReadStatusRegister
+                0x00003e54       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003e54                Timer_1_ReadStatusRegister
  .text.Timer_1_WritePeriod
-                0x00003dfc       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003dfc                Timer_1_WritePeriod
- .text.Timer_1_ReadCapture
-                0x00003e18       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003e18                Timer_1_ReadCapture
- .text.Timer_1_WriteCounter
-                0x00003e30       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003e30                Timer_1_WriteCounter
- .text.Timer_1_ReadCounter
-                0x00003e4c       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003e4c                Timer_1_ReadCounter
- .text.Timer_1_ClearFIFO
                 0x00003e6c       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
-                0x00003e6c                Timer_1_ClearFIFO
+                0x00003e6c                Timer_1_WritePeriod
+ .text.Timer_1_ReadCapture
+                0x00003e88       0x18 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003e88                Timer_1_ReadCapture
+ .text.Timer_1_WriteCounter
+                0x00003ea0       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003ea0                Timer_1_WriteCounter
+ .text.Timer_1_ReadCounter
+                0x00003ebc       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003ebc                Timer_1_ReadCounter
+ .text.Timer_1_ClearFIFO
+                0x00003edc       0x1c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+                0x00003edc                Timer_1_ClearFIFO
  .text.LED_Write
-                0x00003e88       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
-                0x00003e88                LED_Write
- *fill*         0x00003ec4        0x4 
- .text          0x00003ec8       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyBootAsmGnu.o)
-                0x00003ec8                CyDelayCycles
-                0x00003ed8                CyEnterCriticalSection
-                0x00003ee0                CyExitCriticalSection
- .text          0x00003ee8      0x370 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_addsubdf3.o)
-                0x00003ee8                __aeabi_drsub
-                0x00003ef0                __aeabi_dsub
-                0x00003ef0                __subdf3
-                0x00003ef4                __aeabi_dadd
-                0x00003ef4                __adddf3
-                0x0000416c                __floatunsidf
-                0x0000416c                __aeabi_ui2d
-                0x0000418c                __floatsidf
-                0x0000418c                __aeabi_i2d
-                0x000041b0                __aeabi_f2d
-                0x000041b0                __extendsfdf2
-                0x000041ec                __floatundidf
-                0x000041ec                __aeabi_ul2d
-                0x000041fc                __floatdidf
-                0x000041fc                __aeabi_l2d
- .text          0x00004258      0x424 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_muldivdf3.o)
-                0x00004258                __aeabi_dmul
-                0x00004258                __muldf3
-                0x000044ac                __divdf3
-                0x000044ac                __aeabi_ddiv
- .text          0x0000467c       0x50 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_fixdfsi.o)
-                0x0000467c                __aeabi_d2iz
-                0x0000467c                __fixdfsi
- .text.__errno  0x000046cc        0xc c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-errno.o)
-                0x000046cc                __errno
+                0x00003ef8       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
+                0x00003ef8                LED_Write
+ *fill*         0x00003f34        0x4 
+ .text          0x00003f38       0x20 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyBootAsmGnu.o)
+                0x00003f38                CyDelayCycles
+                0x00003f48                CyEnterCriticalSection
+                0x00003f50                CyExitCriticalSection
+ .text          0x00003f58      0x370 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_addsubdf3.o)
+                0x00003f58                __aeabi_drsub
+                0x00003f60                __aeabi_dsub
+                0x00003f60                __subdf3
+                0x00003f64                __aeabi_dadd
+                0x00003f64                __adddf3
+                0x000041dc                __floatunsidf
+                0x000041dc                __aeabi_ui2d
+                0x000041fc                __floatsidf
+                0x000041fc                __aeabi_i2d
+                0x00004220                __aeabi_f2d
+                0x00004220                __extendsfdf2
+                0x0000425c                __floatundidf
+                0x0000425c                __aeabi_ul2d
+                0x0000426c                __floatdidf
+                0x0000426c                __aeabi_l2d
+ .text          0x000042c8      0x424 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_muldivdf3.o)
+                0x000042c8                __aeabi_dmul
+                0x000042c8                __muldf3
+                0x0000451c                __divdf3
+                0x0000451c                __aeabi_ddiv
+ .text          0x000046ec       0x50 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m\libgcc.a(_arm_fixdfsi.o)
+                0x000046ec                __aeabi_d2iz
+                0x000046ec                __fixdfsi
+ .text.__errno  0x0000473c        0xc c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-errno.o)
+                0x0000473c                __errno
  .text.__libc_init_array
-                0x000046d8       0x4c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-init.o)
-                0x000046d8                __libc_init_array
- .text.memcpy   0x00004724       0x16 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memcpy.o)
-                0x00004724                memcpy
- .text.memset   0x0000473a       0x10 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memset.o)
-                0x0000473a                memset
- *fill*         0x0000474a        0x2 
- .text.sprintf  0x0000474c       0x48 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sprintf.o)
-                0x0000474c                siprintf
-                0x0000474c                sprintf
+                0x00004748       0x4c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-init.o)
+                0x00004748                __libc_init_array
+ .text.memcpy   0x00004794       0x16 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memcpy.o)
+                0x00004794                memcpy
+ .text.memset   0x000047aa       0x10 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memset.o)
+                0x000047aa                memset
+ *fill*         0x000047ba        0x2 
+ .text.sprintf  0x000047bc       0x48 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sprintf.o)
+                0x000047bc                siprintf
+                0x000047bc                sprintf
  .text.__ssputs_r
-                0x00004794       0xb2 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x00004794                __ssputs_r
- *fill*         0x00004846        0x2 
+                0x00004804       0xb2 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x00004804                __ssputs_r
+ *fill*         0x000048b6        0x2 
  .text._svfprintf_r
-                0x00004848      0x1e4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
-                0x00004848                _svfiprintf_r
-                0x00004848                _svfprintf_r
+                0x000048b8      0x1e4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x000048b8                _svfiprintf_r
+                0x000048b8                _svfprintf_r
  .text._printf_common
-                0x00004a2c       0xea c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x00004a2c                _printf_common
- *fill*         0x00004b16        0x2 
+                0x00004a9c       0xea c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x00004a9c                _printf_common
+ *fill*         0x00004b86        0x2 
  .text._printf_i
-                0x00004b18      0x240 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x00004b18                _printf_i
- .text.memchr   0x00004d58       0x1c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memchr.o)
-                0x00004d58                memchr
- .text.memmove  0x00004d74       0x36 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memmove.o)
-                0x00004d74                memmove
- *fill*         0x00004daa        0x2 
- .text._free_r  0x00004dac       0x88 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-freer.o)
-                0x00004dac                _free_r
+                0x00004b88      0x240 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x00004b88                _printf_i
+ .text.memchr   0x00004dc8       0x1c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memchr.o)
+                0x00004dc8                memchr
+ .text.memmove  0x00004de4       0x36 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memmove.o)
+                0x00004de4                memmove
+ *fill*         0x00004e1a        0x2 
+ .text._free_r  0x00004e1c       0x88 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-freer.o)
+                0x00004e1c                _free_r
  .text._malloc_r
-                0x00004e34       0xac c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-mallocr.o)
-                0x00004e34                _malloc_r
+                0x00004ea4       0xac c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-mallocr.o)
+                0x00004ea4                _malloc_r
  .text._realloc_r
-                0x00004ee0       0x4c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-reallocr.o)
-                0x00004ee0                _realloc_r
- .text._sbrk_r  0x00004f2c       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sbrkr.o)
-                0x00004f2c                _sbrk_r
+                0x00004f50       0x4c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-reallocr.o)
+                0x00004f50                _realloc_r
+ .text._sbrk_r  0x00004f9c       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sbrkr.o)
+                0x00004f9c                _sbrk_r
  .text._malloc_usable_size_r
-                0x00004f4c       0x14 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-msizer.o)
-                0x00004f4c                _malloc_usable_size_r
+                0x00004fbc       0x14 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-msizer.o)
+                0x00004fbc                _malloc_usable_size_r
  *(.plt)
  *(.gnu.warning)
  *(.glue_7t)
@@ -1582,86 +1581,86 @@ END GROUP
  *(.ARM.extab* .gnu.linkonce.armextab.*)
  *(.gcc_except_table)
 
-.v4_bx          0x00004f60        0x0
+.v4_bx          0x00004fd0        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x00004f60        0x0
+.iplt           0x00004fd0        0x0
  .iplt          0x00000000        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
 
 .eh_frame_hdr
  *(.eh_frame_hdr)
 
-.eh_frame       0x00004f60        0x4
+.eh_frame       0x00004fd0        0x4
  *(.eh_frame)
- .eh_frame      0x00004f60        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
- .eh_frame      0x00004f60        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtend.o
-                0x00004f64                PROVIDE (__exidx_start, .)
+ .eh_frame      0x00004fd0        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
+ .eh_frame      0x00004fd0        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtend.o
+                0x00004fd4                PROVIDE (__exidx_start, .)
 
 .ARM.exidx
  *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-                0x00004f64                __exidx_end = .
+                0x00004fd4                __exidx_end = .
 
-.rodata         0x00004f64      0x14c
+.rodata         0x00004fd4      0x184
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata        0x00004f64        0x8 .\CortexM3\ARM_GCC_493\Debug\tasks.o
- .rodata        0x00004f6c       0x9c .\CortexM3\ARM_GCC_493\Debug\main.o
- .rodata        0x00005008       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+ .rodata        0x00004fd4        0x8 .\CortexM3\ARM_GCC_493\Debug\tasks.o
+ .rodata        0x00004fdc       0xd4 .\CortexM3\ARM_GCC_493\Debug\main.o
+ .rodata        0x000050b0       0x3c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
  .rodata.str1.1
-                0x00005044        0x2 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-impure.o)
+                0x000050ec        0x2 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-impure.o)
  .rodata.str1.1
-                0x00005046       0x11 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
+                0x000050ee       0x11 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
  .rodata.str1.1
-                0x00005057       0x22 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
-                0x0000507c                . = ALIGN (0x4)
- *fill*         0x00005079        0x3 
+                0x000050ff       0x22 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
+                0x00005124                . = ALIGN (0x4)
+ *fill*         0x00005121        0x3 
  *(.init)
- .init          0x0000507c        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crti.o
-                0x0000507c                _init
- .init          0x00005080        0x8 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtn.o
-                0x00005088                . = ALIGN (0x4)
-                0x00005088                __preinit_array_start = .
+ .init          0x00005124        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crti.o
+                0x00005124                _init
+ .init          0x00005128        0x8 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtn.o
+                0x00005130                . = ALIGN (0x4)
+                0x00005130                __preinit_array_start = .
  *(.preinit_array)
-                0x00005088                __preinit_array_end = .
-                0x00005088                . = ALIGN (0x4)
-                0x00005088                __init_array_start = .
+                0x00005130                __preinit_array_end = .
+                0x00005130                . = ALIGN (0x4)
+                0x00005130                __init_array_start = .
  *(SORT(.init_array.*))
  *(.init_array)
- .init_array    0x00005088        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
- .init_array    0x0000508c        0x4 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
-                0x00005090                __init_array_end = .
-                0x00005090                . = ALIGN (0x4)
+ .init_array    0x00005130        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
+ .init_array    0x00005134        0x4 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+                0x00005138                __init_array_end = .
+                0x00005138                . = ALIGN (0x4)
  *(.fini)
- .fini          0x00005090        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crti.o
-                0x00005090                _fini
- .fini          0x00005094        0x8 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtn.o
-                0x0000509c                . = ALIGN (0x4)
-                0x0000509c                __fini_array_start = .
+ .fini          0x00005138        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crti.o
+                0x00005138                _fini
+ .fini          0x0000513c        0x8 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtn.o
+                0x00005144                . = ALIGN (0x4)
+                0x00005144                __fini_array_start = .
  *(.fini_array)
- .fini_array    0x0000509c        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
+ .fini_array    0x00005144        0x4 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
  *(SORT(.fini_array.*))
-                0x000050a0                __fini_array_end = .
-                0x000050a0                . = ALIGN (0x4)
+                0x00005148                __fini_array_end = .
+                0x00005148                . = ALIGN (0x4)
  *crtbegin.o(.ctors)
  *(EXCLUDE_FILE(*crtend.o) .ctors)
  *(SORT(.ctors.*))
  *crtend.o(.ctors)
-                0x000050a0                . = ALIGN (0x4)
+                0x00005148                . = ALIGN (0x4)
  *crtbegin.o(.dtors)
  *(EXCLUDE_FILE(*crtend.o) .dtors)
  *(SORT(.dtors.*))
  *crtend.o(.dtors)
-                0x000050a0                . = ALIGN (0x4)
-                0x000050a0                __cy_regions = .
-                0x000050a0        0x4 LONG 0x50b0 __cy_region_init_ram
-                0x000050a4        0x4 LONG 0x1fff8108 __cy_region_start_data
-                0x000050a8        0x4 LONG 0x78 __cy_region_init_size_ram
-                0x000050ac        0x4 LONG 0x8218 __cy_region_zero_size_ram
-                0x000050b0                __cy_regions_end = .
-                0x000050b0                . = ALIGN (0x8)
-                0x000050b0                _etext = .
+                0x00005148                . = ALIGN (0x4)
+                0x00005148                __cy_regions = .
+                0x00005148        0x4 LONG 0x5158 __cy_region_init_ram
+                0x0000514c        0x4 LONG 0x1fff8108 __cy_region_start_data
+                0x00005150        0x4 LONG 0x78 __cy_region_init_size_ram
+                0x00005154        0x4 LONG 0x8218 __cy_region_zero_size_ram
+                0x00005158                __cy_regions_end = .
+                0x00005158                . = ALIGN (0x8)
+                0x00005158                _etext = .
 
 .cy_checksum_exclude
-                0x000050b0        0x0
+                0x00005158        0x0
  *(.cy_checksum_exclude)
 
 .ramvectors     0x1fff8000      0x100
@@ -1676,7 +1675,7 @@ END GROUP
  .noinit        0x1fff8104        0x1 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
                 0x1fff8104                CyResetStatus
 
-.data           0x1fff8108       0x78 load address 0x000050b0
+.data           0x1fff8108       0x78 load address 0x00005158
                 0x1fff8108                __cy_region_start_data = .
  *(.jcr)
  .jcr           0x1fff8108        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
@@ -1698,10 +1697,10 @@ END GROUP
  *(.ram)
                 0x1fff8180                _edata = .
 
-.igot.plt       0x1fff8180        0x0 load address 0x00005128
+.igot.plt       0x1fff8180        0x0 load address 0x000051d0
  .igot.plt      0x00000000        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
 
-.bss            0x1fff8180     0x8218 load address 0x00005128
+.bss            0x1fff8180     0x8218 load address 0x000051d0
                 0x1fff8180                PROVIDE (__bss_start__, .)
  *(.shbss)
  *(.bss .bss.* .gnu.linkonce.b.*)
@@ -1758,11 +1757,11 @@ END GROUP
                 0x20000398                __end = .
                 0x20000398                PROVIDE (end, .)
                 0x20000398                PROVIDE (__bss_end__, .)
-                0x000050b0                __cy_region_init_ram = LOADADDR (.data)
+                0x00005158                __cy_region_init_ram = LOADADDR (.data)
                 0x00000078                __cy_region_init_size_ram = (_edata - ADDR (.data))
                 0x00008218                __cy_region_zero_size_ram = (_end - _edata)
 
-.heap           0x20000398        0x0 load address 0x00005128
+.heap           0x20000398        0x0 load address 0x000051d0
                 0x20000398                . = _end
                 0x20000398                . = (. + 0x0)
                 0x20000398                __cy_heap_limit = .
@@ -1812,7 +1811,7 @@ END GROUP
  .cymeta        0x90500000        0xc .\CortexM3\ARM_GCC_493\Debug\cymetadata.o
                 0x90500000                cy_metadata
 
-.rel.dyn        0x00005128        0x0 load address 0x9050000c
+.rel.dyn        0x000051d0        0x0 load address 0x9050000c
  .rel.iplt      0x00000000        0x0 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7-m/crtbegin.o
 
 .stab
@@ -2005,7 +2004,7 @@ END GROUP
  .debug_abbrev  0x00002a89      0x13c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyFlash.o)
  .debug_abbrev  0x00002bc5      0x16c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CySpc.o)
 
-.debug_line     0x00000000     0x54a6
+.debug_line     0x00000000     0x54ac
  *(.debug_line)
  .debug_line    0x00000000      0x13a .\CortexM3\ARM_GCC_493\Debug\croutine.o
  .debug_line    0x0000013a      0x240 .\CortexM3\ARM_GCC_493\Debug\list.o
@@ -2014,41 +2013,41 @@ END GROUP
  .debug_line    0x00001555      0x2c8 .\CortexM3\ARM_GCC_493\Debug\port.o
  .debug_line    0x0000181d      0x2e4 .\CortexM3\ARM_GCC_493\Debug\heap_2.o
  .debug_line    0x00001b01      0x1db .\CortexM3\ARM_GCC_493\Debug\IntQueueTimer.o
- .debug_line    0x00001cdc      0x2e6 .\CortexM3\ARM_GCC_493\Debug\main.o
- .debug_line    0x00001fc2      0x2ba .\CortexM3\ARM_GCC_493\Debug\Serial.o
- .debug_line    0x0000227c      0x24c .\CortexM3\ARM_GCC_493\Debug\movement.o
- .debug_line    0x000024c8      0x237 .\CortexM3\ARM_GCC_493\Debug\comtest.o
- .debug_line    0x000026ff       0x51 .\CortexM3\ARM_GCC_493\Debug\cymetadata.o
- .debug_line    0x00002750      0x1dc .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
- .debug_line    0x0000292c      0x21e .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
- .debug_line    0x00002b4a      0x2e4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
- .debug_line    0x00002e2e      0x165 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
- .debug_line    0x00002f93      0x165 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
- .debug_line    0x000030f8      0x1aa .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
- .debug_line    0x000032a2      0x882 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
- .debug_line    0x00003b24      0x37f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyPm.o)
- .debug_line    0x00003ea3      0x18a .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
- .debug_line    0x0000402d      0x1a1 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
- .debug_line    0x000041ce       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
- .debug_line    0x00004263       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
- .debug_line    0x000042f8      0x18a .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
- .debug_line    0x00004482       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
- .debug_line    0x00004517       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
- .debug_line    0x000045ac       0x96 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
- .debug_line    0x00004642      0x124 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
- .debug_line    0x00004766       0x6f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
- .debug_line    0x000047d5      0x1a2 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
- .debug_line    0x00004977      0x124 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
- .debug_line    0x00004a9b       0x6f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
- .debug_line    0x00004b0a      0x18d .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
- .debug_line    0x00004c97      0x18d .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
- .debug_line    0x00004e24      0x170 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
- .debug_line    0x00004f94       0x92 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
- .debug_line    0x00005026       0x66 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyBootAsmGnu.o)
- .debug_line    0x0000508c      0x205 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyFlash.o)
- .debug_line    0x00005291      0x215 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CySpc.o)
+ .debug_line    0x00001cdc      0x2ee .\CortexM3\ARM_GCC_493\Debug\main.o
+ .debug_line    0x00001fca      0x2ba .\CortexM3\ARM_GCC_493\Debug\Serial.o
+ .debug_line    0x00002284      0x24a .\CortexM3\ARM_GCC_493\Debug\movement.o
+ .debug_line    0x000024ce      0x237 .\CortexM3\ARM_GCC_493\Debug\comtest.o
+ .debug_line    0x00002705       0x51 .\CortexM3\ARM_GCC_493\Debug\cymetadata.o
+ .debug_line    0x00002756      0x1dc .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+ .debug_line    0x00002932      0x21e .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+ .debug_line    0x00002b50      0x2e4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+ .debug_line    0x00002e34      0x165 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+ .debug_line    0x00002f99      0x165 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+ .debug_line    0x000030fe      0x1aa .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
+ .debug_line    0x000032a8      0x882 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+ .debug_line    0x00003b2a      0x37f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyPm.o)
+ .debug_line    0x00003ea9      0x18a .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+ .debug_line    0x00004033      0x1a1 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
+ .debug_line    0x000041d4       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
+ .debug_line    0x00004269       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
+ .debug_line    0x000042fe      0x18a .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+ .debug_line    0x00004488       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
+ .debug_line    0x0000451d       0x95 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
+ .debug_line    0x000045b2       0x96 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
+ .debug_line    0x00004648      0x124 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+ .debug_line    0x0000476c       0x6f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
+ .debug_line    0x000047db      0x1a2 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
+ .debug_line    0x0000497d      0x124 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+ .debug_line    0x00004aa1       0x6f .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
+ .debug_line    0x00004b10      0x18d .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+ .debug_line    0x00004c9d      0x18d .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+ .debug_line    0x00004e2a      0x170 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+ .debug_line    0x00004f9a       0x92 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
+ .debug_line    0x0000502c       0x66 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyBootAsmGnu.o)
+ .debug_line    0x00005092      0x205 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyFlash.o)
+ .debug_line    0x00005297      0x215 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CySpc.o)
 
-.debug_frame    0x00000000     0x4c14
+.debug_frame    0x00000000     0x4c1c
  *(.debug_frame)
  .debug_frame   0x00000000       0xd8 .\CortexM3\ARM_GCC_493\Debug\list.o
  .debug_frame   0x000000d8      0x4ec .\CortexM3\ARM_GCC_493\Debug\queue.o
@@ -2056,53 +2055,53 @@ END GROUP
  .debug_frame   0x00000ddc      0x16c .\CortexM3\ARM_GCC_493\Debug\port.o
  .debug_frame   0x00000f48       0xd0 .\CortexM3\ARM_GCC_493\Debug\heap_2.o
  .debug_frame   0x00001018       0x64 .\CortexM3\ARM_GCC_493\Debug\IntQueueTimer.o
- .debug_frame   0x0000107c       0xd8 .\CortexM3\ARM_GCC_493\Debug\main.o
- .debug_frame   0x00001154      0x100 .\CortexM3\ARM_GCC_493\Debug\Serial.o
- .debug_frame   0x00001254      0x138 .\CortexM3\ARM_GCC_493\Debug\movement.o
- .debug_frame   0x0000138c       0xa0 .\CortexM3\ARM_GCC_493\Debug\comtest.o
- .debug_frame   0x0000142c       0xd8 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
- .debug_frame   0x00001504      0x16c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
- .debug_frame   0x00001670      0x42c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
- .debug_frame   0x00001a9c      0x1e8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
- .debug_frame   0x00001c84      0x1e8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
- .debug_frame   0x00001e6c      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
- .debug_frame   0x00002020      0xc0c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
- .debug_frame   0x00002c2c      0x234 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyPm.o)
- .debug_frame   0x00002e60      0x25c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
- .debug_frame   0x000030bc      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
- .debug_frame   0x00003270       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
- .debug_frame   0x00003318       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
- .debug_frame   0x000033c0      0x25c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
- .debug_frame   0x0000361c       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
- .debug_frame   0x000036c4       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
- .debug_frame   0x0000376c       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
- .debug_frame   0x00003814      0x158 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
- .debug_frame   0x0000396c       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
- .debug_frame   0x000039a4      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
- .debug_frame   0x00003b58      0x158 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
- .debug_frame   0x00003cb0       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
- .debug_frame   0x00003ce8      0x258 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
- .debug_frame   0x00003f40      0x258 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
- .debug_frame   0x00004198      0x230 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
- .debug_frame   0x000043c8       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
- .debug_frame   0x00004470      0x210 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyFlash.o)
- .debug_frame   0x00004680      0x1f8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CySpc.o)
- .debug_frame   0x00004878       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-errno.o)
- .debug_frame   0x00004898       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-exit.o)
- .debug_frame   0x000048c0       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-init.o)
- .debug_frame   0x000048ec       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memcpy.o)
- .debug_frame   0x00004914       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memset.o)
- .debug_frame   0x00004934       0x70 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sprintf.o)
- .debug_frame   0x000049a4       0x8c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
- .debug_frame   0x00004a30       0x58 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
- .debug_frame   0x00004a88       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memchr.o)
- .debug_frame   0x00004ab0       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memmove.o)
- .debug_frame   0x00004ad8       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-freer.o)
- .debug_frame   0x00004b04       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-mallocr.o)
- .debug_frame   0x00004b30       0x3c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-reallocr.o)
- .debug_frame   0x00004b6c       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sbrkr.o)
- .debug_frame   0x00004b98       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-msizer.o)
- .debug_frame   0x00004bb8       0x5c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-reent.o)
+ .debug_frame   0x0000107c       0xe0 .\CortexM3\ARM_GCC_493\Debug\main.o
+ .debug_frame   0x0000115c      0x100 .\CortexM3\ARM_GCC_493\Debug\Serial.o
+ .debug_frame   0x0000125c      0x138 .\CortexM3\ARM_GCC_493\Debug\movement.o
+ .debug_frame   0x00001394       0xa0 .\CortexM3\ARM_GCC_493\Debug\comtest.o
+ .debug_frame   0x00001434       0xd8 .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o
+ .debug_frame   0x0000150c      0x16c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyfitter_cfg.o)
+ .debug_frame   0x00001678      0x42c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1.o)
+ .debug_frame   0x00001aa4      0x1e8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_TX_BYTE_COMPLETE.o)
+ .debug_frame   0x00001c8c      0x1e8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(isr_UART1_RX_BYTE_RECEIVED.o)
+ .debug_frame   0x00001e74      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(UART_1_IntClock.o)
+ .debug_frame   0x00002028      0xc0c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyLib.o)
+ .debug_frame   0x00002c34      0x234 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(cyPm.o)
+ .debug_frame   0x00002e68      0x25c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M1.o)
+ .debug_frame   0x000030c4      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(MClock.o)
+ .debug_frame   0x00003278       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_FWD.o)
+ .debug_frame   0x00003320       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1_BWD.o)
+ .debug_frame   0x000033c8      0x25c .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(PWM_M2.o)
+ .debug_frame   0x00003624       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_FWD.o)
+ .debug_frame   0x000036cc       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2_BWD.o)
+ .debug_frame   0x00003774       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Standby.o)
+ .debug_frame   0x0000381c      0x158 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec.o)
+ .debug_frame   0x00003974       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_INT.o)
+ .debug_frame   0x000039ac      0x1b4 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1Clock.o)
+ .debug_frame   0x00003b60      0x158 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec.o)
+ .debug_frame   0x00003cb8       0x38 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_INT.o)
+ .debug_frame   0x00003cf0      0x258 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M1QuadDec_Cnt16.o)
+ .debug_frame   0x00003f48      0x258 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(M2QuadDec_Cnt16.o)
+ .debug_frame   0x000041a0      0x230 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(Timer_1.o)
+ .debug_frame   0x000043d0       0xa8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(LED.o)
+ .debug_frame   0x00004478      0x210 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CyFlash.o)
+ .debug_frame   0x00004688      0x1f8 .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a(CySpc.o)
+ .debug_frame   0x00004880       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-errno.o)
+ .debug_frame   0x000048a0       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-exit.o)
+ .debug_frame   0x000048c8       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-init.o)
+ .debug_frame   0x000048f4       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memcpy.o)
+ .debug_frame   0x0000491c       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memset.o)
+ .debug_frame   0x0000493c       0x70 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sprintf.o)
+ .debug_frame   0x000049ac       0x8c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-svfprintf.o)
+ .debug_frame   0x00004a38       0x58 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-vfprintf_i.o)
+ .debug_frame   0x00004a90       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memchr.o)
+ .debug_frame   0x00004ab8       0x28 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-memmove.o)
+ .debug_frame   0x00004ae0       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-freer.o)
+ .debug_frame   0x00004b0c       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-mallocr.o)
+ .debug_frame   0x00004b38       0x3c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-reallocr.o)
+ .debug_frame   0x00004b74       0x2c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-sbrkr.o)
+ .debug_frame   0x00004ba0       0x20 c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-nano-msizer.o)
+ .debug_frame   0x00004bc0       0x5c c:/program files (x86)/cypress/psoc creator/4.0/psoc creator/import/gnu/arm/4.9.3/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7-m\libg_nano.a(lib_a-reent.o)
 
 .debug_str      0x00000000     0x44ea
  *(.debug_str)

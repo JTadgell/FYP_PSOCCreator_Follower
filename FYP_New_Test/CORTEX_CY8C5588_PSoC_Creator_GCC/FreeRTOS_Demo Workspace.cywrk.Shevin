@@ -227,6 +227,9 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\project.h</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\list.h</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\message_buffer.h</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\mpu_prototypes.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\mpu_wrappers.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\portable.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\projdefs.h</v>
@@ -262,9 +265,6 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3Iar.icf</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3RealView.scat</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3Start.c</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\cmsis_armcc.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\cmsis_gcc.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\core_cm3.h</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">

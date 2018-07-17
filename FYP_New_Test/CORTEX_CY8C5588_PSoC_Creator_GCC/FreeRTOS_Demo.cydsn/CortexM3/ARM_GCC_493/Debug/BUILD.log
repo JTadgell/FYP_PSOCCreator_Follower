@@ -1,5 +1,40 @@
---------------- Build Started: 07/17/2018 13:22:17 Project: FreeRTOS_Demo, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
-The code generation step is up to date.
+--------------- Build Started: 07/17/2018 15:57:38 Project: FreeRTOS_Demo, Configuration: ARM GCC 4.9-2015-q1-update Debug ---------------
+cydsfit.exe -.appdatapath "C:\Users\shevi\AppData\Local\Cypress Semiconductor\PSoC Creator\4.0" -.fdsnotice -.fdswarpdepfile=warp_dependencies.txt -.fdselabdepfile=elab_dependencies.txt -.fdsbldfile=generated_files.txt -.fdsreffile=referenced_files.txt -p C:\Users\shevi\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\FreeRTOS_Demo.cyprj -d CY8C5888LTI-LP097 -s C:\Users\shevi\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\Generated_Source\PSoC5 -- -yv2 -q10 -ygs -o2 -v3 -.fftcfgtype=LE
+Elaborating Design...
+HDL Generation...
+Synthesis...
+Tech Mapping...
+Analog Placement...
+Analog Routing...
+Analog Code Generation...
+Digital Placement...
+Digital Routing...
+Bitstream Generation...
+Bitstream Verification...
+Static timing analysis...
+API Generation...
+Dependency Generation...
+Cleanup...
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/croutine.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\croutine.c -o .\CortexM3\ARM_GCC_493\Debug\croutine.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/list.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\list.c -o .\CortexM3\ARM_GCC_493\Debug\list.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/queue.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\queue.c -o .\CortexM3\ARM_GCC_493\Debug\queue.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/tasks.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\tasks.c -o .\CortexM3\ARM_GCC_493\Debug\tasks.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/port.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\portable\GCC\ARM_CM3\port.c -o .\CortexM3\ARM_GCC_493\Debug\port.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/heap_2.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c ..\..\FreeRTOS_Source\portable\MemMang\heap_2.c -o .\CortexM3\ARM_GCC_493\Debug\heap_2.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/IntQueueTimer.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c IntQueueTimer.c -o .\CortexM3\ARM_GCC_493\Debug\IntQueueTimer.o
+IntQueueTimer.c: In function 'vInitialiseTimerForIntQueueTest':
+IntQueueTimer.c:49:3: warning: implicit declaration of function 'isr_High_Frequency_2000Hz_ClearPending' [-Wimplicit-function-declaration]
+   isr_High_Frequency_2000Hz_ClearPending();
+   ^
+IntQueueTimer.c:50:3: warning: implicit declaration of function 'isr_High_Frequency_2000Hz_StartEx' [-Wimplicit-function-declaration]
+   isr_High_Frequency_2000Hz_StartEx( ( cyisraddress ) vHighFrequencyFirstISR );
+   ^
+IntQueueTimer.c:53:3: warning: implicit declaration of function 'isr_High_Frequency_2001Hz_ClearPending' [-Wimplicit-function-declaration]
+   isr_High_Frequency_2001Hz_ClearPending();
+   ^
+IntQueueTimer.c:54:3: warning: implicit declaration of function 'isr_High_Frequency_2001Hz_StartEx' [-Wimplicit-function-declaration]
+   isr_High_Frequency_2001Hz_StartEx( ( cyisraddress ) vHighFrequencySecondISR );
+   ^
 arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/main.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c main.c -o .\CortexM3\ARM_GCC_493\Debug\main.o
 main.c: In function 'receive_data':
 main.c:161:10: warning: unused variable 'temp' [-Wunused-variable]
@@ -9,15 +44,33 @@ main.c:159:9: warning: variable 'go' set but not used [-Wunused-but-set-variable
      int go = 0;
          ^
 main.c: In function 'PID_initialise':
-main.c:219:13: warning: format '%i' expects argument of type 'int', but argument 7 has type 'uint32_t' [-Wformat=]
+main.c:233:13: warning: format '%i' expects argument of type 'int', but argument 7 has type 'uint32_t' [-Wformat=]
              sprintf((char *) local_write, "%d|%d|%ld|%ld|%i|%d|%d|%d\n", left_wheel.error, left_wheel.motor_volt, -64*M1QuadDec_GetCounter(), left_wheel.cur_dest, left_wheel.time,left_wheel.error,(left_wheel.error-left_wheel.error_prev), (left_wheel.error_sum));
              ^
-main.c:219:13: warning: format '%i' expects argument of type 'int', but argument 7 has type 'uint32_t' [-Wformat=]
+main.c:233:13: warning: format '%i' expects argument of type 'int', but argument 7 has type 'uint32_t' [-Wformat=]
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/Serial.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c Serial.c -o .\CortexM3\ARM_GCC_493\Debug\Serial.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/movement.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c movement.c -o .\CortexM3\ARM_GCC_493\Debug\movement.o
+movement.c: In function 'update_k':
+movement.c:148:9: warning: unused variable 'int1' [-Wunused-variable]
+     int int1 = (unsigned char) buffer[1] - 48;
+         ^
+movement.c:147:9: warning: unused variable 'int0' [-Wunused-variable]
+     int int0 = (unsigned char) buffer[0] - 48;
+         ^
+movement.c: At top level:
+movement.c:24:23: warning: 'pxPort' defined but not used [-Wunused-variable]
+ static xComPortHandle pxPort = NULL;
+                       ^
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/comtest.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c comtest.c -o .\CortexM3\ARM_GCC_493\Debug\comtest.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/UART_1.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c Generated_Source\PSoC5\UART_1.c -o .\CortexM3\ARM_GCC_493\Debug\UART_1.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/UART_1_PM.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c Generated_Source\PSoC5\UART_1_PM.c -o .\CortexM3\ARM_GCC_493\Debug\UART_1_PM.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/UART_1_INT.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c Generated_Source\PSoC5\UART_1_INT.c -o .\CortexM3\ARM_GCC_493\Debug\UART_1_INT.o
+arm-none-eabi-gcc.exe -mcpu=cortex-m3 -mthumb -I..\..\FreeRTOS_Source\portable\GCC\ARM_CM3 -I..\..\FreeRTOS_Source\include -I..\..\FreeRTOS_Source\portable\MemMang -I..\..\FreeRTOS_Source -I. -IGenerated_Source\PSoC5 -Wa,-alh=.\CortexM3\ARM_GCC_493\Debug/UART_1_BOOT.lst -g -Wall -ffunction-sections -O0 -ffat-lto-objects -c Generated_Source\PSoC5\UART_1_BOOT.c -o .\CortexM3\ARM_GCC_493\Debug\UART_1_BOOT.o
 arm-none-eabi-ar.exe -rs .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a .\CortexM3\ARM_GCC_493\Debug\cyfitter_cfg.o .\CortexM3\ARM_GCC_493\Debug\UART_1.o .\CortexM3\ARM_GCC_493\Debug\UART_1_PM.o .\CortexM3\ARM_GCC_493\Debug\UART_1_INT.o .\CortexM3\ARM_GCC_493\Debug\UART_1_BOOT.o .\CortexM3\ARM_GCC_493\Debug\Tx_1.o .\CortexM3\ARM_GCC_493\Debug\isr_UART1_TX_BYTE_COMPLETE.o .\CortexM3\ARM_GCC_493\Debug\isr_UART1_RX_BYTE_RECEIVED.o .\CortexM3\ARM_GCC_493\Debug\UART_1_IntClock.o .\CortexM3\ARM_GCC_493\Debug\CyDmac.o .\CortexM3\ARM_GCC_493\Debug\CyFlash.o .\CortexM3\ARM_GCC_493\Debug\CyLib.o .\CortexM3\ARM_GCC_493\Debug\cyPm.o .\CortexM3\ARM_GCC_493\Debug\CySpc.o .\CortexM3\ARM_GCC_493\Debug\cyutils.o .\CortexM3\ARM_GCC_493\Debug\PWM_M1.o .\CortexM3\ARM_GCC_493\Debug\PWM_M1_PM.o .\CortexM3\ARM_GCC_493\Debug\MClock.o .\CortexM3\ARM_GCC_493\Debug\M1_FWD.o .\CortexM3\ARM_GCC_493\Debug\M1_BWD.o .\CortexM3\ARM_GCC_493\Debug\PWM_M2.o .\CortexM3\ARM_GCC_493\Debug\PWM_M2_PM.o .\CortexM3\ARM_GCC_493\Debug\M2_FWD.o .\CortexM3\ARM_GCC_493\Debug\M2_BWD.o .\CortexM3\ARM_GCC_493\Debug\PWM_Out_1.o .\CortexM3\ARM_GCC_493\Debug\PWM_Out_2.o .\CortexM3\ARM_GCC_493\Debug\Standby.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec_INT.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec_PM.o .\CortexM3\ARM_GCC_493\Debug\M1_Phase1.o .\CortexM3\ARM_GCC_493\Debug\M1_Phase2.o .\CortexM3\ARM_GCC_493\Debug\M1Clock.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec_INT.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec_PM.o .\CortexM3\ARM_GCC_493\Debug\M2_Phase1.o .\CortexM3\ARM_GCC_493\Debug\M2_Phase2.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec_isr.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec_Cnt16.o .\CortexM3\ARM_GCC_493\Debug\M1QuadDec_Cnt16_PM.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec_isr.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec_Cnt16.o .\CortexM3\ARM_GCC_493\Debug\M2QuadDec_Cnt16_PM.o .\CortexM3\ARM_GCC_493\Debug\Timer_1.o .\CortexM3\ARM_GCC_493\Debug\Timer_1_PM.o .\CortexM3\ARM_GCC_493\Debug\LED.o .\CortexM3\ARM_GCC_493\Debug\CyBootAsmGnu.o
 arm-none-eabi-ar.exe: creating .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a
 arm-none-eabi-gcc.exe -Wl,--start-group -o .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.elf .\CortexM3\ARM_GCC_493\Debug\croutine.o .\CortexM3\ARM_GCC_493\Debug\list.o .\CortexM3\ARM_GCC_493\Debug\queue.o .\CortexM3\ARM_GCC_493\Debug\tasks.o .\CortexM3\ARM_GCC_493\Debug\port.o .\CortexM3\ARM_GCC_493\Debug\heap_2.o .\CortexM3\ARM_GCC_493\Debug\IntQueueTimer.o .\CortexM3\ARM_GCC_493\Debug\main.o .\CortexM3\ARM_GCC_493\Debug\Serial.o .\CortexM3\ARM_GCC_493\Debug\movement.o .\CortexM3\ARM_GCC_493\Debug\comtest.o .\CortexM3\ARM_GCC_493\Debug\cymetadata.o .\CortexM3\ARM_GCC_493\Debug\Cm3Start.o .\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.a "C:\Program Files (x86)\Cypress\PSoC Creator\4.0\PSoC Creator\psoc\content\cycomponentlibrary\CyComponentLibrary.cylib\CortexM3\ARM_GCC_493\Debug\CyComponentLibrary.a" -mcpu=cortex-m3 -mthumb -g -ffunction-sections -O0 -ffat-lto-objects -L Generated_Source\PSoC5 -Wl,-Map,.\CortexM3\ARM_GCC_493\Debug/FreeRTOS_Demo.map -T C:\Users\shevi\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\Generated_Source\PSoC5\cm3gcc.ld -specs=nano.specs -Wl,--gc-sections -Wl,--end-group
 cyelftool.exe -C C:\Users\shevi\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.elf --flash_row_size 256 --flash_size 262144
 cyelftool.exe -S C:\Users\shevi\Documents\GitHub\FYP_PSOCCreator_Follower\FYP_New_Test\CORTEX_CY8C5588_PSoC_Creator_GCC\FreeRTOS_Demo.cydsn\CortexM3\ARM_GCC_493\Debug\FreeRTOS_Demo.elf
-Flash used: 20776 of 262144 bytes (7.9%).
+Flash used: 20944 of 262144 bytes (8.0%).
 SRAM used: 34709 of 65536 bytes (53.0%). Stack: 1024 bytes. Heap: 0 bytes.
---------------- Build Succeeded: 07/17/2018 13:22:19 ---------------
+--------------- Build Succeeded: 07/17/2018 15:58:16 ---------------
