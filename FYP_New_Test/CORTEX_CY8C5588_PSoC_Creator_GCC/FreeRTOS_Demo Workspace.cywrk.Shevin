@@ -13,7 +13,7 @@
 <v>Output</v>
 </TreeKeys>
 <TreeStates>
-<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">
+<CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\main.c">
 <ExpandedNodeIds>
 <v>FreeRTOS_Demo Workspace</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo</v>
@@ -53,6 +53,7 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\IntQueueTimer.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\movement.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\croutine.c</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\heap_2.c</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\list.c</v>
@@ -226,28 +227,6 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\project.h</v>
 </ExpandedNodeIds>
 <VisibleNodeIds>
-<v>FreeRTOS_Demo Workspace</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\TopDesign</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Pins</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Analog</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Clocks</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Interrupts</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\DMA</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\System</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Directives</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\Flash Security</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\FreeRTOS_Demo.cydwr\EEPROM</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\croutine.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\deprecated_definitions.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\event_groups.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\FreeRTOS.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\list.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\message_buffer.h</v>
-<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\mpu_prototypes.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\mpu_wrappers.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\portable.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\Kernel\projdefs.h</v>
@@ -264,6 +243,28 @@
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\IntQueueTimer.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Header Files\movement.h</v>
 <v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\croutine.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\heap_2.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\list.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\port.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\queue.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Kernel\tasks.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\comtest.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\IntQueueTimer.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\main.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\movement.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Source Files\Serial.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\cm3gcc.ld</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3Iar.icf</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3RealView.scat</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\Cm3Start.c</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\cmsis_armcc.h</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\cmsis_gcc.h</v>
+<v>FreeRTOS_Demo Workspace\FreeRTOS_Demo\Generated_Source\PSoC5\cy_boot\core_cm3.h</v>
 </VisibleNodeIds>
 </CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237>
 <CyGuid_2a325b3b-c96a-4e9f-b7a0-2c44ecb5f237 type_name="CyDesigner.Common.Base.Controls.CyTreeViewState" version="1" SelectedNodeId="">

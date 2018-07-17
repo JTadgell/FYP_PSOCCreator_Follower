@@ -85,7 +85,7 @@ int main( void ) {
     LED_Write(1);
     const signed char * run[64];
     sprintf((char *) run, "\n=== NEW RUN ===\n\n");
-    vSerialPutString(pxPort, (const signed char *) run, 64);
+    //vSerialPutString(pxPort, (const signed char *) run, 64);
     
     gatekeeper = xSemaphoreCreateMutex();
     
@@ -169,10 +169,10 @@ void receive_data( void *p ) {
                         buffer[i] = rx_receive;
                     }
                     sprintf((char *) local_write, "buffer read as %s\n", buffer);
-                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
+                    //vSerialPutString(pxPort, (const signed char *) local_write, 64);
                     update_inc( &left_wheel, &right_wheel, buffer);
-                    sprintf((char *) local_write, "left inc: %i\nright inc: %i\n", left_wheel.inc, right_wheel.inc);
-                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
+                    sprintf((char *) local_write, "left dest: %li\nright dest: %li\n", left_wheel.cur_dest, right_wheel.cur_dest);
+                    //vSerialPutString(pxPort, (const signed char *) local_write, 64);
                 }
                 if(type=='2'){
                     CySoftwareReset();
@@ -182,12 +182,9 @@ void receive_data( void *p ) {
                         xSerialGetChar(pxPort, &rx_receive, comRX_BLOCK_TIME);
                         buffer[i] = rx_receive;
                     }
-                    sprintf((char *) local_write, "buffer read as %s\n", buffer);
-                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
+                   
                     update_k( &k, buffer);
-                    snprintf((char *) local_write,64, "Kp Value: %f", k.Kp);
-                    
-                    vSerialPutString(pxPort, (const signed char *) local_write, 64);
+            
                     
                 }
                 for (i=0; i<65; i++) {
@@ -208,17 +205,19 @@ void PID_initialise( void *p ) {
     initialise_wheel_data(&left_wheel);
     initialise_wheel_data(&right_wheel);
     
-    k.Kp = 100;
-    k.Ki = 0.1;
-    k.Kd = 1000;
+    k.Kp = 0;
+    k.Ki = 0;
+    k.Kd = 0;
     
     signed char *local_write[64];  
     
     while(1) {
     	if(xSemaphoreTake(gatekeeper, 50000)) {              // wait until semaphore is free:
             mov_update_error(&left_wheel, &right_wheel);    // update error values
-                sprintf((char *) local_write, "left wheel inc: %li\n", left_wheel.cur_dest);
+                //sprintf((char *) local_write, "left wheel inc: %li\n", left_wheel.cur_dest);
                 //vSerialPutString(pxPort, (signed char *) local_write, 64);
+            sprintf((char *) local_write, "%d|%d|%ld|%ld|%i|%d|%d|%d\n", left_wheel.error, left_wheel.motor_volt, -64*M1QuadDec_GetCounter(), left_wheel.cur_dest, left_wheel.time,left_wheel.error,(left_wheel.error-left_wheel.error_prev), (left_wheel.error_sum));
+            vSerialPutString(pxPort, (signed char *) local_write, 64);
             mov_get_PID(&left_wheel, &right_wheel, &k);     // calculate wheel voltage from errors using PID
             
             mov_Adj_Volt(&left_wheel, &right_wheel);        // adjust the voltage of the wheels

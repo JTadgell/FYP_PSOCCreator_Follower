@@ -154,7 +154,7 @@ void update_k( PID_data *K, unsigned char *buffer){
     int int7 = (unsigned char) buffer[7] - 48;
     
     
-    K->Kp = (int0*100000 + int1*10000 + int2*1000 + int3*100 +int4*10 +int5*1)*10^-2;
+    K->Kp = (int2*100000 + int3*10000 + int4*1000 + int5*100 +int6*10 +int7*1)/100;
     K->Kd =0;
     K->Ki = 0;
 }

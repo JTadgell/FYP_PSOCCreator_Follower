@@ -35,8 +35,8 @@ uint8 UART_1_initVar = 0u;
 #if (UART_1_RX_INTERRUPT_ENABLED && (UART_1_RX_ENABLED || UART_1_HD_ENABLED))
     uint8 UART_1_errorStatus = 0u;
     volatile uint8 UART_1_rxBuffer[UART_1_RX_BUFFER_SIZE];
-    volatile uint16 UART_1_rxBufferRead  = 0u;
-    volatile uint16 UART_1_rxBufferWrite = 0u;
+    volatile uint8 UART_1_rxBufferRead  = 0u;
+    volatile uint8 UART_1_rxBufferWrite = 0u;
     volatile uint8 UART_1_rxBufferLoopDetect = 0u;
     volatile uint8 UART_1_rxBufferOverflow   = 0u;
     #if (UART_1_RXHW_ADDRESS_ENABLED)
@@ -395,8 +395,8 @@ void  UART_1_WriteControlRegister(uint8 control)
 
     #if (UART_1_RX_INTERRUPT_ENABLED)
 
-        uint16 locRxBufferRead;
-        uint16 locRxBufferWrite;
+        uint8 locRxBufferRead;
+        uint8 locRxBufferWrite;
 
         /* Protect variables that could change on interrupt */
         UART_1_DisableRxInt();
@@ -535,8 +535,8 @@ void  UART_1_WriteControlRegister(uint8 control)
         uint8 rxStatus;
 
     #if (UART_1_RX_INTERRUPT_ENABLED)
-        uint16 locRxBufferRead;
-        uint16 locRxBufferWrite;
+        uint8 locRxBufferRead;
+        uint8 locRxBufferWrite;
 
         /* Protect variables that could change on interrupt */
         UART_1_DisableRxInt();
@@ -665,7 +665,7 @@ void  UART_1_WriteControlRegister(uint8 control)
     *  None.
     *
     * Return:
-    *  uint16: Number of bytes in the RX buffer. 
+    *  uint8: Number of bytes in the RX buffer. 
     *    Return value type depends on RX Buffer Size parameter.
     *
     * Global Variables:
@@ -680,10 +680,10 @@ void  UART_1_WriteControlRegister(uint8 control)
     *  Allows the user to find out how full the RX Buffer is.
     *
     *******************************************************************************/
-    uint16 UART_1_GetRxBufferSize(void)
+    uint8 UART_1_GetRxBufferSize(void)
                                                             
     {
-        uint16 size;
+        uint8 size;
 
     #if (UART_1_RX_INTERRUPT_ENABLED)
 

@@ -1,5 +1,5 @@
 -- Project:   FreeRTOS_Demo
--- Generated: 07/13/2018 18:28:28
+-- Generated: 07/17/2018 13:21:37
 -- PSoC Creator  4.0
 
 ENTITY FreeRTOS_Demo IS
@@ -2408,14 +2408,6 @@ BEGIN
             q => \Timer_1:TimerUDB:status_tc\,
             main_0 => \Timer_1:TimerUDB:control_7\,
             main_1 => \Timer_1:TimerUDB:per_zero\);
-
-    \UART_1:RXInternalInterrupt\:interrupt
-        GENERIC MAP(
-            int_type => "10",
-            is_nmi => 0)
-        PORT MAP(
-            interrupt => Net_30,
-            clock => ClockBlock_BUS_CLK);
 
     \UART_1:BUART:sTX:TxShifter:u0\:datapathcell
         GENERIC MAP(

@@ -2,7 +2,7 @@
 --	Conversion of FreeRTOS_Demo.v to vh2:
 --
 --	Cypress Semiconductor - WARP Version 6.3 IR 41
---	Fri Jul 13 18:28:25 2018
+--	Tue Jul 17 13:21:36 2018
 --
 
 USE cypress.cypress.all;
@@ -13,7 +13,6 @@ END top_RTL;
 --------------------------------------------------------
 ARCHITECTURE R_T_L OF top_RTL IS
 SIGNAL \UART_1:Net_9\ : bit;
-SIGNAL Net_30 : bit;
 SIGNAL \UART_1:Net_61\ : bit;
 SIGNAL one : bit;
 SIGNAL \UART_1:BUART:clock_op\ : bit;
@@ -33,6 +32,7 @@ SIGNAL Net_213 : bit;
 SIGNAL \UART_1:BUART:txn\ : bit;
 SIGNAL Net_29 : bit;
 SIGNAL \UART_1:BUART:tx_interrupt_out\ : bit;
+SIGNAL Net_30 : bit;
 SIGNAL \UART_1:BUART:rx_interrupt_out\ : bit;
 SIGNAL \UART_1:BUART:tx_state_1\ : bit;
 SIGNAL \UART_1:BUART:tx_state_0\ : bit;
@@ -2458,10 +2458,6 @@ Net_170 <=  ('0') ;
 		is_digital=>'1')
 	PORT MAP(clock_out=>\UART_1:Net_9\,
 		dig_domain_out=>open);
-\UART_1:RXInternalInterrupt\:cy_isr_v1_0
-	GENERIC MAP(int_type=>"10",
-		is_nmi=>'0')
-	PORT MAP(int_signal=>Net_30);
 \UART_1:BUART:ClkSync\:cy_psoc3_udb_clock_enable_v1_0
 	GENERIC MAP(sync_mode=>'1')
 	PORT MAP(clock_in=>\UART_1:Net_9\,
